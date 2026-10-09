@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MarkupGrid item: square thumbnail, with a play icon and duration on videos. -->
+<component name="AssetTile" extends="Group">
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+    </interface>
+
+    <script type="text/brightscript" uri="AssetTile.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+
+    <children>
+        <Rectangle width="260" height="260" color="0x1E242AFF" />
+        <Poster id="thumb" width="260" height="260" loadWidth="260" loadHeight="260"
+            loadDisplayMode="scaleToZoom" />
+        <Group id="badge" translation="[8,216]" visible="false">
+            <Rectangle width="104" height="36" color="0x000000B0" />
+            <Poster uri="pkg:/images/play.png" width="16" height="16" translation="[10,10]" />
+            <Label id="duration" translation="[32,0]" width="68" height="36" vertAlign="center"
+                font="font:SmallestSystemFont" color="0xFFFFFFFF" />
+        </Group>
+    </children>
+</component>

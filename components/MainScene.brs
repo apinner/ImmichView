@@ -1,13 +1,37 @@
 sub init()
     m.top.backgroundColor = "0x101418FF"
     m.screens = []
+    m.global.addFields({ serverUrl: "", apiKey: "" })
 
-    login = pushScreen("LoginScreen")
-    if hasSettings(loadSettings()) then login.autoConnect = true
+    ' Short pause after "Connected as ..." so the confirmation is readable.
+    m.connectedTimer = CreateObject("roSGNode", "Timer")
+    m.connectedTimer.duration = 1.5
+    m.connectedTimer.observeField("fire", "onConnectedTimer")
+    m.top.appendChild(m.connectedTimer)
+
+    settings = loadSettings()
+    applySettings(settings)
+    if hasSettings(settings)
+        resetTo("HomeScreen")
+    else
+        resetTo("LoginScreen")
+    end if
 end sub
 
-function pushScreen(name as string) as object
+sub applySettings(settings as object)
+    m.global.serverUrl = settings.serverUrl
+    m.global.apiKey = settings.apiKey
+end sub
+
+' ---- Screen stack ----
+
+' params: field values set on the new screen before it is shown, e.g. { album: {...} }
+function pushScreen(name as string, params = invalid as dynamic) as object
     screen = CreateObject("roSGNode", name)
+    screen.observeField("navigate", "onNavigate")
+    if name = "LoginScreen" then screen.observeField("connectedUser", "onConnected")
+    if params <> invalid then screen.update(params)
+
     if m.screens.Count() > 0 then m.screens.Peek().visible = false
     m.top.appendChild(screen)
     m.screens.Push(screen)
@@ -24,6 +48,28 @@ sub popScreen()
         top.visible = true
         top.setFocus(true)
     end if
+end sub
+
+sub resetTo(name as string)
+    while m.screens.Count() > 0
+        m.top.removeChild(m.screens.Pop())
+    end while
+    pushScreen(name)
+end sub
+
+' Screens request navigation by setting their `navigate` field to { screen, params }.
+sub onNavigate(event as object)
+    nav = event.getData()
+    pushScreen(nav.screen, nav.params)
+end sub
+
+sub onConnected()
+    applySettings(loadSettings())
+    m.connectedTimer.control = "start"
+end sub
+
+sub onConnectedTimer()
+    resetTo("HomeScreen")
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean

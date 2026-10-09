@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home: rows of albums (later also Recent, Memories, People, Search). -->
+<component name="HomeScreen" extends="Group">
+    <interface>
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="HomeScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+
+    <children>
+        <Label text="Immich" translation="[80,60]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label text="* Settings" translation="[1440,76]" width="400" horizAlign="right"
+            font="font:SmallSystemFont" color="0x80888FFF" />
+
+        <RowList id="rows" translation="[80,170]" itemComponentName="AlbumTile"
+            numRows="2" itemSize="[1760,400]" rowItemSize="[[360,320]]" rowItemSpacing="[[24,0]]"
+            showRowLabel="[true]" rowLabelOffset="[[0,16]]"
+            rowLabelFont="font:MediumBoldSystemFont" rowLabelColor="0xE0E4E8FF"
+            rowFocusAnimationStyle="floatingFocus"
+            focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
+
+        <Label id="status" translation="[160,440]" width="1600" wrap="true" horizAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+    </children>
+</component>

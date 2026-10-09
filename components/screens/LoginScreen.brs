@@ -16,10 +16,6 @@ sub onFocusChanged()
     if m.top.hasFocus() then m.menu.setFocus(true)
 end sub
 
-sub onAutoConnect()
-    if m.top.autoConnect then startConnect()
-end sub
-
 ' ---- Menu ----
 
 sub refreshMenu()

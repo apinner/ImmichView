@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Server URL + API key entry and connection check. Doubles as the settings screen until Phase 2. -->
+<!-- Server URL + API key entry and connection check. Also opened from Home (Options key) as settings. -->
 <component name="LoginScreen" extends="Group">
     <interface>
-        <!-- Set true to run the connection check straight away with the stored settings. -->
-        <field id="autoConnect" type="boolean" onChange="onAutoConnect" />
         <!-- Set after a successful check: { name, email, serverVersion } -->
         <field id="connectedUser" type="assocarray" />
     </interface>

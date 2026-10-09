@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Server URL + API key entry and connection check. Doubles as the settings screen until Phase 2. -->
+<component name="LoginScreen" extends="Group">
+    <interface>
+        <!-- Set true to run the connection check straight away with the stored settings. -->
+        <field id="autoConnect" type="boolean" onChange="onAutoConnect" />
+        <!-- Set after a successful check: { name, email, serverVersion } -->
+        <field id="connectedUser" type="assocarray" />
+    </interface>
+
+    <script type="text/brightscript" uri="LoginScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+
+    <children>
+        <Label id="title" text="Immich" translation="[160,120]"
+            font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label id="subtitle" text="Connect to your Immich server" translation="[160,200]"
+            font="font:MediumSystemFont" color="0xA0A8B0FF" />
+
+        <LabelList id="menu" translation="[160,300]" itemSize="[1200,72]" itemSpacing="[0,12]"
+            numRows="3" vertFocusAnimationStyle="floatingFocus"
+            color="0xE0E4E8FF" focusedColor="0x101418FF" />
+
+        <Label id="status" translation="[160,620]" width="1600" wrap="true"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+
+        <Label id="hint" translation="[160,900]" width="1600" wrap="true"
+            font="font:SmallSystemFont" color="0x80888FFF"
+            text="Create an API key in the Immich web app under Account Settings > API Keys. The keyboard in the Roku mobile app makes typing it much easier." />
+    </children>
+</component>

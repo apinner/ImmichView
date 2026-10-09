@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generic Immich API request. Set the inputs, observe `response`, then set control = "RUN". -->
+<component name="ImmichApiTask" extends="Task">
+    <interface>
+        <field id="serverUrl" type="string" />
+        <field id="apiKey" type="string" />
+        <field id="method" type="string" value="GET" />
+        <field id="path" type="string" />
+        <field id="body" type="assocarray" />
+        <field id="timeoutMs" type="integer" value="10000" />
+        <!-- { ok, status, kind, message, data }
+             kind: "" on success, else "timeout" | "network" | "http" | "parse" -->
+        <field id="response" type="assocarray" />
+    </interface>
+
+    <script type="text/brightscript" uri="ImmichApiTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+</component>

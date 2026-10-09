@@ -1,0 +1,15 @@
+# Local secrets: Roku dev IP/password, test server URL and API key
+.env
+
+# Build output
+out/
+dist/
+*.zip
+
+# Tooling
+node_modules/
+.roku-deploy-staging/
+
+# OS / editor
+Thumbs.db
+.DS_Store

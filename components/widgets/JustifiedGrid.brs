@@ -263,6 +263,13 @@ sub scrollToRow(row as object, animate as boolean)
     end if
 end sub
 
+sub onJumpToItem()
+    index = m.top.jumpToItem
+    if index < 0 or index >= m.items.Count() then return
+    m.stickyX = invalid
+    setFocusIndex(index, false)
+end sub
+
 function moveToItem(index as integer) as boolean
     if index < 0 or index >= m.items.Count() then return false
     m.stickyX = invalid

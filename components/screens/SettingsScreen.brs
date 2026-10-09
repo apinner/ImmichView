@@ -1,13 +1,28 @@
 sub init()
     m.users = m.top.findNode("users")
+    m.options = m.top.findNode("options")
+    m.hint = m.top.findNode("hint")
     m.users.observeField("itemSelected", "onUserSelected")
+    m.options.observeField("itemSelected", "onOptionSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
     refreshUsers()
+    refreshOptions()
 end sub
 
 sub onFocusChanged()
-    if m.top.hasFocus() then m.users.setFocus(true)
+    if m.top.hasFocus() then focusList(m.users)
 end sub
+
+sub focusList(list as object)
+    list.setFocus(true)
+    if list.isSameNode(m.users)
+        m.hint.text = "OK: switch to this user      * : remove user"
+    else
+        m.hint.text = "OK: change"
+    end if
+end sub
+
+' ---- Users ----
 
 sub refreshUsers()
     data = loadProfiles()
@@ -42,11 +57,43 @@ sub onUserSelected()
     m.top.profilesChanged = true
 end sub
 
+' ---- Slideshow ----
+
+sub refreshOptions()
+    content = CreateObject("roSGNode", "ContentNode")
+    item = content.createChild("ContentNode")
+    item.title = "Time per photo:   " + loadSlideshowSeconds().ToStr() + " seconds"
+    m.options.content = content
+end sub
+
+' Cycles through the available intervals.
+sub onOptionSelected()
+    intervals = slideshowIntervals()
+    current = loadSlideshowSeconds()
+    nextValue = intervals[0]
+    for i = 0 to intervals.Count() - 2
+        if intervals[i] = current then nextValue = intervals[i + 1]
+    end for
+    saveSlideshowSeconds(nextValue)
+    refreshOptions()
+end sub
+
+' ---- Keys ----
+
 function onKeyEvent(key as string, press as boolean) as boolean
-    if not press or key <> "options" then return false
-    index = m.users.itemFocused
-    if index >= 0 and index < m.profiles.Count() then confirmRemove(m.profiles[index])
-    return true
+    if not press then return false
+    if key = "down" and m.users.hasFocus()
+        focusList(m.options)
+        return true
+    else if key = "up" and m.options.hasFocus()
+        focusList(m.users)
+        return true
+    else if key = "options" and m.users.hasFocus()
+        index = m.users.itemFocused
+        if index >= 0 and index < m.profiles.Count() then confirmRemove(m.profiles[index])
+        return true
+    end if
+    return false
 end function
 
 ' ---- Remove user ----
@@ -78,5 +125,5 @@ end sub
 
 sub onDialogClosed()
     m.dialog = invalid
-    m.users.setFocus(true)
+    focusList(m.users)
 end sub

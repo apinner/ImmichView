@@ -80,6 +80,26 @@ sub removeProfile(id as string)
     saveProfiles(kept, activeId)
 end sub
 
+' ---- Slideshow (shared by all users) ----
+
+function slideshowIntervals() as object
+    return [3, 5, 10, 15, 30, 60]
+end function
+
+function loadSlideshowSeconds() as integer
+    raw = registrySection().Read("slideshowSeconds")
+    if raw = "" then return 5
+    return raw.ToInt()
+end function
+
+sub saveSlideshowSeconds(seconds as integer)
+    sec = registrySection()
+    sec.Write("slideshowSeconds", seconds.ToStr())
+    sec.Flush()
+end sub
+
+' ---- Display helpers ----
+
 function profileDisplayName(profile as object) as string
     if profile.name = invalid or profile.name = "" then return "Unnamed user"
     return profile.name

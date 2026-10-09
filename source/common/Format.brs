@@ -18,12 +18,45 @@ function padTwo(n as integer) as string
     return n.ToStr()
 end function
 
+function monthNames() as object
+    return ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+end function
+
 ' "2020-11-01" (timeline bucket) -> "November 2020"
 function formatMonthYear(isoDate as string) as string
-    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     month = Mid(isoDate, 6, 2).ToInt()
     if month < 1 or month > 12 then return isoDate
-    return months[month - 1] + " " + Left(isoDate, 4)
+    return monthNames()[month - 1] + " " + Left(isoDate, 4)
+end function
+
+' Immich localDateTime (local time, written with a Z) -> "Monday 28 September 2026, 12:44"
+function formatPhotoDate(localDateTime as dynamic) as string
+    if localDateTime = invalid or localDateTime = "" then return ""
+    dt = CreateObject("roDateTime")
+    dt.FromISO8601String(localDateTime)
+    text = dt.GetWeekday() + " " + dt.GetDayOfMonth().ToStr() + " " + monthNames()[dt.GetMonth() - 1]
+    text = text + " " + dt.GetYear().ToStr() + ", " + padTwo(dt.GetHours()) + ":" + padTwo(dt.GetMinutes())
+    return text
+end function
+
+' 1.9 -> "1.9", 5.0 -> "5"
+function formatOneDecimal(value as dynamic) as string
+    tenths = Int(value * 10 + 0.5)
+    whole = Int(tenths / 10)
+    if tenths MOD 10 = 0 then return whole.ToStr()
+    return whole.ToStr() + "." + (tenths MOD 10).ToStr()
+end function
+
+' Joins the non-empty strings in parts.
+function joinNonEmpty(parts as object, separator as string) as string
+    text = ""
+    for each part in parts
+        if part <> invalid and part <> ""
+            if text <> "" then text = text + separator
+            text = text + part
+        end if
+    end for
+    return text
 end function
 
 function formatItemCount(count as dynamic) as string

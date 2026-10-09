@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Full-screen photo viewer with info overlay and slideshow. Steps through a TimelineView's
+    assets (loading more months as needed). Three posters hold previous / current / next.
+-->
+<component name="PhotoViewer" extends="Group">
+    <interface>
+        <!-- { timeline: TimelineView node, index } -->
+        <field id="open" type="assocarray" onChange="onOpen" />
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="PhotoViewer.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Rectangle width="1920" height="1080" color="0x000000FF" />
+        <Group id="stage">
+            <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                loadDisplayMode="scaleToFit" opacity="0" />
+            <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                loadDisplayMode="scaleToFit" opacity="0" />
+            <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                loadDisplayMode="scaleToFit" opacity="0" />
+        </Group>
+        <Rectangle id="fadeDummy" width="0" height="0" />
+
+        <Label id="message" translation="[160,500]" width="1600" horizAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+
+        <Group id="videoNote" translation="[560,900]" visible="false">
+            <Rectangle width="800" height="64" color="0x000000B0" />
+            <Poster uri="pkg:/images/play.png" width="24" height="24" translation="[24,20]" />
+            <Label id="videoText" translation="[64,0]" width="720" height="64" vertAlign="center"
+                font="font:SmallSystemFont" color="0xFFFFFFFF" />
+        </Group>
+
+        <Group id="info" translation="[0,820]" visible="false">
+            <Rectangle width="1920" height="260" color="0x000000C0" />
+            <Label id="infoDate" translation="[80,32]" width="1300"
+                font="font:MediumBoldSystemFont" color="0xFFFFFFFF" />
+            <Label id="infoPlace" translation="[80,92]" width="1300"
+                font="font:SmallSystemFont" color="0xE0E4E8FF" />
+            <Label id="infoCamera" translation="[80,140]" width="1300"
+                font="font:SmallSystemFont" color="0xA0A8B0FF" />
+            <Label id="infoName" translation="[80,188]" width="1300"
+                font="font:SmallestSystemFont" color="0x80888FFF" />
+            <Label translation="[1340,32]" width="500" horizAlign="right" wrap="true"
+                font="font:SmallestSystemFont" color="0x80888FFF"
+                text="OK  hide info&#10;Play  slideshow&#10;Left / Right  previous / next" />
+        </Group>
+
+        <Group id="toast" translation="[80,60]" opacity="0">
+            <Rectangle id="toastBack" width="640" height="64" color="0x000000C0" />
+            <Label id="toastText" translation="[24,0]" height="64" vertAlign="center"
+                font="font:SmallSystemFont" color="0xFFFFFFFF" />
+        </Group>
+
+        <Timer id="slideTimer" repeat="false" />
+        <Animation id="fade" duration="0.35" easeFunction="linear">
+            <FloatFieldInterpolator id="fadeIn" key="[0.0, 1.0]" keyValue="[0.0, 1.0]" fieldToInterp="p0.opacity" />
+            <FloatFieldInterpolator id="fadeOut" key="[0.0, 1.0]" keyValue="[1.0, 0.0]" fieldToInterp="fadeDummy.opacity" />
+        </Animation>
+        <Animation id="toastAnim" duration="2.5" easeFunction="linear">
+            <FloatFieldInterpolator key="[0.0, 0.8, 1.0]" keyValue="[1.0, 1.0, 0.0]" fieldToInterp="toast.opacity" />
+        </Animation>
+    </children>
+</component>

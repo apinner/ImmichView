@@ -100,8 +100,10 @@ end sub
 ' ---- Photos tab ----
 
 sub onTimelineSelected()
-    ' Phase 3: open PhotoViewer / Phase 4: VideoPlayer.
-    logDebug("selected " + m.timeline.itemSelected.asset.assetId)
+    m.top.navigate = {
+        screen: "PhotoViewer"
+        params: { open: { timeline: m.timeline, index: m.timeline.itemSelected.index } }
+    }
 end sub
 
 ' ---- Albums tab ----

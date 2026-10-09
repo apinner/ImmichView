@@ -16,6 +16,7 @@
 
         <!-- Index into all appended items. -->
         <field id="itemFocused" type="integer" value="-1" />
+        <field id="jumpToItem" type="integer" alwaysNotify="true" onChange="onJumpToItem" />
         <field id="itemSelected" type="integer" alwaysNotify="true" />
         <!-- Set when Up is pressed on the first row (lets the parent move focus elsewhere). -->
         <field id="exitedTop" type="boolean" alwaysNotify="true" />

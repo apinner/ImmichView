@@ -34,6 +34,7 @@ sub onBuckets(event as object)
         return
     end if
     m.buckets = resp.data
+    m.top.hasMore = m.buckets.Count() > 0
     if m.buckets.Count() = 0
         m.status.text = m.top.emptyText
         return
@@ -82,8 +83,22 @@ sub appendAssets(title as string, data as object)
         m.assets.Push(asset)
     end for
     m.grid.appendGroup = { title: title, items: items }
+    m.top.hasMore = m.nextBucket < m.buckets.Count()
+    m.top.assetCount = m.assets.Count()
     logDebug("timeline items loaded: " + m.assets.Count().ToStr())
 end sub
+
+' ---- PhotoViewer access (callFunc) ----
+
+function getAsset(index as integer) as dynamic
+    if index < 0 or index >= m.assets.Count() then return invalid
+    return m.assets[index]
+end function
+
+function requestMore() as boolean
+    loadNextBucket()
+    return true
+end function
 
 sub onItemFocused()
     remaining = m.assets.Count() - m.grid.itemFocused

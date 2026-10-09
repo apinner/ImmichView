@@ -12,6 +12,13 @@
         <!-- { index, asset } of the selected item -->
         <field id="itemSelected" type="assocarray" alwaysNotify="true" />
         <field id="exitedTop" type="boolean" alias="grid.exitedTop" />
+        <field id="jumpToIndex" type="integer" alias="grid.jumpToItem" />
+
+        <!-- For PhotoViewer: how many assets are loaded and whether more months remain. -->
+        <field id="assetCount" type="integer" />
+        <field id="hasMore" type="boolean" />
+        <function name="getAsset" />
+        <function name="requestMore" />
     </interface>
 
     <script type="text/brightscript" uri="TimelineView.brs" />

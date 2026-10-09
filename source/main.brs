@@ -25,6 +25,6 @@ end sub
 sub applyLaunchSettings(args as dynamic)
     if type(args) <> "roAssociativeArray" then return
     if args.serverUrl = invalid or args.apiKey = invalid then return
-    saveSettings(normalizeServerUrl(args.serverUrl), args.apiKey)
+    upsertProfile("", normalizeServerUrl(args.serverUrl), args.apiKey)
     logDebug("settings applied from launch parameters")
 end sub

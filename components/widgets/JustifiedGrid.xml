@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Justified photo grid (like the Immich web timeline): photos are grouped under a header
+    (e.g. a month), rows fill the full width and each row's height is chosen so its photos
+    keep their aspect ratio. Only rows near the viewport have nodes.
+    Feed it with appendGroup = { title, items: [{ assetId, ratio, isVideo, durationMs }] }.
+-->
+<component name="JustifiedGrid" extends="Group">
+    <interface>
+        <field id="gridWidth" type="float" value="1760" />
+        <field id="viewHeight" type="float" value="860" />
+        <field id="targetRowHeight" type="float" value="250" />
+        <field id="spacing" type="float" value="8" />
+
+        <field id="appendGroup" type="assocarray" onChange="onAppendGroup" />
+
+        <!-- Index into all appended items. -->
+        <field id="itemFocused" type="integer" value="-1" />
+        <field id="itemSelected" type="integer" alwaysNotify="true" />
+        <!-- Set when Up is pressed on the first row (lets the parent move focus elsewhere). -->
+        <field id="exitedTop" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="JustifiedGrid.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+
+    <children>
+        <Group id="viewport">
+            <Group id="content">
+                <Group id="rows" />
+                <Poster id="focusFrame" uri="pkg:/images/focus.9.png" visible="false" />
+            </Group>
+        </Group>
+        <Animation id="scrollAnim" duration="0.15" easeFunction="outQuad">
+            <Vector2DFieldInterpolator id="scrollInterp" key="[0.0, 1.0]" fieldToInterp="content.translation" />
+        </Animation>
+    </children>
+</component>

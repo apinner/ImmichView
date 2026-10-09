@@ -30,6 +30,7 @@ function pushScreen(name as string, params = invalid as dynamic) as object
     screen = CreateObject("roSGNode", name)
     screen.observeField("navigate", "onNavigate")
     if name = "LoginScreen" then screen.observeField("connectedUser", "onConnected")
+    if name = "SettingsScreen" then screen.observeField("profilesChanged", "onProfilesChanged")
     if params <> invalid then screen.update(params)
 
     if m.screens.Count() > 0 then m.screens.Peek().visible = false
@@ -70,6 +71,17 @@ end sub
 
 sub onConnectedTimer()
     resetTo("HomeScreen")
+end sub
+
+' User switched or removed in Settings: start over as the now-active user.
+sub onProfilesChanged()
+    settings = loadSettings()
+    applySettings(settings)
+    if hasSettings(settings)
+        resetTo("HomeScreen")
+    else
+        resetTo("LoginScreen")
+    end if
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean

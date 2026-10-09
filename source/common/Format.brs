@@ -18,6 +18,14 @@ function padTwo(n as integer) as string
     return n.ToStr()
 end function
 
+' "2020-11-01" (timeline bucket) -> "November 2020"
+function formatMonthYear(isoDate as string) as string
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    month = Mid(isoDate, 6, 2).ToInt()
+    if month < 1 or month > 12 then return isoDate
+    return months[month - 1] + " " + Left(isoDate, 4)
+end function
+
 function formatItemCount(count as dynamic) as string
     if count = invalid then return ""
     if count = 1 then return "1 item"

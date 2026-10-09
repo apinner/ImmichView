@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Timeline of assets grouped by month, loaded a bucket at a time from /api/timeline.
+    Set `query` (e.g. "albumId=...&order=desc" or "visibility=timeline&order=desc") to load.
+-->
+<component name="TimelineView" extends="Group">
+    <interface>
+        <field id="query" type="string" onChange="onQueryChanged" />
+        <field id="viewHeight" type="float" alias="grid.viewHeight" />
+        <field id="emptyText" type="string" value="No photos here yet." />
+
+        <!-- { index, asset } of the selected item -->
+        <field id="itemSelected" type="assocarray" alwaysNotify="true" />
+        <field id="exitedTop" type="boolean" alias="grid.exitedTop" />
+    </interface>
+
+    <script type="text/brightscript" uri="TimelineView.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+
+    <children>
+        <JustifiedGrid id="grid" gridWidth="1760" targetRowHeight="250" spacing="8" />
+        <Label id="status" translation="[80,260]" width="1600" wrap="true" horizAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+    </children>
+</component>

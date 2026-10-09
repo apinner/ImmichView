@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Server URL + API key entry and connection check. Also opened from Home (Options key) as settings. -->
+<!-- Server URL + API key entry and connection check. First run, and "Add user" in Settings. -->
 <component name="LoginScreen" extends="Group">
     <interface>
         <!-- Set after a successful check: { name, email, serverVersion } -->

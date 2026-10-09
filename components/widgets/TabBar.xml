@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Horizontal tabs. Left/Right change `selected` while focused; the parent swaps content. -->
+<component name="TabBar" extends="Group">
+    <interface>
+        <field id="tabs" type="array" onChange="onTabsChanged" />
+        <field id="selected" type="integer" value="0" onChange="updateStyles" />
+    </interface>
+
+    <script type="text/brightscript" uri="TabBar.brs" />
+</component>

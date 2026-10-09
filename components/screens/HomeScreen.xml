@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home: rows of albums (later also Recent, Memories, People, Search). -->
+<!-- Home: Photos (library timeline) and Albums tabs. Later also People, Memories, Search. -->
 <component name="HomeScreen" extends="Group">
     <interface>
         <field id="navigate" type="assocarray" alwaysNotify="true" />
@@ -8,20 +8,29 @@
     <script type="text/brightscript" uri="HomeScreen.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
 
     <children>
-        <Label text="Immich" translation="[80,60]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
-        <Label text="* Settings" translation="[1440,76]" width="400" horizAlign="right"
+        <Label text="Immich" translation="[80,40]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label id="userName" translation="[940,56]" width="900" horizAlign="right"
             font="font:SmallSystemFont" color="0x80888FFF" />
 
-        <RowList id="rows" translation="[80,170]" itemComponentName="AlbumTile"
-            numRows="2" itemSize="[1760,400]" rowItemSize="[[360,320]]" rowItemSpacing="[[24,0]]"
-            showRowLabel="[true]" rowLabelOffset="[[0,16]]"
-            rowLabelFont="font:MediumBoldSystemFont" rowLabelColor="0xE0E4E8FF"
-            rowFocusAnimationStyle="floatingFocus"
-            focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
+        <TabBar id="tabs" translation="[80,116]" />
 
-        <Label id="status" translation="[160,440]" width="1600" wrap="true" horizAlign="center"
+        <TimelineView id="timeline" translation="[80,200]" viewHeight="866"
+            emptyText="No photos in your library yet." />
+
+        <Group id="albumsPane" visible="false">
+            <!-- 5 x 328 + 4 x 30 = 1760 wide -->
+            <MarkupGrid id="albums" translation="[80,216]" itemComponentName="AlbumTile"
+                numColumns="5" numRows="3" itemSize="[328,272]" itemSpacing="[30,16]"
+                vertFocusAnimationStyle="floatingFocus"
+                focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
+            <Label id="albumStatus" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
+                font="font:MediumSystemFont" color="0xE0E4E8FF" />
+        </Group>
+
+        <Label id="status" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />
     </children>
 </component>

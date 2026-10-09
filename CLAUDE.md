@@ -10,12 +10,19 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 4. Search (smart/CLIP search, people)
 5. Roku system screensaver showing photos from the library
 
-## Open questions (ask the user before Phase 1 if not yet answered)
+## Setup (answered 2026-10-09)
 
-- Immich server version (check `GET /api/server/version`). The API changed significantly across v1 → v2 → v3; current releases are 3.x.
-- Server reachable on LAN only (http://192.168.x.x:2283) or via HTTPS reverse proxy?
-- Roku model(s) in use (HD vs 4K matters for HEVC playback and texture memory).
-- Is developer mode enabled on the Roku, and what is its IP and dev password?
+- Immich server v3.3.1, reached over HTTPS (reverse proxy) and on the LAN.
+- Rokus: a mix of HD and 4K models; dev device is a Streaming Stick 4K (3820EU), Roku OS 15.1.4.
+- Dev Roku IP/password, test server URL and API key live in the git-ignored `.env` (see `.env.example`).
+- ECP "Control by mobile apps" is Permissive, so `tools/drive.ps1` can send remote keys.
+
+## Dev workflow
+
+- `.\deploy.ps1` zips and sideloads (curl.exe, no Node). Sideloading wipes the channel registry.
+- `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
+- `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`).
+- BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 
 ## Tech stack and tooling
 
@@ -33,9 +40,9 @@ source/
   screensaver.brs     ' Sub RunScreenSaver(params) – screensaver entry
 components/
   MainScene.xml/.brs
-  screens/            ' LoginScreen, HomeScreen, AlbumGrid, PhotoViewer, VideoPlayer, SearchScreen, SettingsScreen
+  screens/            ' LoginScreen, HomeScreen (Photos/Albums tabs), AlbumGrid, SettingsScreen; later PhotoViewer, VideoPlayer, SearchScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' Reusable tiles, badges, overlays
+  widgets/            ' JustifiedGrid, TimelineView, TabBar, AlbumTile
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art
 ```
@@ -43,8 +50,8 @@ images/               ' Icons, splash, focus art
 ## Architecture rules
 
 - **All network I/O runs in Task nodes**, never on the render thread. One generic `ImmichApiTask` takes `{method, path, body}` and returns parsed JSON or an error code via an observed field.
-- **Authentication:** Immich API key sent as the `x-api-key` header. Store server URL and API key in `roRegistrySection("immich")`. Don't use username/password login; typing on a remote is painful.
-- **Image loading:** Poster and Video nodes need the auth header too. Create an `roHttpAgent`, `AddHeader("x-api-key", key)`, and call `node.setHttpAgent(agent)` on every Poster and Video node.
+- **Authentication:** Immich API key sent as the `x-api-key` header. Users are profiles `{id, name, serverUrl, apiKey}` stored as JSON in `roRegistrySection("immich")` (`profiles`, `activeProfile`); see `source/common/Settings.brs`. Don't use username/password login; typing on a remote is painful.
+- **Image loading:** Poster and Video nodes need the auth header too. Create an `roHttpAgent`, `AddHeader("x-api-key", key)`, and call `node.setHttpAgent(agent)` on every Poster and Video node. Share one agent per grid/screen: creating one per tile (each loading the CA bundle) tripped the render-thread execution timeout.
 - **Memory:** Roku texture memory is tight. Always set `loadWidth`/`loadHeight` on Posters, use Immich's small thumbnails for grids and preview size for full screen, and never load originals into a Poster. Recycle grid items (MarkupGrid/RowList) rather than creating thousands of nodes.
 - **Pagination:** Album and timeline contents can be large. Fetch in pages and load more as focus nears the end of a grid.
 - **Navigation:** maintain a screen stack in MainScene. Back closes the current screen. Back on the home screen exits.
@@ -59,9 +66,9 @@ Reference: https://api.immich.app and the OpenAPI spec for the server's version.
 | Connectivity check | `GET /api/server/ping`, `GET /api/server/version` |
 | Validate key / current user | `GET /api/users/me` |
 | List albums | `GET /api/albums` |
-| Album contents | `GET /api/albums/{id}` |
-| Timeline buckets | `GET /api/timeline/buckets`, `GET /api/timeline/bucket` |
-| Thumbnail / preview | `GET /api/assets/{id}/thumbnail?size=thumbnail\|preview` |
+| Album contents | v3.3.1: `GET /api/albums/{id}` no longer embeds assets; use the timeline endpoints with `albumId=` |
+| Timeline buckets | `GET /api/timeline/buckets`, `GET /api/timeline/bucket` (verified v3.3.1: `timeBucket=YYYY-MM-DD` as returned; bucket data is column arrays `id[]`, `ratio[]`, `isImage[]`, `duration[]` in ms; library timeline uses `visibility=timeline&withPartners=true&withStacked=true`) |
+| Thumbnail / preview | `GET /api/assets/{id}/thumbnail?size=thumbnail\|preview` (verified: thumbnail is WebP and renders on Roku OS 15; preview is JPEG) |
 | Asset metadata (EXIF) | `GET /api/assets/{id}` |
 | Video stream (transcoded if available) | `GET /api/assets/{id}/video/playback` |
 | Smart search | `POST /api/search/smart` |

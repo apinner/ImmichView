@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings: switch, add and remove users. Later also slideshow and screensaver options. -->
+<component name="SettingsScreen" extends="Group">
+    <interface>
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <!-- Set when the active user changed or was removed; MainScene reloads. -->
+        <field id="profilesChanged" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="SettingsScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Label text="Settings" translation="[160,80]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label text="Users" translation="[160,180]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
+
+        <LabelList id="users" translation="[160,250]" itemSize="[1200,72]" itemSpacing="[0,12]"
+            numRows="8" vertFocusAnimationStyle="floatingFocus"
+            color="0xE0E4E8FF" focusedColor="0x101418FF" />
+
+        <Label translation="[160,960]" width="1600"
+            font="font:SmallSystemFont" color="0x80888FFF"
+            text="OK: switch to this user      * : remove user" />
+    </children>
+</component>

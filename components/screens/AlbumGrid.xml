@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Thumbnail grid for one album, loaded a month (timeline bucket) at a time. -->
+<!-- One album's photos, grouped by month. -->
 <component name="AlbumGrid" extends="Group">
     <interface>
         <!-- { albumId, title, assetCount, order } -->
@@ -9,22 +9,14 @@
 
     <script type="text/brightscript" uri="AlbumGrid.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
 
     <children>
-        <Label id="title" translation="[150,56]" width="1300" height="72"
+        <Label id="title" translation="[80,48]" width="1300" height="72"
             font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
-        <Label id="count" translation="[150,134]" width="800"
+        <Label id="count" translation="[80,122]" width="800"
             font="font:SmallSystemFont" color="0x80888FFF" />
 
-        <!-- 6 x 260 + 5 x 12 = 1620 wide, centred -->
-        <MarkupGrid id="grid" translation="[150,200]" itemComponentName="AssetTile"
-            numColumns="6" numRows="3" itemSize="[260,260]" itemSpacing="[12,12]"
-            vertFocusAnimationStyle="floatingFocus"
-            focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
-
-        <Label id="status" translation="[160,480]" width="1600" wrap="true" horizAlign="center"
-            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+        <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="This album is empty." />
     </children>
 </component>

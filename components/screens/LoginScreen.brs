@@ -3,9 +3,12 @@ sub init()
     m.status = m.top.findNode("status")
     m.busy = false
 
-    settings = loadSettings()
-    m.serverUrl = settings.serverUrl
-    m.apiKey = settings.apiKey
+    ' Adding another user: most households share one server, so start from the current one.
+    m.serverUrl = loadSettings().serverUrl
+    m.apiKey = ""
+    if loadProfiles().profiles.Count() > 0
+        m.top.findNode("subtitle").text = "Add another Immich user"
+    end if
 
     m.menu.observeField("itemSelected", "onMenuSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
@@ -133,7 +136,7 @@ sub onMe(event as object)
     user = resp.data
     name = user.name
     if name = invalid or name = "" then name = user.email
-    saveSettings(m.check.serverUrl, m.check.apiKey)
+    upsertProfile(name, m.check.serverUrl, m.check.apiKey)
 
     text = "Connected as " + name
     if m.check.version <> "" then text = text + "  (Immich v" + m.check.version + ")"

@@ -100,10 +100,7 @@ end sub
 ' ---- Photos tab ----
 
 sub onTimelineSelected()
-    m.top.navigate = {
-        screen: "PhotoViewer"
-        params: { open: { timeline: m.timeline, index: m.timeline.itemSelected.index } }
-    }
+    m.top.navigate = assetNavigation(m.timeline, m.timeline.itemSelected)
 end sub
 
 ' ---- Albums tab ----

@@ -64,7 +64,7 @@ sub showIndex(index as integer, fadeSeconds as float)
 
     asset = assetAt(index)
     m.videoNote.visible = asset.isVideo
-    if asset.isVideo then m.videoText.text = "Video  " + formatDuration(asset.durationMs) + "  -  playback is coming soon"
+    if asset.isVideo then m.videoText.text = "Video  " + formatDuration(asset.durationMs) + "  -  press OK to play"
 
     if isReady(m.target)
         m.message.text = ""
@@ -339,11 +339,14 @@ end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
     if not press then return false
+    asset = assetAt(m.index)
     if key = "right"
         goNext()
     else if key = "left"
         goPrevious()
-    else if key = "OK"
+    else if (key = "OK" or key = "play") and asset.isVideo
+        playVideo(asset)
+    else if key = "OK" or key = "up" or key = "down"
         toggleInfo()
     else if key = "play"
         toggleSlideshow()
@@ -355,6 +358,11 @@ function onKeyEvent(key as string, press as boolean) as boolean
     end if
     return true
 end function
+
+sub playVideo(asset as object)
+    if m.slideshow then stopSlideshow("Slideshow off")
+    m.top.navigate = { screen: "VideoPlayer", params: { asset: asset } }
+end sub
 
 sub close()
     m.slideshow = false

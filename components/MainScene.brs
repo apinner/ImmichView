@@ -31,6 +31,7 @@ function pushScreen(name as string, params = invalid as dynamic) as object
     screen.observeField("navigate", "onNavigate")
     if name = "LoginScreen" then screen.observeField("connectedUser", "onConnected")
     if name = "SettingsScreen" then screen.observeField("profilesChanged", "onProfilesChanged")
+    if screen.hasField("done") then screen.observeField("done", "onScreenDone")
     if params <> invalid then screen.update(params)
 
     if m.screens.Count() > 0 then m.screens.Peek().visible = false
@@ -49,6 +50,11 @@ sub popScreen()
         top.visible = true
         top.setFocus(true)
     end if
+end sub
+
+' A screen finished by itself (e.g. a video ended): close it if it's on top.
+sub onScreenDone(event as object)
+    if m.screens.Count() > 1 and m.screens.Peek().isSameNode(event.getRoSGNode()) then popScreen()
 end sub
 
 sub resetTo(name as string)

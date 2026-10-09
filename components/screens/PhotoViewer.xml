@@ -50,7 +50,7 @@
                 font="font:SmallestSystemFont" color="0x80888FFF" />
             <Label translation="[1340,32]" width="500" horizAlign="right" wrap="true"
                 font="font:SmallestSystemFont" color="0x80888FFF"
-                text="OK  hide info&#10;Play  slideshow&#10;Left / Right  previous / next" />
+                text="OK / Down  hide info&#10;Play  slideshow&#10;Left / Right  previous / next" />
         </Group>
 
         <Group id="toast" translation="[80,60]" opacity="0">

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Plays one video asset with the standard Roku trick-play UI. Closes when it finishes. -->
+<component name="VideoPlayer" extends="Group">
+    <interface>
+        <!-- { assetId, durationMs } -->
+        <field id="asset" type="assocarray" onChange="onAssetSet" />
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <!-- Set when playback finished; MainScene closes the screen. -->
+        <field id="done" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="VideoPlayer.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+
+    <children>
+        <Rectangle width="1920" height="1080" color="0x000000FF" />
+        <Video id="video" width="1920" height="1080" enableUI="true" />
+        <Label id="error" translation="[260,420]" width="1400" wrap="true" horizAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" visible="false" />
+    </children>
+</component>

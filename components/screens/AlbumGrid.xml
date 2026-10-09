@@ -10,6 +10,7 @@
     <script type="text/brightscript" uri="AlbumGrid.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Navigation.brs" />
 
     <children>
         <Label id="title" translation="[80,48]" width="1300" height="72"

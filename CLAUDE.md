@@ -23,6 +23,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
 - `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`).
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
+- Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
 ## Tech stack and tooling
 
@@ -40,7 +41,7 @@ source/
   screensaver.brs     ' Sub RunScreenSaver(params) – screensaver entry
 components/
   MainScene.xml/.brs
-  screens/            ' LoginScreen, HomeScreen (Photos/Albums tabs), AlbumGrid, PhotoViewer, SettingsScreen; later VideoPlayer, SearchScreen
+  screens/            ' LoginScreen, HomeScreen (Photos/Albums tabs), AlbumGrid, PhotoViewer, VideoPlayer, SettingsScreen; later SearchScreen
   tasks/              ' ImmichApiTask and any other Task nodes
   widgets/            ' JustifiedGrid, TimelineView, TabBar, AlbumTile
   screensaver/        ' ScreensaverScene and its components
@@ -70,7 +71,7 @@ Reference: https://api.immich.app and the OpenAPI spec for the server's version.
 | Timeline buckets | `GET /api/timeline/buckets`, `GET /api/timeline/bucket` (verified v3.3.1: `timeBucket=YYYY-MM-DD` as returned; bucket data is column arrays `id[]`, `ratio[]`, `isImage[]`, `duration[]` in ms; library timeline uses `visibility=timeline&withPartners=true&withStacked=true`) |
 | Thumbnail / preview | `GET /api/assets/{id}/thumbnail?size=thumbnail\|preview` (verified: thumbnail is WebP and renders on Roku OS 15; preview is JPEG) |
 | Asset metadata (EXIF) | `GET /api/assets/{id}` |
-| Video stream (transcoded if available) | `GET /api/assets/{id}/video/playback` |
+| Video stream (transcoded if available) | `GET /api/assets/{id}/video/playback` (verified v3.3.1: MP4 with byte ranges; used with `streamFormat=mp4`). The HLS endpoints (`/video/stream/main.m3u8`) need real-time transcoding, which is off on this server (400). Sampled library: mostly H.264, a few HEVC |
 | Smart search | `POST /api/search/smart` |
 | Metadata search | `POST /api/search/metadata` |
 | Random assets (screensaver) | `POST /api/search/random` |

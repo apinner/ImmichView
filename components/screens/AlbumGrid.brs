@@ -18,8 +18,5 @@ sub onAlbumSet()
 end sub
 
 sub onItemSelected()
-    m.top.navigate = {
-        screen: "PhotoViewer"
-        params: { open: { timeline: m.timeline, index: m.timeline.itemSelected.index } }
-    }
+    m.top.navigate = assetNavigation(m.timeline, m.timeline.itemSelected)
 end sub

@@ -27,5 +27,8 @@
         <Label id="hint" translation="[160,900]" width="1600" wrap="true"
             font="font:SmallSystemFont" color="0x80888FFF"
             text="Create an API key in the Immich web app under Account Settings > API Keys. The keyboard in the Roku mobile app makes typing it much easier." />
+        <Label translation="[160,1010]" width="1600"
+            font="font:SmallestSystemFont" color="0x6A6F7AFF"
+            text="ImmichView is an unofficial app. It is not affiliated with or endorsed by Immich or FUTO." />
     </children>
 </component>

@@ -26,5 +26,7 @@
 
         <Label id="hint" translation="[160,984]" width="1600"
             font="font:SmallSystemFont" color="0x80888FFF" />
+        <Label id="about" translation="[160,1030]" width="1600"
+            font="font:SmallestSystemFont" color="0x6A6F7AFF" />
     </children>
 </component>

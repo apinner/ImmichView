@@ -8,6 +8,8 @@ sub init()
     m.lastList = m.users
     refreshUsers()
     refreshOptions()
+    version = CreateObject("roAppInfo").GetVersion()
+    m.top.findNode("about").text = "ImmichView " + version + "   -   Unofficial app, not affiliated with or endorsed by Immich or FUTO."
 end sub
 
 ' Also runs when returning from the screensaver photo picker.

@@ -30,9 +30,9 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 
 ## 3. Listing in the Developer Dashboard (Alex, with help)
 
-- [ ] Channel name. "Immich" is someone else's project name; check Immich's trademark/brand
-      guidance before publishing "ImmichView", or choose a name that only describes
-      compatibility (e.g. "… for Immich").
+- [ ] Channel name: **ImmichView** (decided). Before publishing, email the Immich team (address in the
+      Commercial Guidelines section of docs.immich.app/FAQ) as notification; the app and listing say
+      it's unofficial and not affiliated with or endorsed by Immich or FUTO.
 - [ ] Description, category, keywords, rating questionnaire.
 - [ ] Screenshots (taken from the app with `tools/screenshot.ps1`).
 - [ ] Privacy policy URL. ImmichView only talks to the user's own Immich server and collects

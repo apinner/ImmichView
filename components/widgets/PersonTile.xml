@@ -14,7 +14,7 @@
         <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
         <!-- Round placeholder (MaskGroup masks textures, not Rectangles). -->
         <Poster uri="pkg:/images/circle-mask.png" translation="[6,6]" width="220" height="220"
-            blendColor="0x1E242AFF" />
+            blendColor="0x2E2D3AFF" />
         <MaskGroup translation="[6,6]" maskUri="pkg:/images/circle-mask.png" maskSize="[220,220]">
             <Poster id="face" width="220" height="220" loadWidth="220" loadHeight="220"
                 loadDisplayMode="scaleToZoom" />

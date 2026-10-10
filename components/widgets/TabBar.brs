@@ -1,5 +1,6 @@
-function tabWidth() as integer
-    return 200
+' Horizontal space around each tab's text inside its pill.
+function tabPadding() as integer
+    return 36
 end function
 
 sub init()
@@ -15,42 +16,40 @@ sub onTabsChanged()
         tabNode = m.top.createChild("Group")
         tabNode.translation = [x, 0]
 
-        pill = tabNode.createChild("Rectangle")
-        pill.width = tabWidth()
-        pill.height = 56
-        pill.color = "0xADCBFAFF"
+        label = CreateObject("roSGNode", "Label")
+        label.font = "font:MediumBoldSystemFont"
+        label.text = title
+        width = label.boundingRect().width + tabPadding() * 2
 
-        label = tabNode.createChild("Label")
-        label.width = tabWidth()
+        pill = tabNode.createChild("Poster")
+        pill.uri = "pkg:/images/pill.9.png"
+        pill.width = width
+        pill.height = 56
+
+        label.width = width
         label.height = 56
         label.horizAlign = "center"
         label.vertAlign = "center"
-        label.font = "font:MediumBoldSystemFont"
-        label.text = title
+        tabNode.appendChild(label)
 
-        underline = tabNode.createChild("Rectangle")
-        underline.translation = [50, 60]
-        underline.width = tabWidth() - 100
-        underline.height = 4
-        underline.color = "0xADCBFAFF"
-
-        m.tabNodes.Push({ pill: pill, label: label, underline: underline })
-        x = x + tabWidth() + 16
+        m.tabNodes.Push({ pill: pill, label: label })
+        x = x + width + 12
     end for
     updateStyles()
 end sub
 
-' Focused: the selected tab is a filled pill. Unfocused: the selected tab is underlined.
+' Selected tab: a light pill while the tabs have focus, a dark pill otherwise.
 sub updateStyles()
     focused = m.top.hasFocus()
     for i = 0 to m.tabNodes.Count() - 1
         tabNode = m.tabNodes[i]
         isSelected = (i = m.top.selected)
-        tabNode.pill.visible = focused and isSelected
-        tabNode.underline.visible = isSelected and not focused
-        if focused and isSelected
-            tabNode.label.color = "0x101418FF"
+        tabNode.pill.visible = isSelected
+        if isSelected and focused
+            tabNode.pill.blendColor = "0xADCBFAFF"
+            tabNode.label.color = "0x0B0E11FF"
         else if isSelected
+            tabNode.pill.blendColor = "0x3A3950FF"
             tabNode.label.color = "0xFFFFFFFF"
         else
             tabNode.label.color = "0x80888FFF"

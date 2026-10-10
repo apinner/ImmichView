@@ -10,7 +10,7 @@
     <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
 
     <children>
-        <Rectangle width="328" height="205" color="0x1E242AFF" />
+        <Rectangle width="328" height="205" color="0x2E2D3AFF" />
         <Poster id="cover" width="328" height="205" loadWidth="328" loadHeight="205"
             loadDisplayMode="scaleToZoom" />
         <Label id="name" translation="[0,212]" width="328" height="34"

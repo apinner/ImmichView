@@ -208,7 +208,7 @@ sub addTile(parent as object, asset as object, x as integer, w as integer, h as 
     placeholder.translation = [x, 0]
     placeholder.width = w
     placeholder.height = h
-    placeholder.color = "0x1E242AFF"
+    placeholder.color = "0x2E2D3AFF"
 
     thumb = parent.createChild("Poster")
     thumb.setHttpAgent(m.agent)

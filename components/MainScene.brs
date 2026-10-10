@@ -1,5 +1,6 @@
 sub init()
-    m.top.backgroundColor = "0x101418FF"
+    m.top.backgroundUri = ""  ' the theme's default background image would hide backgroundColor
+    m.top.backgroundColor = "0x24232FFF"
     m.screens = []
     m.global.addFields({ serverUrl: "", apiKey: "" })
 

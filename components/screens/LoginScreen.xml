@@ -12,14 +12,14 @@
     <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 
     <children>
-        <Label id="title" text="Immich" translation="[160,120]"
+        <Label id="title" text="ImmichView" translation="[160,120]"
             font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
         <Label id="subtitle" text="Connect to your Immich server" translation="[160,200]"
             font="font:MediumSystemFont" color="0xA0A8B0FF" />
 
         <LabelList id="menu" translation="[160,300]" itemSize="[1200,72]" itemSpacing="[0,12]"
             numRows="3" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x101418FF" />
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
 
         <Label id="status" translation="[160,620]" width="1600" wrap="true"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />

@@ -1,4 +1,4 @@
-# Immich for Roku
+# ImmichView
 
 A sideloaded Roku channel for browsing a self-hosted [Immich](https://immich.app) library. See [CLAUDE.md](CLAUDE.md) for the design and build phases.
 

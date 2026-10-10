@@ -40,9 +40,9 @@ end sub
 sub updateBoxStyle()
     if m.box.hasFocus()
         m.boxBack.color = "0xADCBFAFF"
-        m.boxText.color = "0x101418FF"
+        m.boxText.color = "0x0B0E11FF"
     else
-        m.boxBack.color = "0x262C34FF"
+        m.boxBack.color = "0x2E2D3AFF"
         if m.query = ""
             m.boxText.color = "0x80888FFF"
         else

@@ -12,7 +12,7 @@
     <script type="text/brightscript" uri="pkg:/source/common/Navigation.brs" />
 
     <children>
-        <Label text="Immich" translation="[80,40]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label text="ImmichView" translation="[80,40]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
         <Label id="userName" translation="[940,56]" width="900" horizAlign="right"
             font="font:SmallSystemFont" color="0x80888FFF" />
 

@@ -1,4 +1,4 @@
-# Immich Client for Roku
+# ImmichView (Immich client for Roku)
 
 A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-hosted Immich server. Sideloaded via Roku developer mode; not intended for the Roku Channel Store.
 
@@ -105,7 +105,7 @@ Format notes:
 - Keyboard and voice input (voice comes through the keyboard dialog). Smart search results shown in the same grid component. People search by face thumbnails.
 
 ### Screensaver
-- Manifest: `screensaver_title=Immich Photos`. Entry point `Sub RunScreenSaver(params)` in `source/screensaver.brs`, which creates `ScreensaverScene`.
+- Manifest: `screensaver_title=ImmichView`. Entry point `Sub RunScreenSaver(params)` in `source/screensaver.brs`, which creates `ScreensaverScene`.
 - Uses the stored server URL and key (same registry section). If not configured, show a simple "Open Immich app to set up" message.
 - Photos only by default. Fetch a batch of random assets (or album/memories, per setting), cycle with crossfade at the configured interval, refill the batch when it runs low. Include a slow pan/position shift to avoid burn-in.
 

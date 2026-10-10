@@ -13,7 +13,7 @@
 
     <children>
         <Group id="box" translation="[80,210]">
-            <Rectangle id="boxBack" width="1100" height="72" color="0x262C34FF" />
+            <Rectangle id="boxBack" width="1100" height="72" color="0x2E2D3AFF" />
             <Label id="boxText" translation="[28,0]" width="1050" height="72" vertAlign="center"
                 font="font:MediumSystemFont" color="0x80888FFF" />
         </Group>

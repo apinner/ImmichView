@@ -61,4 +61,17 @@ $g.Dispose()
 $bmp.Save((Join-Path $images 'focus-ring.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
-Write-Host "Wrote play.png, focus.9.png, circle-mask.png and focus-ring.png to $images"
+# Pill 9-patch for tabs: 56px-tall white rounded rectangle (fully rounded ends), tinted at
+# runtime with blendColor. Only the centre column/row stretch.
+$bmp = New-Object Drawing.Bitmap 58, 58
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.Clear([Drawing.Color]::Transparent)
+$g.FillEllipse([Drawing.Brushes]::White, 1, 1, 56, 56)
+$g.Dispose()
+$bmp.SetPixel(29, 0, $black)
+$bmp.SetPixel(0, 29, $black)
+$bmp.Save((Join-Path $images 'pill.9.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png and pill.9.png to $images"

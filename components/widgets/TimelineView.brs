@@ -29,6 +29,33 @@ sub init()
     m.grid.observeField("itemFocused", "onItemFocused")
     m.grid.observeField("itemSelected", "onItemSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
+    m.global.observeField("mediaFilter", "onFilterChanged")
+end sub
+
+' ---- Photos / videos filter (m.global.mediaFilter) ----
+' The timeline API can't filter by type, so bucket items are filtered here; search asks the server.
+
+function matchesFilter(isVideo as boolean) as boolean
+    filter = m.global.mediaFilter
+    if filter = "photos" then return not isVideo
+    if filter = "videos" then return isVideo
+    return true
+end function
+
+function emptyMessage() as string
+    if m.global.mediaFilter = "photos" then return "No photos here."
+    if m.global.mediaFilter = "videos" then return "No videos here."
+    return m.top.emptyText
+end function
+
+sub onFilterChanged()
+    if m.mode = "timeline" and m.top.query <> ""
+        m.grid.clear = true
+        resetData()
+        onQueryChanged()
+    else if m.mode = "search" and m.top.searchText <> ""
+        onSearchTextChanged()
+    end if
 end sub
 
 sub onFocusChanged()
@@ -106,25 +133,37 @@ sub onBucket(event as object)
     title = formatMonthYear(m.buckets[m.nextBucket].timeBucket)
     m.nextBucket = m.nextBucket + 1
     m.top.hasMore = m.nextBucket < m.buckets.Count()
-    appendBucket(title, resp.data)
-    m.status.text = ""
-    ' Small months: keep going until there's at least a couple of screens' worth.
-    if m.assets.Count() < loadAheadItems() then loadMore()
+    added = appendBucket(title, resp.data)
+    if m.assets.Count() > 0 then m.status.text = ""
+    if added = 0 and not m.top.hasMore and m.assets.Count() = 0
+        ' The filter matched nothing in any month.
+        m.status.text = emptyMessage()
+        m.top.loaded = true
+        return
+    end if
+    ' Small months (or months with nothing matching the filter): keep going until
+    ' there's at least a couple of screens' worth.
+    if m.assets.Count() < loadAheadItems() or added = 0 then loadMore()
 end sub
 
 ' Bucket responses are column arrays: id[], isImage[], duration[], ratio[], ...
-sub appendBucket(title as string, data as object)
+' Returns how many items matched the filter (and were added).
+function appendBucket(title as string, data as object) as integer
     ids = data.id
     items = []
     for i = 0 to ids.Count() - 1
-        durationMs = data.duration[i]
-        if durationMs = invalid then durationMs = 0
-        ratio = data.ratio[i]
-        if ratio = invalid then ratio = 1.0
-        items.Push({ assetId: ids[i], ratio: ratio, isVideo: not data.isImage[i], durationMs: durationMs })
+        isVideo = not data.isImage[i]
+        if matchesFilter(isVideo)
+            durationMs = data.duration[i]
+            if durationMs = invalid then durationMs = 0
+            ratio = data.ratio[i]
+            if ratio = invalid then ratio = 1.0
+            items.Push({ assetId: ids[i], ratio: ratio, isVideo: isVideo, durationMs: durationMs })
+        end if
     end for
-    appendItems({ title: title, items: items })
-end sub
+    if items.Count() > 0 then appendItems({ title: title, items: items })
+    return items.Count()
+end function
 
 ' ---- Smart search ----
 
@@ -153,6 +192,8 @@ sub loadNextSearchPage()
     if m.loading or m.nextPage = invalid then return
     m.loading = true
     body = { query: m.top.searchText, page: m.nextPage, size: searchPageSize() }
+    if m.global.mediaFilter = "photos" then body.type = "IMAGE"
+    if m.global.mediaFilter = "videos" then body.type = "VIDEO"
     m.task = startApiRequest(currentSettings(), "POST", "/api/search/smart", "onSearchPage", body, searchTimeoutMs())
 end sub
 

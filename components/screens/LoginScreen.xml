@@ -12,8 +12,7 @@
     <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 
     <children>
-        <Label id="title" text="ImmichView" translation="[160,120]"
-            font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <AppTitle translation="[160,104]" />
         <Label id="subtitle" text="Connect to your Immich server" translation="[160,200]"
             font="font:MediumSystemFont" color="0xA0A8B0FF" />
 

@@ -37,6 +37,7 @@ sub onTabsChanged()
         m.tabNodes.Push({ pill: pill, label: label })
         x = x + width + 12
     end for
+    m.top.totalWidth = x - 12
     updateStyles()
 end sub
 

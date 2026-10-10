@@ -5,6 +5,7 @@ A sideloaded Roku channel for browsing a self-hosted [Immich](https://immich.app
 ## Features
 
 - **Photos:** your whole library as a timeline grouped by month, in a justified grid like the Immich web app
+- **All / Photos / Videos filter** in the top bar, applied everywhere and remembered
 - **Albums** and **People** (named faces), each opening the same month-grouped grid
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
 - **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera) and a slideshow

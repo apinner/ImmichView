@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    All | Photos | Videos pills. Reads and writes m.global.mediaFilter (saved in the registry),
+    so every screen's filter bar and TimelineView stay in step.
+-->
+<component name="MediaFilterBar" extends="Group">
+    <interface>
+        <field id="totalWidth" type="float" alias="pills.totalWidth" />
+    </interface>
+
+    <script type="text/brightscript" uri="MediaFilterBar.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <TabBar id="pills" />
+    </children>
+</component>

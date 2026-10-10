@@ -74,4 +74,26 @@ $bmp.SetPixel(0, 29, $black)
 $bmp.Save((Join-Path $images 'pill.9.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
-Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png and pill.9.png to $images"
+# Logo mark for the in-app title: the flower from the supplied splash artwork, cropped to a
+# square (centred on the emblem) with rounded corners, 128x128 (shown at 64x64).
+$splash = [Drawing.Image]::FromFile((Join-Path $images 'splash-screen_fhd.jpg'))
+$bmp = New-Object Drawing.Bitmap 128, 128
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.InterpolationMode = 'HighQualityBicubic'
+$g.Clear([Drawing.Color]::Transparent)
+$radius = 28
+$path = New-Object Drawing.Drawing2D.GraphicsPath
+$path.AddArc(0, 0, $radius * 2, $radius * 2, 180, 90)
+$path.AddArc(128 - $radius * 2, 0, $radius * 2, $radius * 2, 270, 90)
+$path.AddArc(128 - $radius * 2, 128 - $radius * 2, $radius * 2, $radius * 2, 0, 90)
+$path.AddArc(0, 128 - $radius * 2, $radius * 2, $radius * 2, 90, 90)
+$path.CloseFigure()
+$g.SetClip($path)
+$g.DrawImage($splash, (New-Object Drawing.Rectangle 0, 0, 128, 128), (New-Object Drawing.Rectangle 717, 225, 480, 480), [Drawing.GraphicsUnit]::Pixel)
+$g.Dispose()
+$splash.Dispose()
+$bmp.Save((Join-Path $images 'logo-mark.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, pill.9.png and logo-mark.png to $images"

@@ -48,7 +48,7 @@ components/
   MainScene.xml/.brs
   screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AlbumTile, PeoplePane, PersonTile, SearchPane
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, MediaFilterBar, AppTitle, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art
 ```

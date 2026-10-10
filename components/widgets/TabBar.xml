@@ -4,6 +4,8 @@
     <interface>
         <field id="tabs" type="array" onChange="onTabsChanged" />
         <field id="selected" type="integer" value="0" onChange="updateStyles" />
+        <!-- Width of all the pills, set when tabs is set (for right-aligning the bar). -->
+        <field id="totalWidth" type="float" />
     </interface>
 
     <script type="text/brightscript" uri="TabBar.brs" />

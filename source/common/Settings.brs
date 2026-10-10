@@ -98,6 +98,25 @@ sub saveSlideshowSeconds(seconds as integer)
     sec.Flush()
 end sub
 
+' ---- Photos / videos filter (shared by all users) ----
+' "all", "photos" or "videos"; applies to the timeline, albums, people and search.
+
+function mediaFilters() as object
+    return ["all", "photos", "videos"]
+end function
+
+function loadMediaFilter() as string
+    value = registrySection().Read("mediaFilter")
+    if value = "photos" or value = "videos" then return value
+    return "all"
+end function
+
+sub saveMediaFilter(value as string)
+    sec = registrySection()
+    sec.Write("mediaFilter", value)
+    sec.Flush()
+end sub
+
 ' ---- Screensaver (shared by all users) ----
 ' source: "random" (whole library), "memories" (on this day) or "album" (albumId/albumName)
 

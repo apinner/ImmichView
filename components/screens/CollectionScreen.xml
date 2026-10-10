@@ -13,10 +13,12 @@
     <script type="text/brightscript" uri="pkg:/source/common/Navigation.brs" />
 
     <children>
-        <Label id="title" translation="[80,48]" width="1300" height="72"
+        <Label id="title" translation="[80,48]" width="1180" height="72"
             font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
         <Label id="count" translation="[80,122]" width="800"
             font="font:SmallSystemFont" color="0x80888FFF" />
+        <!-- Right-aligned in init once its width is known; Up from the photos reaches it. -->
+        <MediaFilterBar id="filter" translation="[1300,56]" />
 
         <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="Nothing here yet." />
     </children>

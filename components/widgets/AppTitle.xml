@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Logo mark plus the two-tone wordmark: "Immich" in white, "View" in the logo's purple. -->
+<component name="AppTitle" extends="Group">
+    <script type="text/brightscript" uri="AppTitle.brs" />
+
+    <children>
+        <Poster uri="pkg:/images/logo-mark.png" width="64" height="64" />
+        <Label id="first" text="Immich" translation="[80,0]" height="64" vertAlign="center"
+            font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <Label id="second" text="View" height="64" vertAlign="center"
+            font="font:LargeBoldSystemFont" color="0xA274D4FF" />
+    </children>
+</component>

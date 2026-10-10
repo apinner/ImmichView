@@ -27,6 +27,8 @@ sub init()
     m.top.observeField("focusedChild", "onFocusChanged")
 
     m.tabs.tabs = ["Photos", "Albums", "People", "Search"]
+    m.filter = m.top.findNode("filter")
+    m.filter.translation = [1840 - m.filter.totalWidth, 116]
     loadUser()
     m.timeline.query = timelineQuery()
 end sub
@@ -71,9 +73,21 @@ function onKeyEvent(key as string, press as boolean) as boolean
         m.top.navigate = { screen: "SettingsScreen" }
         return true
     end if
+    ' Top bar: tabs on the left, photos/videos filter on the right; Left/Right move between them.
     if m.tabs.isInFocusChain()
         if key = "down" or key = "OK"
             focusContent()
+            return true
+        else if key = "right"
+            m.filter.setFocus(true)
+            return true
+        end if
+    else if m.filter.isInFocusChain()
+        if key = "down" or key = "OK"
+            focusContent()
+            return true
+        else if key = "left" or key = "up" or key = "back"
+            focusTabs()
             return true
         end if
     else if key = "up" or key = "back"

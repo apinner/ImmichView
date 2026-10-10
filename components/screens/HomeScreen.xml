@@ -14,11 +14,13 @@
     <script type="text/brightscript" uri="pkg:/source/common/Navigation.brs" />
 
     <children>
-        <Label text="ImmichView" translation="[80,40]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <AppTitle translation="[80,28]" />
         <Label id="userName" translation="[940,56]" width="900" horizAlign="right"
             font="font:SmallSystemFont" color="0x80888FFF" />
 
         <TabBar id="tabs" translation="[80,116]" />
+        <!-- Right-aligned in init once its width is known. -->
+        <MediaFilterBar id="filter" translation="[1300,116]" />
 
         <TimelineView id="timeline" translation="[80,200]" viewHeight="866"
             emptyText="No photos in your library yet." />

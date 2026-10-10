@@ -2,7 +2,7 @@ sub init()
     m.top.backgroundUri = ""  ' the theme's default background image would hide backgroundColor
     m.top.backgroundColor = "0x24232FFF"
     m.screens = []
-    m.global.addFields({ serverUrl: "", apiKey: "" })
+    m.global.addFields({ serverUrl: "", apiKey: "", mediaFilter: loadMediaFilter() })
 
     ' Short pause after "Connected as ..." so the confirmation is readable.
     m.connectedTimer = CreateObject("roSGNode", "Timer")

@@ -42,4 +42,10 @@ Turn on the screensaver in Roku **Settings > Theme > Screensavers > ImmichView**
 
 More tools: `tools\screenshot.ps1`, `tools\drive.ps1` (scripted remote keys), `tools\relaunch.ps1 -Screensaver`. Debug output: `telnet <roku-ip> 8085`.
 
-The dev launch parameters (`serverUrl`, `apiKey`, `screensaver`) are accepted from anyone on your network who can reach the Roku's ECP port; that's fine for a sideloaded dev channel, but keep it in mind.
+The dev launch parameters (`serverUrl`, `apiKey`, `screensaver`) only exist in dev builds (`bs_const DEV=true`, which `deploy.ps1` sets); release builds compile them out.
+
+## Privacy, support and licence
+
+- [Privacy policy](https://apinner.github.io/RokuImmichClient/privacy.html) and [support page](https://apinner.github.io/RokuImmichClient/) (source in `docs/`).
+- MIT licensed; see [LICENSE](LICENSE).
+- ImmichView is an unofficial app. It is not affiliated with or endorsed by Immich or FUTO.

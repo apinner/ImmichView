@@ -4,6 +4,7 @@
     (e.g. a month), rows fill the full width and each row's height is chosen so its photos
     keep their aspect ratio. Only rows near the viewport have nodes.
     Feed it with appendGroup = { title, items: [{ assetId, ratio, isVideo, durationMs }] }.
+    An empty title adds no header; continues = true flows the items on from the previous group.
 -->
 <component name="JustifiedGrid" extends="Group">
     <interface>
@@ -13,6 +14,7 @@
         <field id="spacing" type="float" value="8" />
 
         <field id="appendGroup" type="assocarray" onChange="onAppendGroup" />
+        <field id="clear" type="boolean" alwaysNotify="true" onChange="onClear" />
 
         <!-- Index into all appended items. -->
         <field id="itemFocused" type="integer" value="-1" />

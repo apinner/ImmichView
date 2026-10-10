@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Home: Photos (library timeline) and Albums tabs. Later also People, Memories, Search. -->
+<!-- Home: Photos (library timeline), Albums, People and Search tabs. -->
 <component name="HomeScreen" extends="Group">
     <interface>
         <field id="navigate" type="assocarray" alwaysNotify="true" />
@@ -30,6 +30,9 @@
             <Label id="albumStatus" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
                 font="font:MediumSystemFont" color="0xE0E4E8FF" />
         </Group>
+
+        <PeoplePane id="peoplePane" visible="false" />
+        <SearchPane id="searchPane" visible="false" />
 
         <Label id="status" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />

@@ -8,12 +8,13 @@ end function
 ' Starts one request. `callback` is the name of a sub in the calling component
 ' that receives the roSGNodeEvent for the task's `response` field.
 ' Keep a reference to the returned task until the callback fires.
-function startApiRequest(settings as object, method as string, path as string, callback as string, body = invalid as dynamic) as object
+function startApiRequest(settings as object, method as string, path as string, callback as string, body = invalid as dynamic, timeoutMs = 10000 as integer) as object
     task = CreateObject("roSGNode", "ImmichApiTask")
     task.serverUrl = settings.serverUrl
     task.apiKey = settings.apiKey
     task.method = method
     task.path = path
+    task.timeoutMs = timeoutMs
     if body <> invalid then task.body = body
     task.observeField("response", callback)
     task.control = "RUN"

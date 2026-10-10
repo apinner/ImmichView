@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MarkupGrid item: round face thumbnail and name, with its own focus ring. -->
+<component name="PersonTile" extends="Group">
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="focusPercent" type="float" onChange="onFocusChanged" />
+        <field id="gridHasFocus" type="boolean" onChange="onFocusChanged" />
+    </interface>
+
+    <script type="text/brightscript" uri="PersonTile.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+
+    <children>
+        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
+        <!-- Round placeholder (MaskGroup masks textures, not Rectangles). -->
+        <Poster uri="pkg:/images/circle-mask.png" translation="[6,6]" width="220" height="220"
+            blendColor="0x1E242AFF" />
+        <MaskGroup translation="[6,6]" maskUri="pkg:/images/circle-mask.png" maskSize="[220,220]">
+            <Poster id="face" width="220" height="220" loadWidth="220" loadHeight="220"
+                loadDisplayMode="scaleToZoom" />
+        </MaskGroup>
+        <Label id="name" translation="[0,240]" width="232" height="36" horizAlign="center"
+            font="font:SmallSystemFont" color="0xA0A8B0FF" />
+    </children>
+</component>

@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Timeline of assets grouped by month, loaded a bucket at a time from /api/timeline.
-    Set `query` (e.g. "albumId=...&order=desc" or "visibility=timeline&order=desc") to load.
+    A JustifiedGrid fed from one of two sources:
+    - query: timeline buckets (e.g. "albumId=...&order=desc"), grouped by month
+    - searchText: smart (CLIP) search results, in relevance order
+    Either way it pages in more as focus nears the end, and PhotoViewer can step through it.
 -->
 <component name="TimelineView" extends="Group">
     <interface>
         <field id="query" type="string" onChange="onQueryChanged" />
+        <field id="searchText" type="string" onChange="onSearchTextChanged" />
         <field id="viewHeight" type="float" alias="grid.viewHeight" />
         <field id="emptyText" type="string" value="No photos here yet." />
+        <!-- Status label position relative to the view. -->
+        <field id="statusTranslation" type="vector2d" alias="status.translation" />
 
         <!-- { index, asset } of the selected item -->
         <field id="itemSelected" type="assocarray" alwaysNotify="true" />
         <field id="exitedTop" type="boolean" alias="grid.exitedTop" />
         <field id="jumpToIndex" type="integer" alias="grid.jumpToItem" />
+        <!-- Total items in the timeline (sum of bucket counts); -1 for search. -->
+        <field id="totalCount" type="integer" value="-1" />
 
-        <!-- For PhotoViewer: how many assets are loaded and whether more months remain. -->
+        <!-- For PhotoViewer: how many assets are loaded and whether more remain. -->
         <field id="assetCount" type="integer" />
         <field id="hasMore" type="boolean" />
         <function name="getAsset" />
@@ -30,5 +37,6 @@
         <JustifiedGrid id="grid" gridWidth="1760" targetRowHeight="250" spacing="8" />
         <Label id="status" translation="[80,260]" width="1600" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />
+        <Timer id="slowTimer" duration="5" repeat="false" />
     </children>
 </component>

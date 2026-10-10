@@ -25,7 +25,7 @@ end sub
 
 ' ---- Screen stack ----
 
-' params: field values set on the new screen before it is shown, e.g. { album: {...} }
+' params: field values set on the new screen before it is shown, e.g. { source: {...} }
 function pushScreen(name as string, params = invalid as dynamic) as object
     screen = CreateObject("roSGNode", name)
     screen.observeField("navigate", "onNavigate")

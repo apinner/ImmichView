@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One album's photos, grouped by month. -->
-<component name="AlbumGrid" extends="Group">
+<!-- A titled set of photos grouped by month: an album, or everything with one person in it. -->
+<component name="CollectionScreen" extends="Group">
     <interface>
-        <!-- { albumId, title, assetCount, order } -->
-        <field id="album" type="assocarray" onChange="onAlbumSet" />
+        <!-- { title, query } where query selects timeline buckets, e.g. "albumId=...&order=desc" -->
+        <field id="source" type="assocarray" onChange="onSourceSet" />
         <field id="navigate" type="assocarray" alwaysNotify="true" />
     </interface>
 
-    <script type="text/brightscript" uri="AlbumGrid.brs" />
+    <script type="text/brightscript" uri="CollectionScreen.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Navigation.brs" />
@@ -18,6 +18,6 @@
         <Label id="count" translation="[80,122]" width="800"
             font="font:SmallSystemFont" color="0x80888FFF" />
 
-        <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="This album is empty." />
+        <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="Nothing here yet." />
     </children>
 </component>

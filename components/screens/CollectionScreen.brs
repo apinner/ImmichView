@@ -3,6 +3,7 @@ sub init()
     m.count = m.top.findNode("count")
     m.timeline = m.top.findNode("timeline")
     m.timeline.observeField("itemSelected", "onItemSelected")
+    m.timeline.observeField("totalCount", "onTotalCount")
     m.top.observeField("focusedChild", "onFocusChanged")
 end sub
 
@@ -10,11 +11,13 @@ sub onFocusChanged()
     if m.top.hasFocus() then m.timeline.setFocus(true)
 end sub
 
-sub onAlbumSet()
-    album = m.top.album
-    m.title.text = album.title
-    m.count.text = formatItemCount(album.assetCount)
-    m.timeline.query = "albumId=" + album.albumId + "&order=" + album.order
+sub onSourceSet()
+    m.title.text = m.top.source.title
+    m.timeline.query = m.top.source.query
+end sub
+
+sub onTotalCount()
+    if m.timeline.totalCount >= 0 then m.count.text = formatItemCount(m.timeline.totalCount)
 end sub
 
 sub onItemSelected()

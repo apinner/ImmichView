@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home's Search tab: a search box (keyboard and voice) above smart search results. -->
+<component name="SearchPane" extends="Group">
+    <interface>
+        <!-- { index, asset } of the selected result -->
+        <field id="itemSelected" type="assocarray" alwaysNotify="true" />
+        <!-- The results TimelineView, for PhotoViewer to step through. -->
+        <field id="results" type="node" />
+    </interface>
+
+    <script type="text/brightscript" uri="SearchPane.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+
+    <children>
+        <Group id="box" translation="[80,210]">
+            <Rectangle id="boxBack" width="1100" height="72" color="0x262C34FF" />
+            <Label id="boxText" translation="[28,0]" width="1050" height="72" vertAlign="center"
+                font="font:MediumSystemFont" color="0x80888FFF" />
+        </Group>
+        <Label id="hint" translation="[1220,210]" width="620" height="72" vertAlign="center" wrap="true"
+            font="font:SmallestSystemFont" color="0x80888FFF"
+            text="Press OK to type, or use the mic. Finds photos by what's in them." />
+
+        <TimelineView id="resultsView" translation="[80,310]" viewHeight="756"
+            statusTranslation="[80,160]" emptyText="" />
+    </children>
+</component>

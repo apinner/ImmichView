@@ -41,9 +41,9 @@ source/
   screensaver.brs     ' Sub RunScreenSaver(params) – screensaver entry
 components/
   MainScene.xml/.brs
-  screens/            ' LoginScreen, HomeScreen (Photos/Albums tabs), AlbumGrid, PhotoViewer, VideoPlayer, SettingsScreen; later SearchScreen
+  screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView, TabBar, AlbumTile
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AlbumTile, PeoplePane, PersonTile, SearchPane
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art
 ```

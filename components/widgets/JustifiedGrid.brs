@@ -11,7 +11,11 @@ sub init()
     m.anim = m.top.findNode("scrollAnim")
     m.interp = m.top.findNode("scrollInterp")
     m.agent = createAuthAgent()
+    resetState()
+    m.top.observeField("focusedChild", "onFocusChanged")
+end sub
 
+sub resetState()
     m.items = []        ' every appended item
     m.rows = []         ' { start, count, top, height, xs[], widths[] }
     m.headers = []      ' { top, title }
@@ -21,8 +25,14 @@ sub init()
     m.focus = -1
     m.stickyX = invalid ' remembered column centre for repeated up/down
     m.scrollY = 0
+end sub
 
-    m.top.observeField("focusedChild", "onFocusChanged")
+sub onClear()
+    m.anim.control = "stop"
+    m.rowsGroup.removeChildrenIndex(m.rowsGroup.getChildCount(), 0)
+    m.content.translation = [0, 0]
+    m.focusFrame.visible = false
+    resetState()
 end sub
 
 sub onFocusChanged()
@@ -35,11 +45,15 @@ sub onAppendGroup()
     group = m.top.appendGroup
     if group.items = invalid or group.items.Count() = 0 then return
 
-    if m.headers.Count() > 0 then m.contentHeight = m.contentHeight + 24
-    m.headers.Push({ top: m.contentHeight, title: group.title })
-    m.contentHeight = m.contentHeight + headerHeight()
-
     start = m.items.Count()
+    if group.continues <> invalid and group.continues and m.rows.Count() > 0
+        start = reopenLastRow()
+    else if group.title <> invalid and group.title <> ""
+        if m.rows.Count() > 0 then m.contentHeight = m.contentHeight + 24
+        m.headers.Push({ top: m.contentHeight, title: group.title })
+        m.contentHeight = m.contentHeight + headerHeight()
+    end if
+
     for each item in group.items
         m.items.Push(item)
     end for
@@ -47,10 +61,27 @@ sub onAppendGroup()
 
     if m.focus < 0
         setFocusIndex(0, false)
+    else if m.focus >= start
+        setFocusIndex(m.focus, false)  ' its row was laid out again
     else
         refreshVisibleNodes()
     end if
 end sub
+
+' Takes the last (partial) row back out so new items can fill it. Returns its first item.
+function reopenLastRow() as integer
+    row = m.rows.Pop()
+    for i = 1 to row.count
+        m.itemRow.Pop()
+    end for
+    m.contentHeight = row.top
+    key = "r" + m.rows.Count().ToStr()
+    if m.nodes.DoesExist(key)
+        m.rowsGroup.removeChild(m.nodes[key])
+        m.nodes.Delete(key)
+    end if
+    return row.start
+end function
 
 function itemAspect(item as object) as float
     ratio = item.ratio

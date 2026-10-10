@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home's People tab: named people as round face thumbnails. -->
+<component name="PeoplePane" extends="Group">
+    <interface>
+        <!-- Set true the first time the tab is shown. -->
+        <field id="load" type="boolean" onChange="onLoad" />
+        <!-- { id, name } -->
+        <field id="personSelected" type="assocarray" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="PeoplePane.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+
+    <children>
+        <!-- 7 x 232 + 6 x 22 = 1756 wide -->
+        <MarkupGrid id="grid" translation="[80,216]" itemComponentName="PersonTile"
+            numColumns="7" numRows="3" itemSize="[232,276]" itemSpacing="[22,12]"
+            vertFocusAnimationStyle="floatingFocus" drawFocusFeedback="false" />
+        <Label id="status" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+    </children>
+</component>

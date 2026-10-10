@@ -40,4 +40,25 @@ for ($i = 1 + $border + 2; $i -le 32 - $border - 2; $i++) {
 $bmp.Save((Join-Path $images 'focus.9.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
-Write-Host "Wrote play.png and focus.9.png to $images"
+# Circle mask for face thumbnails (MaskGroup uses the alpha channel): 220x220.
+$bmp = New-Object Drawing.Bitmap 220, 220
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.Clear([Drawing.Color]::Transparent)
+$g.FillEllipse([Drawing.Brushes]::White, 0, 0, 219, 219)
+$g.Dispose()
+$bmp.Save((Join-Path $images 'circle-mask.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+# Focus ring for face thumbnails: 6px white ring, 232x232 (drawn 6px outside the face).
+$bmp = New-Object Drawing.Bitmap 232, 232
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.Clear([Drawing.Color]::Transparent)
+$pen = New-Object Drawing.Pen ([Drawing.Color]::White), 6
+$g.DrawEllipse($pen, 3, 3, 225, 225)
+$g.Dispose()
+$bmp.Save((Join-Path $images 'focus-ring.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+Write-Host "Wrote play.png, focus.9.png, circle-mask.png and focus-ring.png to $images"

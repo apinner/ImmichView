@@ -8,18 +8,24 @@ sub init()
     m.albumsPane = m.top.findNode("albumsPane")
     m.albums = m.top.findNode("albums")
     m.albumStatus = m.top.findNode("albumStatus")
+    m.peoplePane = m.top.findNode("peoplePane")
+    m.searchPane = m.top.findNode("searchPane")
     m.userName = m.top.findNode("userName")
     m.status = m.top.findNode("status")
     m.failed = false
     m.albumsLoaded = false
+    ' Tab index -> content pane, in TabBar order.
+    m.panes = [m.timeline, m.albumsPane, m.peoplePane, m.searchPane]
 
     m.tabs.observeField("selected", "onTabChanged")
     m.timeline.observeField("exitedTop", "focusTabs")
     m.timeline.observeField("itemSelected", "onTimelineSelected")
     m.albums.observeField("itemSelected", "onAlbumSelected")
+    m.peoplePane.observeField("personSelected", "onPersonSelected")
+    m.searchPane.observeField("itemSelected", "onSearchResultSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
 
-    m.tabs.tabs = ["Photos", "Albums"]
+    m.tabs.tabs = ["Photos", "Albums", "People", "Search"]
     loadUser()
     m.timeline.query = timelineQuery()
 end sub
@@ -31,10 +37,12 @@ end sub
 ' ---- Tabs and focus ----
 
 sub onTabChanged()
-    showAlbums = (m.tabs.selected = 1)
-    m.timeline.visible = not showAlbums
-    m.albumsPane.visible = showAlbums
-    if showAlbums and not m.albumsLoaded then loadAlbums()
+    selected = m.tabs.selected
+    for i = 0 to m.panes.Count() - 1
+        m.panes[i].visible = (i = selected) and not m.failed
+    end for
+    if selected = 1 and not m.albumsLoaded then loadAlbums()
+    if selected = 2 then m.peoplePane.load = true
 end sub
 
 sub focusTabs()
@@ -42,14 +50,13 @@ sub focusTabs()
 end sub
 
 sub focusContent()
+    selected = m.tabs.selected
     if m.failed
         m.tabs.setFocus(true)
-    else if m.tabs.selected = 0
-        m.timeline.setFocus(true)
-    else if m.albums.content <> invalid
-        m.albums.setFocus(true)
+    else if selected = 1
+        if m.albums.content <> invalid then m.albums.setFocus(true) else m.tabs.setFocus(true)
     else
-        m.tabs.setFocus(true)
+        m.panes[selected].setFocus(true)
     end if
 end sub
 
@@ -83,8 +90,9 @@ sub onUser(event as object)
     m.userTask = invalid
     if not resp.ok
         m.failed = true
-        m.timeline.visible = false
-        m.albumsPane.visible = false
+        for each pane in m.panes
+            pane.visible = false
+        end for
         m.status.text = describeApiError(resp) + Chr(10) + Chr(10) + "Press OK for Settings."
         focusTabs()
         return
@@ -101,6 +109,20 @@ end sub
 
 sub onTimelineSelected()
     m.top.navigate = assetNavigation(m.timeline, m.timeline.itemSelected)
+end sub
+
+' ---- People and Search tabs ----
+
+sub onPersonSelected()
+    person = m.peoplePane.personSelected
+    m.top.navigate = {
+        screen: "CollectionScreen"
+        params: { source: { title: person.name, query: "personId=" + person.id + "&visibility=timeline&order=desc" } }
+    }
+end sub
+
+sub onSearchResultSelected()
+    m.top.navigate = assetNavigation(m.searchPane.results, m.searchPane.itemSelected)
 end sub
 
 ' ---- Albums tab ----
@@ -156,7 +178,7 @@ end sub
 sub onAlbumSelected()
     item = m.albums.content.getChild(m.albums.itemSelected)
     m.top.navigate = {
-        screen: "AlbumGrid"
-        params: { album: { albumId: item.albumId, title: item.title, assetCount: item.assetCount, order: item.order } }
+        screen: "CollectionScreen"
+        params: { source: { title: item.title, query: "albumId=" + item.albumId + "&order=" + item.order } }
     }
 end sub

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A fixed list of assets with the same interface PhotoViewer uses on a TimelineView
+    (assetCount, hasMore, getAsset, requestMore, jumpToIndex). Used to open a deep-linked photo.
+-->
+<component name="AssetListSource" extends="Node">
+    <interface>
+        <!-- [{ assetId, ratio, isVideo, durationMs }] -->
+        <field id="assets" type="array" onChange="onAssetsChanged" />
+        <field id="assetCount" type="integer" />
+        <field id="hasMore" type="boolean" value="false" />
+        <field id="jumpToIndex" type="integer" />
+        <function name="getAsset" />
+        <function name="requestMore" />
+    </interface>
+
+    <script type="text/brightscript" uri="AssetListSource.brs" />
+</component>

@@ -24,7 +24,9 @@ end sub
 
 sub onStateChanged()
     state = m.video.state
-    if state = "finished"
+    if state = "playing" and not m.top.playbackStarted
+        m.top.playbackStarted = true
+    else if state = "finished"
         m.top.done = true
     else if state = "error"
         logDebug("video error " + m.video.errorCode.ToStr() + ": " + m.video.errorMsg)
@@ -42,6 +44,7 @@ sub showError()
     m.error.visible = true
     m.video.visible = false
     m.top.setFocus(true)
+    m.top.playbackStarted = true  ' playback attempt is over: lets a deep-linked launch complete
 end sub
 
 function canDecodeHevc() as boolean

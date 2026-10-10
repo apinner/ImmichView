@@ -10,13 +10,101 @@ sub init()
     m.connectedTimer.observeField("fire", "onConnectedTimer")
     m.top.appendChild(m.connectedTimer)
 
+    ' Launch beacons (certification): AppLaunchComplete once Home is ready or deep-linked
+    ' content is showing; AppDialog* around the sign-in screen if it's shown at launch.
+    m.launchCompleteSent = false
+    m.launchDialogOpen = false
+    m.homeReady = false
+    m.pendingDeepLink = invalid
+
     settings = loadSettings()
     applySettings(settings)
     if hasSettings(settings)
         resetTo("HomeScreen")
     else
         resetTo("LoginScreen")
+        m.top.signalBeacon("AppDialogInitiate")
+        m.launchDialogOpen = true
     end if
+end sub
+
+sub sendLaunchComplete()
+    if m.launchCompleteSent then return
+    m.launchCompleteSent = true
+    m.top.signalBeacon("AppLaunchComplete")
+    logDebug("AppLaunchComplete")
+end sub
+
+sub onHomeReady(event as object)
+    if not event.getData() then return
+    m.homeReady = true
+    if m.pendingDeepLink <> invalid
+        link = m.pendingDeepLink
+        m.pendingDeepLink = invalid
+        openDeepLink(link)
+    else
+        sendLaunchComplete()
+    end if
+end sub
+
+' ---- Deep links (contentId = Immich asset ID) ----
+
+sub onDeepLink()
+    link = m.top.deepLink
+    logDebug("deep link " + link.mediaType + " " + link.contentId)
+    if m.homeReady
+        openDeepLink(link)
+    else
+        m.pendingDeepLink = link  ' opened once Home is ready (after sign-in if needed)
+    end if
+end sub
+
+sub openDeepLink(link as object)
+    if not CreateObject("roRegex", "^[0-9a-fA-F-]{36}$", "").IsMatch(link.contentId)
+        deepLinkFailed("not an asset ID")
+        return
+    end if
+    m.deepLinkTask = startApiRequest(currentSettings(), "GET", "/api/assets/" + link.contentId, "onDeepLinkAsset")
+end sub
+
+sub onDeepLinkAsset(event as object)
+    resp = event.getData()
+    m.deepLinkTask = invalid
+    if not resp.ok
+        deepLinkFailed("asset lookup " + resp.status.ToStr())
+        return
+    end if
+
+    ' Show it on top of Home, whatever was open before.
+    while m.screens.Count() > 1
+        popScreen()
+    end while
+    asset = resp.data
+    duration = asset.duration
+    if duration = invalid then duration = 0
+    item = { assetId: asset.id, ratio: 1.0, isVideo: asset.type = "VIDEO", durationMs: duration }
+    if item.isVideo
+        player = pushScreen("VideoPlayer", { asset: item })
+        if m.launchCompleteSent
+            return
+        end if
+        player.observeField("playbackStarted", "onDeepLinkPlaybackStarted")
+    else
+        source = CreateObject("roSGNode", "AssetListSource")
+        source.assets = [item]
+        pushScreen("PhotoViewer", { open: { timeline: source, index: 0 } })
+        sendLaunchComplete()
+    end if
+end sub
+
+sub onDeepLinkPlaybackStarted()
+    sendLaunchComplete()
+end sub
+
+' Invalid or inaccessible content: stay on Home, as certification expects.
+sub deepLinkFailed(reason as string)
+    logDebug("deep link ignored: " + reason)
+    sendLaunchComplete()
 end sub
 
 sub applySettings(settings as object)
@@ -31,6 +119,10 @@ function pushScreen(name as string, params = invalid as dynamic) as object
     screen = CreateObject("roSGNode", name)
     screen.observeField("navigate", "onNavigate")
     if name = "LoginScreen" then screen.observeField("connectedUser", "onConnected")
+    if name = "HomeScreen"
+        m.homeReady = false
+        screen.observeField("ready", "onHomeReady")
+    end if
     if name = "SettingsScreen" then screen.observeField("profilesChanged", "onProfilesChanged")
     if screen.hasField("done") then screen.observeField("done", "onScreenDone")
     if params <> invalid then screen.update(params)
@@ -73,6 +165,10 @@ end sub
 
 sub onConnected()
     applySettings(loadSettings())
+    if m.launchDialogOpen
+        m.launchDialogOpen = false
+        m.top.signalBeacon("AppDialogComplete")
+    end if
     m.connectedTimer.control = "start"
 end sub
 

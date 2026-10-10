@@ -20,6 +20,8 @@
         <field id="jumpToIndex" type="integer" alias="grid.jumpToItem" />
         <!-- Total items in the timeline (sum of bucket counts); -1 for search. -->
         <field id="totalCount" type="integer" value="-1" />
+        <!-- Set once the first photos (or an empty/error message) are on screen. -->
+        <field id="loaded" type="boolean" />
 
         <!-- For PhotoViewer: how many assets are loaded and whether more remain. -->
         <field id="assetCount" type="integer" />

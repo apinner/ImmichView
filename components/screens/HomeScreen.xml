@@ -3,6 +3,8 @@
 <component name="HomeScreen" extends="Group">
     <interface>
         <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <!-- Set once the Photos tab shows photos or a message (for the AppLaunchComplete beacon). -->
+        <field id="ready" type="boolean" />
     </interface>
 
     <script type="text/brightscript" uri="HomeScreen.brs" />

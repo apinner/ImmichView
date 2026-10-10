@@ -7,6 +7,8 @@
         <field id="navigate" type="assocarray" alwaysNotify="true" />
         <!-- Set when playback finished; MainScene closes the screen. -->
         <field id="done" type="boolean" alwaysNotify="true" />
+        <!-- Set when the video first starts playing, or fails to (AppLaunchComplete after a deep link). -->
+        <field id="playbackStarted" type="boolean" />
     </interface>
 
     <script type="text/brightscript" uri="VideoPlayer.brs" />

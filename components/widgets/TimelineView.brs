@@ -64,6 +64,7 @@ sub onBuckets(event as object)
     m.task = invalid
     if not resp.ok
         m.status.text = describeApiError(resp)
+        m.top.loaded = true
         return
     end if
     m.buckets = resp.data
@@ -75,6 +76,7 @@ sub onBuckets(event as object)
     m.top.hasMore = m.buckets.Count() > 0
     if m.buckets.Count() = 0
         m.status.text = m.top.emptyText
+        m.top.loaded = true
         return
     end if
     loadMore()
@@ -96,6 +98,7 @@ sub onBucket(event as object)
     if not resp.ok
         ' Leave nextBucket alone so moving focus retries this month.
         if m.assets.Count() = 0 then m.status.text = describeApiError(resp)
+        m.top.loaded = true
         logDebug("bucket load failed: " + resp.status.ToStr())
         return
     end if
@@ -160,6 +163,7 @@ sub onSearchPage(event as object)
     m.loading = false
     if not resp.ok
         if m.assets.Count() = 0 then m.status.text = describeApiError(resp)
+        m.top.loaded = true
         logDebug("search page failed: " + resp.status.ToStr())
         return
     end if
@@ -208,6 +212,7 @@ sub appendItems(group as object)
     end for
     m.grid.appendGroup = group
     m.top.assetCount = m.assets.Count()
+    m.top.loaded = true
     logDebug("items loaded: " + m.assets.Count().ToStr())
 end sub
 

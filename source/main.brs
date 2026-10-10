@@ -1,11 +1,13 @@
 ' App entry point. Creates MainScene and keeps the channel alive until it closes.
 sub Main(args as dynamic)
-    applyLaunchSettings(args)
-    ' Dev: tools\relaunch.ps1 -Screensaver opens the screensaver directly for testing.
-    if type(args) = "roAssociativeArray" and args.screensaver = "preview"
-        RunScreenSaver(args)
-        return
-    end if
+    #if DEV
+        applyDevLaunchSettings(args)
+        ' tools\relaunch.ps1 -Screensaver opens the screensaver directly for testing.
+        if type(args) = "roAssociativeArray" and args.screensaver = "preview"
+            RunScreenSaver(args)
+            return
+        end if
+    #end if
 
     screen = CreateObject("roSGScreen")
     port = CreateObject("roMessagePort")
@@ -14,6 +16,12 @@ sub Main(args as dynamic)
     screen.show()
     scene.observeField("exitApp", port)
 
+    ' Deep links: contentId/mediaType at launch, and roInput events while running.
+    input = CreateObject("roInput")
+    input.setMessagePort(port)
+    deepLink = deepLinkFrom(args)
+    if deepLink <> invalid then scene.deepLink = deepLink
+
     while true
         msg = wait(0, port)
         msgType = type(msg)
@@ -21,15 +29,30 @@ sub Main(args as dynamic)
             if msg.isScreenClosed() then return
         else if msgType = "roSGNodeEvent"
             if msg.getField() = "exitApp" and msg.getData() = true then return
+        else if msgType = "roInputEvent"
+            if msg.isInput()
+                deepLink = deepLinkFrom(msg.getInfo())
+                if deepLink <> invalid then scene.deepLink = deepLink
+            end if
         end if
     end while
 end sub
 
+' { contentId, mediaType } when both are present, else invalid. contentId is an Immich asset ID.
+function deepLinkFrom(params as dynamic) as dynamic
+    if type(params) <> "roAssociativeArray" then return invalid
+    if params.contentId = invalid or params.mediaType = invalid then return invalid
+    return { contentId: params.contentId, mediaType: params.mediaType }
+end function
+
+#if DEV
 ' Dev convenience: sideloading wipes the registry, so tools\relaunch.ps1 passes
 ' serverUrl and apiKey (from .env) as ECP launch parameters to avoid retyping them.
-sub applyLaunchSettings(args as dynamic)
+' Compiled out of release builds: anyone on the network could otherwise reconfigure the channel.
+sub applyDevLaunchSettings(args as dynamic)
     if type(args) <> "roAssociativeArray" then return
     if args.serverUrl = invalid or args.apiKey = invalid then return
     upsertProfile("", normalizeServerUrl(args.serverUrl), args.apiKey)
     logDebug("settings applied from launch parameters")
 end sub
+#end if

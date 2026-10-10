@@ -6,12 +6,15 @@
     For another Roku pass -RokuHost; its password comes from ROKU_DEV_PASSWORD_<ip with
     dots as underscores> in .env if set (e.g. ROKU_DEV_PASSWORD_10_10_10_164), else ROKU_DEV_PASSWORD.
     Uses the curl.exe that ships with Windows, so Node isn't needed.
+    Builds a dev build (bs_const DEV=true: debug logging and dev launch parameters) unless
+    -Release is given, which keeps the manifest's DEV=false as in store builds.
 .EXAMPLE
     .\deploy.ps1                          # build and install on ROKU_HOST
     .\deploy.ps1 -RokuHost 10.10.10.164   # install on another Roku
+    .\deploy.ps1 -Release                 # install a release build (as published)
     .\deploy.ps1 -ZipOnly                 # just build out\immich-roku.zip
 #>
-param([switch]$ZipOnly, [string]$RokuHost)
+param([switch]$ZipOnly, [string]$RokuHost, [switch]$Release)
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
@@ -27,7 +30,7 @@ function Read-DotEnv([string]$path) {
     return $values
 }
 
-function New-ChannelZip([string]$zipPath) {
+function New-ChannelZip([string]$zipPath, [bool]$devBuild) {
     # Built by hand so entry names use forward slashes (Compress-Archive on PS 5.1 writes backslashes).
     Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
     if (Test-Path $zipPath) { Remove-Item $zipPath }
@@ -38,7 +41,14 @@ function New-ChannelZip([string]$zipPath) {
             if (-not (Test-Path $path)) { continue }
             foreach ($file in Get-ChildItem $path -Recurse -File) {
                 $entry = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
-                [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $entry, 'Optimal')
+                if ($entry -eq 'manifest' -and $devBuild) {
+                    $text = (Get-Content $file.FullName -Raw) -replace '(?m)^bs_const=DEV=false', 'bs_const=DEV=true'
+                    $writer = New-Object IO.StreamWriter ($zip.CreateEntry($entry).Open())
+                    $writer.Write($text)
+                    $writer.Dispose()
+                } else {
+                    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $entry, 'Optimal')
+                }
             }
         }
     } finally {
@@ -49,8 +59,8 @@ function New-ChannelZip([string]$zipPath) {
 $outDir = Join-Path $root 'out'
 New-Item -ItemType Directory -Force $outDir | Out-Null
 $zipPath = Join-Path $outDir 'immich-roku.zip'
-New-ChannelZip $zipPath
-Write-Host "Built $zipPath"
+New-ChannelZip $zipPath (-not $Release)
+if ($Release) { Write-Host "Built $zipPath (release)" } else { Write-Host "Built $zipPath (dev)" }
 if ($ZipOnly) { return }
 
 $config = Read-DotEnv (Join-Path $root '.env')

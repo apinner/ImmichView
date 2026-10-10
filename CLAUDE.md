@@ -1,6 +1,6 @@
 # ImmichView (Immich client for Roku)
 
-A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-hosted Immich server. Sideloaded via Roku developer mode; not intended for the Roku Channel Store.
+A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-hosted Immich server. Developed by sideloading; being prepared for the Roku Channel Store (see PUBLISHING.md for the checklist).
 
 ## Goals
 
@@ -23,6 +23,9 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
 - `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`). Key names: `Info` is the `*` button (opens Settings on Home), `Lit_x` types a character into a keyboard dialog.
 - `.\tools\relaunch.ps1 -Screensaver` opens the screensaver directly (dev launch param `screensaver=preview`).
+- Dev vs release: the manifest has `bs_const=DEV=false`; `deploy.ps1` rewrites it to `true` in the zip unless `-Release`. `#if DEV` guards the dev launch params and `logDebug`. Never ship a DEV build.
+- `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
+- Both Rokus take `-RokuHost` (deploy, relaunch, deeplink): Guest Bedroom 10.10.10.163 (default `ROKU_HOST`), Living Room 10.10.10.164.
 - `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill). Channel posters and splash screens in `images/` are supplied artwork; don't regenerate them.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.

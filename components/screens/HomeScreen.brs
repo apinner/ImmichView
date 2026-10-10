@@ -19,6 +19,7 @@ sub init()
 
     m.tabs.observeField("selected", "onTabChanged")
     m.timeline.observeField("exitedTop", "focusTabs")
+    m.timeline.observeField("loaded", "onTimelineLoaded")
     m.timeline.observeField("itemSelected", "onTimelineSelected")
     m.albums.observeField("itemSelected", "onAlbumSelected")
     m.peoplePane.observeField("personSelected", "onPersonSelected")
@@ -32,6 +33,10 @@ end sub
 
 sub onFocusChanged()
     if m.top.hasFocus() then focusContent()
+end sub
+
+sub onTimelineLoaded()
+    if m.timeline.loaded then m.top.ready = true
 end sub
 
 ' ---- Tabs and focus ----
@@ -95,6 +100,7 @@ sub onUser(event as object)
         end for
         m.status.text = describeApiError(resp) + Chr(10) + Chr(10) + "Press OK for Settings."
         focusTabs()
+        m.top.ready = true
         return
     end if
 

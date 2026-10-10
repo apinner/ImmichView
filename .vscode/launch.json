@@ -10,6 +10,7 @@
             "password": "${env:ROKU_DEV_PASSWORD}",
             "rootDir": "${workspaceFolder}",
             "files": ["manifest", "source/**/*", "components/**/*", "images/**/*"],
+            "bsConst": { "DEV": true },
             "stopOnEntry": false
         }
     ]

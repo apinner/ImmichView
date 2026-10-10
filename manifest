@@ -11,3 +11,5 @@ splash_screen_sd=pkg:/images/splash-screen_sd.jpg
 splash_color=#0E0618
 splash_min_time=1500
 screensaver_title=ImmichView
+supports_input_launch=1
+bs_const=DEV=false

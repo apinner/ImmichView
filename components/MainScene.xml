@@ -2,9 +2,12 @@
 <component name="MainScene" extends="Scene">
     <interface>
         <field id="exitApp" type="boolean" alwaysNotify="true" />
+        <!-- { contentId, mediaType } from launch parameters or roInput (set by Main). -->
+        <field id="deepLink" type="assocarray" alwaysNotify="true" onChange="onDeepLink" />
     </interface>
 
     <script type="text/brightscript" uri="MainScene.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 </component>

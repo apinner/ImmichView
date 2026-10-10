@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Settings: switch, add and remove users; slideshow speed. Later also screensaver options. -->
+<!-- Settings: switch, add and remove users; slideshow speed; screensaver photos and caption. -->
 <component name="SettingsScreen" extends="Group">
     <interface>
         <field id="navigate" type="assocarray" alwaysNotify="true" />
@@ -16,12 +16,13 @@
 
         <Label text="Users" translation="[160,180]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
         <LabelList id="users" translation="[160,240]" itemSize="[1200,72]" itemSpacing="[0,12]"
-            numRows="5" vertFocusAnimationStyle="floatingFocus"
+            numRows="4" vertFocusAnimationStyle="floatingFocus"
             color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
 
-        <Label text="Slideshow" translation="[160,700]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
-        <LabelList id="options" translation="[160,760]" itemSize="[1200,72]" itemSpacing="[0,12]"
-            numRows="1" color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
+        <Label text="Slideshow and screensaver" translation="[160,610]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
+        <LabelList id="options" translation="[160,670]" itemSize="[1200,72]" itemSpacing="[0,12]"
+            numRows="3" vertFocusAnimationStyle="floatingFocus"
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
 
         <Label id="hint" translation="[160,960]" width="1600"
             font="font:SmallSystemFont" color="0x80888FFF" />

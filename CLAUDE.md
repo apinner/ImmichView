@@ -21,7 +21,9 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 
 - `.\deploy.ps1` zips and sideloads (curl.exe, no Node). Sideloading wipes the channel registry.
 - `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
-- `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`).
+- `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`). Key names: `Info` is the `*` button (opens Settings on Home), `Lit_x` types a character into a keyboard dialog.
+- `.\tools\relaunch.ps1 -Screensaver` opens the screensaver directly (dev launch param `screensaver=preview`).
+- `.\tools\make-images.ps1` (play icon, focus frames, masks, pill) and `.\tools\make-icons.ps1` (channel icons and splash from `art/immichview.svg` via headless Edge).
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
@@ -74,9 +76,9 @@ Reference: https://api.immich.app and the OpenAPI spec for the server's version.
 | Video stream (transcoded if available) | `GET /api/assets/{id}/video/playback` (verified v3.3.1: MP4 with byte ranges; used with `streamFormat=mp4`). The HLS endpoints (`/video/stream/main.m3u8`) need real-time transcoding, which is off on this server (400). Sampled library: mostly H.264, a few HEVC |
 | Smart search | `POST /api/search/smart` |
 | Metadata search | `POST /api/search/metadata` |
-| Random assets (screensaver) | `POST /api/search/random` |
+| Random assets (screensaver) | `POST /api/search/random` (verified v3.3.1: `{size, type: "IMAGE", withExif, visibility}` or `albumIds` for one album; returns an array of assets) |
 | People | `GET /api/people`, plus person filter in search |
-| Memories ("on this day") | `GET /api/memories` |
+| Memories ("on this day") | `GET /api/memories?for=YYYY-MM-DD` (verified: memories of type `on_this_day` with `data.year` and `assets[]`) |
 
 Format notes:
 - Roku can't decode HEIC. Always use Immich's generated thumbnail/preview images (JPEG/WebP), never originals. Confirm WebP renders on the target Roku OS version; if not, request JPEG or fall back.

@@ -9,3 +9,4 @@ splash_screen_fhd=pkg:/images/splash_fhd.png
 splash_screen_hd=pkg:/images/splash_hd.png
 splash_color=#24232F
 splash_min_time=0
+screensaver_title=ImmichView

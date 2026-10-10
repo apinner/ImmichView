@@ -5,15 +5,20 @@ sub init()
     m.users.observeField("itemSelected", "onUserSelected")
     m.options.observeField("itemSelected", "onOptionSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
+    m.lastList = m.users
     refreshUsers()
     refreshOptions()
 end sub
 
+' Also runs when returning from the screensaver photo picker.
 sub onFocusChanged()
-    if m.top.hasFocus() then focusList(m.users)
+    if not m.top.hasFocus() then return
+    refreshOptions()
+    focusList(m.lastList)
 end sub
 
 sub focusList(list as object)
+    m.lastList = list
     list.setFocus(true)
     if list.isSameNode(m.users)
         m.hint.text = "OK: switch to this user      * : remove user"
@@ -57,17 +62,40 @@ sub onUserSelected()
     m.top.profilesChanged = true
 end sub
 
-' ---- Slideshow ----
+' ---- Slideshow and screensaver ----
 
 sub refreshOptions()
+    screensaver = loadScreensaverSettings()
+    caption = "Off"
+    if screensaver.showCaption then caption = "On"
+    titles = [
+        "Time per photo:   " + loadSlideshowSeconds().ToStr() + " seconds"
+        "Screensaver photos:   " + screensaverSourceLabel(screensaver)
+        "Screensaver shows date and place:   " + caption
+    ]
     content = CreateObject("roSGNode", "ContentNode")
-    item = content.createChild("ContentNode")
-    item.title = "Time per photo:   " + loadSlideshowSeconds().ToStr() + " seconds"
+    for each title in titles
+        item = content.createChild("ContentNode")
+        item.title = title
+    end for
+    focused = m.options.itemFocused
     m.options.content = content
+    if focused > 0 then m.options.jumpToItem = focused
 end sub
 
-' Cycles through the available intervals.
 sub onOptionSelected()
+    index = m.options.itemSelected
+    if index = 0
+        cycleSlideshowInterval()
+    else if index = 1
+        m.top.navigate = { screen: "ScreensaverSourceScreen" }
+    else if index = 2
+        saveScreensaverCaption(not loadScreensaverSettings().showCaption)
+        refreshOptions()
+    end if
+end sub
+
+sub cycleSlideshowInterval()
     intervals = slideshowIntervals()
     current = loadSlideshowSeconds()
     nextValue = intervals[0]

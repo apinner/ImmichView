@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Picks where the screensaver's photos come from: random, memories, or one album. -->
+<component name="ScreensaverSourceScreen" extends="Group">
+    <interface>
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <field id="done" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="ScreensaverSourceScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Label text="Screensaver photos" translation="[160,80]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <LabelList id="sources" translation="[160,200]" itemSize="[1200,64]" itemSpacing="[0,8]"
+            numRows="11" vertFocusAnimationStyle="floatingFocus"
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
+        <Label id="status" translation="[160,980]" width="1600"
+            font="font:SmallSystemFont" color="0x80888FFF" />
+    </children>
+</component>

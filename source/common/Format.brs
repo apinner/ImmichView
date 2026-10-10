@@ -39,6 +39,14 @@ function formatPhotoDate(localDateTime as dynamic) as string
     return text
 end function
 
+' Immich localDateTime -> "28 September 2026"
+function formatShortDate(localDateTime as dynamic) as string
+    if localDateTime = invalid or localDateTime = "" then return ""
+    dt = CreateObject("roDateTime")
+    dt.FromISO8601String(localDateTime)
+    return dt.GetDayOfMonth().ToStr() + " " + monthNames()[dt.GetMonth() - 1] + " " + dt.GetYear().ToStr()
+end function
+
 ' 1.9 -> "1.9", 5.0 -> "5"
 function formatOneDecimal(value as dynamic) as string
     tenths = Int(value * 10 + 0.5)

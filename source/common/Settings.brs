@@ -98,6 +98,41 @@ sub saveSlideshowSeconds(seconds as integer)
     sec.Flush()
 end sub
 
+' ---- Screensaver (shared by all users) ----
+' source: "random" (whole library), "memories" (on this day) or "album" (albumId/albumName)
+
+function loadScreensaverSettings() as object
+    sec = registrySection()
+    source = sec.Read("ssSource")
+    if source = "" then source = "random"
+    return {
+        source: source
+        albumId: sec.Read("ssAlbumId")
+        albumName: sec.Read("ssAlbumName")
+        showCaption: sec.Read("ssCaption") <> "off"
+    }
+end function
+
+sub saveScreensaverSource(source as string, albumId as string, albumName as string)
+    sec = registrySection()
+    sec.Write("ssSource", source)
+    sec.Write("ssAlbumId", albumId)
+    sec.Write("ssAlbumName", albumName)
+    sec.Flush()
+end sub
+
+sub saveScreensaverCaption(show as boolean)
+    sec = registrySection()
+    if show then sec.Write("ssCaption", "on") else sec.Write("ssCaption", "off")
+    sec.Flush()
+end sub
+
+function screensaverSourceLabel(settings as object) as string
+    if settings.source = "memories" then return "Memories (on this day)"
+    if settings.source = "album" then return "Album: " + settings.albumName
+    return "Random photos from your library"
+end function
+
 ' ---- Display helpers ----
 
 function profileDisplayName(profile as object) as string

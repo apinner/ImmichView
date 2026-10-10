@@ -4,8 +4,9 @@
     Useful for catching compile errors after .\deploy.ps1. Uses ROKU_HOST from .env.
     If IMMICH_URL and IMMICH_API_KEY are set in .env they are passed as launch
     parameters, so the channel is signed in even though sideloading wiped its registry.
+    -Screensaver opens the screensaver instead of the app (for testing it).
 #>
-param([int]$Seconds = 10)
+param([int]$Seconds = 10, [switch]$Screensaver)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -18,6 +19,9 @@ $launchUrl = "http://${rokuHost}:8060/launch/dev"
 if ($config['IMMICH_URL'] -and $config['IMMICH_API_KEY']) {
     $launchUrl += '?serverUrl=' + [uri]::EscapeDataString($config['IMMICH_URL']) +
         '&apiKey=' + [uri]::EscapeDataString($config['IMMICH_API_KEY'])
+}
+if ($Screensaver) {
+    if ($launchUrl.Contains('?')) { $launchUrl += '&screensaver=preview' } else { $launchUrl += '?screensaver=preview' }
 }
 
 $client = New-Object Net.Sockets.TcpClient

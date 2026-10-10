@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    System screensaver: crossfades full-screen photos with a slow zoom/drift (against burn-in).
+    Photos come from random library photos, today's memories or one album (see Settings).
+-->
+<component name="ScreensaverScene" extends="Scene">
+    <script type="text/brightscript" uri="ScreensaverScene.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Group id="stage">
+            <Poster id="photoA" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
+            <Poster id="photoB" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
+        </Group>
+        <Rectangle id="fadeDummy" width="0" height="0" />
+
+        <Group id="caption" opacity="0">
+            <Rectangle id="captionBack" color="0x00000090" />
+            <Label id="captionDate" translation="[24,14]" font="font:MediumBoldSystemFont" color="0xFFFFFFFF" />
+            <Label id="captionPlace" translation="[24,62]" font="font:SmallSystemFont" color="0xE0E4E8FF" />
+        </Group>
+
+        <Label id="message" width="1000" wrap="true" horizAlign="center" visible="false"
+            font="font:MediumSystemFont" color="0xA0A8B0FF" />
+
+        <Timer id="advanceTimer" repeat="false" />
+        <Timer id="retryTimer" duration="60" repeat="false" />
+        <Timer id="moveMessageTimer" duration="20" repeat="true" />
+
+        <Animation id="fade" duration="1.5" easeFunction="linear">
+            <FloatFieldInterpolator id="fadeIn" key="[0.0, 1.0]" keyValue="[0.0, 1.0]" fieldToInterp="photoA.opacity" />
+            <FloatFieldInterpolator id="fadeOut" key="[0.0, 1.0]" keyValue="[1.0, 0.0]" fieldToInterp="fadeDummy.opacity" />
+            <FloatFieldInterpolator id="captionFade" key="[0.0, 0.6, 1.0]" keyValue="[0.0, 0.0, 1.0]" fieldToInterp="caption.opacity" />
+        </Animation>
+        <Animation id="drift" easeFunction="linear">
+            <Vector2DFieldInterpolator id="driftScale" key="[0.0, 1.0]" fieldToInterp="photoA.scale" />
+            <Vector2DFieldInterpolator id="driftMove" key="[0.0, 1.0]" fieldToInterp="photoA.translation" />
+        </Animation>
+    </children>
+</component>

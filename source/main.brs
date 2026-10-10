@@ -1,6 +1,11 @@
 ' App entry point. Creates MainScene and keeps the channel alive until it closes.
 sub Main(args as dynamic)
     applyLaunchSettings(args)
+    ' Dev: tools\relaunch.ps1 -Screensaver opens the screensaver directly for testing.
+    if type(args) = "roAssociativeArray" and args.screensaver = "preview"
+        RunScreenSaver(args)
+        return
+    end if
 
     screen = CreateObject("roSGScreen")
     port = CreateObject("roMessagePort")

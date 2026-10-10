@@ -17,8 +17,9 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [x] **Signed package script.** `tools/package.ps1` installs the release build, has the Roku sign it, and saves `out/packages/ImmichView-<version>.pkg`.
 - [ ] **Static Analysis.** Run Roku's analyzer (in the Developer Dashboard upload, or the CLI
       tool) and fix anything it reports.
-- [ ] Pre-certification test pass on a real Roku: launch time under 15 s, Back on Home exits,
-      no crashes, network errors handled, screensaver behaviour.
+- [x] Pre-certification test pass on the test Roku: launch about 2 s to AppLaunchComplete (limit 15 s),
+      Back on Home exits, unreachable server and rejected key show clear messages with a path to
+      Settings, add/remove user, screensaver, stress-tested grids and viewer.
 
 ## 2. Accounts and signing (Alex)
 

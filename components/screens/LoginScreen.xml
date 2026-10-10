@@ -19,7 +19,9 @@
 
         <LabelList id="menu" translation="[160,300]" itemSize="[1200,72]" itemSpacing="[0,12]"
             numRows="3" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF"
+            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xADCBFAFF"
+            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x3A3950FF" />
 
         <Label id="status" translation="[160,620]" width="1600" wrap="true"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />

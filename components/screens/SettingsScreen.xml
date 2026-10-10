@@ -15,16 +15,20 @@
         <Label text="Settings" translation="[160,80]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
 
         <Label text="Users" translation="[160,180]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
-        <LabelList id="users" translation="[160,240]" itemSize="[1200,72]" itemSpacing="[0,12]"
+        <LabelList id="users" translation="[160,256]" itemSize="[1200,72]" itemSpacing="[0,12]"
             numRows="4" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF"
+            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xADCBFAFF"
+            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x3A3950FF" />
 
         <Label text="Slideshow and screensaver" translation="[160,610]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
-        <LabelList id="options" translation="[160,670]" itemSize="[1200,72]" itemSpacing="[0,12]"
+        <LabelList id="options" translation="[160,686]" itemSize="[1200,72]" itemSpacing="[0,12]"
             numRows="3" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x0B0E11FF" />
+            color="0xE0E4E8FF" focusedColor="0x0B0E11FF"
+            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xADCBFAFF"
+            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x3A3950FF" />
 
-        <Label id="hint" translation="[160,960]" width="1600"
+        <Label id="hint" translation="[160,984]" width="1600"
             font="font:SmallSystemFont" color="0x80888FFF" />
     </children>
 </component>

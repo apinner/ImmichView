@@ -35,6 +35,12 @@
                 <Poster id="focusFrame" uri="pkg:/images/focus.9.png" visible="false" />
             </Group>
         </Group>
+        <!-- The current group's title, shown while its own header is scrolled off the top. -->
+        <Group id="sticky" translation="[0,-8]" visible="false">
+            <Rectangle id="stickyBack" height="60" color="0x24232FFF" />
+            <Label id="stickyLabel" height="52" vertAlign="bottom"
+                font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
+        </Group>
         <Animation id="scrollAnim" duration="0.15" easeFunction="outQuad">
             <Vector2DFieldInterpolator id="scrollInterp" key="[0.0, 1.0]" fieldToInterp="content.translation" />
         </Animation>

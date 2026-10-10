@@ -2,6 +2,7 @@
 ' Roku closes the screen when the user presses a key. Roku calls this without
 ' arguments; Main passes its launch args when previewing (tools\relaunch.ps1 -Screensaver).
 sub RunScreenSaver(params = invalid as dynamic)
+    if params <> invalid then logDebug("screensaver preview")
     screen = CreateObject("roSGScreen")
     port = CreateObject("roMessagePort")
     screen.setMessagePort(port)

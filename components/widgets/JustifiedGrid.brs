@@ -25,6 +25,7 @@ sub resetState()
     m.focus = -1
     m.stickyX = invalid ' remembered column centre for repeated up/down
     m.scrollY = 0
+    m.lastGroupHasHeader = false
 end sub
 
 sub onClear()
@@ -33,6 +34,7 @@ sub onClear()
     m.content.translation = [0, 0]
     m.focusFrame.visible = false
     resetState()
+    updateSticky()
 end sub
 
 sub onFocusChanged()
@@ -52,6 +54,9 @@ sub onAppendGroup()
         if m.rows.Count() > 0 then m.contentHeight = m.contentHeight + 24
         m.headers.Push({ top: m.contentHeight, title: group.title })
         m.contentHeight = m.contentHeight + headerHeight()
+        m.lastGroupHasHeader = true
+    else
+        m.lastGroupHasHeader = false
     end if
 
     for each item in group.items
@@ -138,7 +143,10 @@ sub addRow(start as integer, count as integer, scale as float)
         m.itemRow.Push(rowIndex)
         x = x + w + gap
     end for
-    m.rows.Push({ start: start, count: count, top: m.contentHeight, height: Int(rowHeight + 0.5), xs: xs, widths: widths })
+    ' header: index of the group header above this row (-1 for header-less results)
+    header = m.headers.Count() - 1
+    if m.lastGroupHasHeader <> true then header = -1
+    m.rows.Push({ start: start, count: count, top: m.contentHeight, height: Int(rowHeight + 0.5), xs: xs, widths: widths, header: header })
     m.contentHeight = m.contentHeight + Int(rowHeight + 0.5) + gap
 end sub
 
@@ -256,6 +264,24 @@ function createHeaderNode(index as integer) as object
     return header
 end function
 
+' Shows the title of the group at the top of the view once its header has scrolled off.
+sub updateSticky()
+    sticky = m.top.findNode("sticky")
+    r = firstRowEndingBelow(m.scrollY + 1)
+    if r >= m.rows.Count() or m.rows[r].header < 0
+        sticky.visible = false
+        return
+    end if
+    header = m.headers[m.rows[r].header]
+    if header.top + headerHeight() - 12 > m.scrollY
+        sticky.visible = false  ' the real header is still on screen
+        return
+    end if
+    m.top.findNode("stickyBack").width = m.top.gridWidth
+    m.top.findNode("stickyLabel").text = header.title
+    sticky.visible = true
+end sub
+
 ' ---- Focus and scrolling ----
 
 sub setFocusIndex(index as integer, animate as boolean)
@@ -282,6 +308,7 @@ sub scrollToRow(row as object, animate as boolean)
     if target <> m.scrollY
         m.scrollY = target
         refreshVisibleNodes()
+        updateSticky()
         if animate
             m.anim.control = "stop"
             m.interp.keyValue = [m.content.translation, [0, -target]]

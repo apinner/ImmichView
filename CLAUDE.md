@@ -23,7 +23,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
 - `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`). Key names: `Info` is the `*` button (opens Settings on Home), `Lit_x` types a character into a keyboard dialog.
 - `.\tools\relaunch.ps1 -Screensaver` opens the screensaver directly (dev launch param `screensaver=preview`).
-- `.\tools\make-images.ps1` (play icon, focus frames, masks, pill) and `.\tools\make-icons.ps1` (channel icons and splash from `art/immichview.svg` via headless Edge).
+- `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill). Channel posters and splash screens in `images/` are supplied artwork; don't regenerate them.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 

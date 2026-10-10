@@ -39,8 +39,8 @@ end sub
 
 sub updateBoxStyle()
     if m.box.hasFocus()
-        m.boxBack.color = "0xADCBFAFF"
-        m.boxText.color = "0x0B0E11FF"
+        m.boxBack.color = "0xC6A1E7FF"
+        m.boxText.color = "0x2D0F47FF"
     else
         m.boxBack.color = "0x2E2D3AFF"
         if m.query = ""
@@ -80,6 +80,13 @@ sub showKeyboard()
     dlg.message = ["Describe what you're looking for, like " + Chr(34) + "dog on the beach" + Chr(34) + ". Use the mic button to speak."]
     dlg.text = m.query
     dlg.buttons = ["Search", "Cancel"]
+    ' The dialog's built-in keyboard defaults voice to letter-by-letter ("alphanumeric");
+    ' "generic" transcribes whole words and phrases, which is what a search needs.
+    dlg.keyboardDomain = "generic"
+    if dlg.textEditBox <> invalid
+        dlg.textEditBox.voiceEntryType = "generic"
+        logDebug("search voice entry: " + dlg.textEditBox.voiceEntryType)
+    end if
     dlg.observeField("buttonSelected", "onKeyboardButton")
     dlg.observeField("wasClosed", "onKeyboardClosed")
     m.dialog = dlg

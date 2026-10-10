@@ -46,10 +46,10 @@ sub updateStyles()
         isSelected = (i = m.top.selected)
         tabNode.pill.visible = isSelected
         if isSelected and focused
-            tabNode.pill.blendColor = "0xADCBFAFF"
-            tabNode.label.color = "0x0B0E11FF"
+            tabNode.pill.blendColor = "0xC6A1E7FF"
+            tabNode.label.color = "0x2D0F47FF"
         else if isSelected
-            tabNode.pill.blendColor = "0x3A3950FF"
+            tabNode.pill.blendColor = "0x4A2D66FF"
             tabNode.label.color = "0xFFFFFFFF"
         else
             tabNode.label.color = "0x80888FFF"

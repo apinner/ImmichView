@@ -15,9 +15,9 @@
         <Label text="Screensaver photos" translation="[160,80]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
         <LabelList id="sources" translation="[160,216]" itemSize="[1200,64]" itemSpacing="[0,8]"
             numRows="11" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x0B0E11FF"
-            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xADCBFAFF"
-            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x3A3950FF" />
+            color="0xE0E4E8FF" focusedColor="0x2D0F47FF"
+            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xC6A1E7FF"
+            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x4A2D66FF" />
         <Label id="status" translation="[160,980]" width="1600"
             font="font:SmallSystemFont" color="0x80888FFF" />
     </children>

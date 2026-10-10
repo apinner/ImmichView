@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    "Who's watching?" at launch when there are several users (or the only one has a PIN), and
+    after the active user is removed. Choosing a user with a PIN asks for it.
+-->
+<component name="ProfilePickerScreen" extends="Group">
+    <interface>
+        <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <!-- Set once a user is chosen (and their PIN entered); MainScene opens Home. -->
+        <field id="profileChosen" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="ProfilePickerScreen.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <AppTitle translation="[80,28]" />
+        <Label text="Who's watching?" translation="[0,250]" width="1920" horizAlign="center"
+            font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <!-- Centred horizontally in init from the number of tiles. -->
+        <MarkupGrid id="grid" translation="[0,380]" itemComponentName="ProfileTile" drawFocusFeedback="false"
+            itemSize="[232,300]" itemSpacing="[56,40]" numRows="2" vertFocusAnimationStyle="floatingFocus" />
+        <Label translation="[0,1000]" width="1920" horizAlign="center"
+            font="font:SmallSystemFont" color="0x80888FFF" text="OK to choose      Back to exit" />
+    </children>
+</component>

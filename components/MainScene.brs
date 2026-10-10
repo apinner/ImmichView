@@ -17,15 +17,36 @@ sub init()
     m.homeReady = false
     m.pendingDeepLink = invalid
 
-    settings = loadSettings()
-    applySettings(settings)
-    if hasSettings(settings)
-        resetTo("HomeScreen")
-    else
-        resetTo("LoginScreen")
+    applySettings(loadSettings())
+    first = launchScreen()
+    resetTo(first)
+    if first <> "HomeScreen"
+        ' Sign-in or user selection before Home: certification's AppDialog beacons.
         m.top.signalBeacon("AppDialogInitiate")
         m.launchDialogOpen = true
     end if
+end sub
+
+' Sign-in when there are no users; Who's watching when there are several, when the only user
+' has a PIN, or when none is active; otherwise straight to Home.
+function launchScreen() as string
+    profiles = loadProfiles().profiles
+    if profiles.Count() = 0 then return "LoginScreen"
+    active = loadSettings()
+    if profiles.Count() >= 2 or not hasSettings(active) or profileHasPin(active) then return "ProfilePickerScreen"
+    return "HomeScreen"
+end function
+
+sub endLaunchDialog()
+    if not m.launchDialogOpen then return
+    m.launchDialogOpen = false
+    m.top.signalBeacon("AppDialogComplete")
+end sub
+
+sub onProfileChosen()
+    endLaunchDialog()
+    applySettings(loadSettings())
+    resetTo("HomeScreen")
 end sub
 
 sub sendLaunchComplete()
@@ -124,6 +145,7 @@ function pushScreen(name as string, params = invalid as dynamic) as object
         screen.observeField("ready", "onHomeReady")
     end if
     if screen.hasField("profilesChanged") then screen.observeField("profilesChanged", "onProfilesChanged")
+    if screen.hasField("profileChosen") then screen.observeField("profileChosen", "onProfileChosen")
     if screen.hasField("done") then screen.observeField("done", "onScreenDone")
     if params <> invalid then screen.update(params)
 
@@ -165,10 +187,7 @@ end sub
 
 sub onConnected()
     applySettings(loadSettings())
-    if m.launchDialogOpen
-        m.launchDialogOpen = false
-        m.top.signalBeacon("AppDialogComplete")
-    end if
+    endLaunchDialog()
     m.connectedTimer.control = "start"
 end sub
 
@@ -176,12 +195,15 @@ sub onConnectedTimer()
     resetTo("HomeScreen")
 end sub
 
-' User switched or removed in Settings: start over as the now-active user.
+' User switched (PIN already checked) or removed: start over as the now-active user. After
+' removing the active user none is active, so Who's watching appears (or sign-in if none left).
 sub onProfilesChanged()
     settings = loadSettings()
     applySettings(settings)
     if hasSettings(settings)
         resetTo("HomeScreen")
+    else if loadProfiles().profiles.Count() > 0
+        resetTo("ProfilePickerScreen")
     else
         resetTo("LoginScreen")
     end if

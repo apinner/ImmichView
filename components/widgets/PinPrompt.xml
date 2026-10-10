@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Asks for a user's PIN with Roku's PIN pad dialog. Append it to a screen, set profile and mode,
+    then set start; observe result.
+    mode "verify": check the profile's PIN (3 wrong tries lock it for 30 s, doubling each time).
+    mode "set": choose a new PIN, entered twice; the PIN ends up in newPin.
+-->
+<component name="PinPrompt" extends="Group">
+    <interface>
+        <field id="profile" type="assocarray" />
+        <field id="mode" type="string" value="verify" />
+        <field id="start" type="boolean" alwaysNotify="true" onChange="onStart" />
+        <!-- "ok" or "cancelled" -->
+        <field id="result" type="string" alwaysNotify="true" />
+        <field id="newPin" type="string" />
+    </interface>
+
+    <script type="text/brightscript" uri="PinPrompt.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+</component>

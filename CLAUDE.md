@@ -28,6 +28,9 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - **Test only on the Guest Bedroom Roku (10.10.10.163, the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
 - `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill). Channel posters and splash screens in `images/` are supplied artwork; don't regenerate them.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
+- Dot-notation (`aa.pinSalt = x`) stores lowercase keys and `ParseJson` dictionaries are case-sensitive, so `Delete`/lookups by string must use the lowercase key.
+- Don't open the next dialog from inside a dialog's `wasClosed` observer: Roku clears `scene.dialog` afterwards and dismisses it. `PinPrompt` reports its result via a short Timer for this reason.
+- `drive.ps1` sends a step's keys 250 ms apart; put a key that opens a dialog in its own step, or the following keys can be lost.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
 ## Tech stack and tooling
@@ -46,9 +49,9 @@ source/
   screensaver.brs     ' Sub RunScreenSaver(params) – screensaver entry
 components/
   MainScene.xml/.brs
-  screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen
+  screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, PinPrompt, ProfileTile, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art
 ```
@@ -56,7 +59,7 @@ images/               ' Icons, splash, focus art
 ## Architecture rules
 
 - **All network I/O runs in Task nodes**, never on the render thread. One generic `ImmichApiTask` takes `{method, path, body}` and returns parsed JSON or an error code via an observed field.
-- **Authentication:** Immich API key sent as the `x-api-key` header. Users are profiles `{id, name, serverUrl, apiKey}` stored as JSON in `roRegistrySection("immich")` (`profiles`, `activeProfile`); see `source/common/Settings.brs`. Don't use username/password login; typing on a remote is painful.
+- **Authentication:** Immich API key sent as the `x-api-key` header. Users are profiles `{id, name, serverUrl, apiKey, pinSalt?, pinHash?}` (optional PIN stored as salted SHA-256; a household privacy lock, not security) stored as JSON in `roRegistrySection("immich")` (`profiles`, `activeProfile`); see `source/common/Settings.brs`. Don't use username/password login; typing on a remote is painful.
 - **Image loading:** Poster and Video nodes need the auth header too. Create an `roHttpAgent`, `AddHeader("x-api-key", key)`, and call `node.setHttpAgent(agent)` on every Poster and Video node. Share one agent per grid/screen: creating one per tile (each loading the CA bundle) tripped the render-thread execution timeout.
 - **Memory:** Roku texture memory is tight. Always set `loadWidth`/`loadHeight` on Posters, use Immich's small thumbnails for grids and preview size for full screen, and never load originals into a Poster. Recycle grid items (MarkupGrid/RowList) rather than creating thousands of nodes.
 - **Pagination:** Album and timeline contents can be large. Fetch in pages and load more as focus nears the end of a grid.

@@ -1,7 +1,7 @@
 ' Persistent settings in roRegistrySection("immich").
 ' Users are stored as profiles, each with its own server and API key:
-'   profiles      = JSON array of { id, name, serverUrl, apiKey }
-'   activeProfile = id of the profile in use
+'   profiles      = JSON array of { id, name, serverUrl, apiKey, pinSalt?, pinHash? }
+'   activeProfile = id of the profile in use ("" when none is chosen, e.g. after removing it)
 
 function registrySection() as object
     return CreateObject("roRegistrySection", "immich")
@@ -37,7 +37,8 @@ function hasSettings(settings as object) as boolean
 end function
 
 ' Adds a profile, or updates the one with the same server and key, and makes it active.
-function upsertProfile(name as string, serverUrl as string, apiKey as string) as string
+' clearPin: signing in again with a user's API key proves access, so it resets a forgotten PIN.
+function upsertProfile(name as string, serverUrl as string, apiKey as string, clearPin = false as boolean) as string
     data = loadProfiles()
     target = invalid
     for each profile in data.profiles
@@ -49,8 +50,16 @@ function upsertProfile(name as string, serverUrl as string, apiKey as string) as
     else if name <> ""
         target.name = name
     end if
+    if clearPin then removePinFields(target)
     saveProfiles(data.profiles, target.id)
     return target.id
+end function
+
+function findProfile(id as string) as dynamic
+    for each profile in loadProfiles().profiles
+        if profile.id = id then return profile
+    end for
+    return invalid
 end function
 
 sub setActiveProfile(id as string)
@@ -65,7 +74,8 @@ sub setProfileName(id as string, name as string)
     saveProfiles(data.profiles, data.activeId)
 end sub
 
-' Removes a profile. If it was active, the first remaining profile becomes active.
+' Removes a profile. If it was active, no profile is active afterwards: MainScene shows the
+' Who's watching picker rather than opening another user (who may have a PIN).
 sub removeProfile(id as string)
     data = loadProfiles()
     kept = []
@@ -73,11 +83,59 @@ sub removeProfile(id as string)
         if profile.id <> id then kept.Push(profile)
     end for
     activeId = data.activeId
-    if activeId = id
-        activeId = ""
-        if kept.Count() > 0 then activeId = kept[0].id
-    end if
+    if activeId = id then activeId = ""
     saveProfiles(kept, activeId)
+end sub
+
+' ---- User PINs ----
+' A household privacy lock between adults, not security: the API key itself is stored on the
+' device. Profiles keep a random salt and the SHA-256 of salt + PIN, never the PIN.
+
+function pinLength() as integer
+    return 4
+end function
+
+function hashPin(pin as string, salt as string) as string
+    bytes = CreateObject("roByteArray")
+    bytes.FromAsciiString(salt + pin)
+    digest = CreateObject("roEVPDigest")
+    digest.Setup("sha256")
+    return digest.Process(bytes)
+end function
+
+function profileHasPin(profile as dynamic) as boolean
+    return profile <> invalid and profile.pinHash <> invalid and profile.pinHash <> ""
+end function
+
+function checkProfilePin(profile as object, pin as string) as boolean
+    return profileHasPin(profile) and hashPin(pin, profile.pinSalt) = profile.pinHash
+end function
+
+sub setProfilePin(id as string, pin as string)
+    data = loadProfiles()
+    for each profile in data.profiles
+        if profile.id = id
+            profile.pinSalt = CreateObject("roDeviceInfo").GetRandomUUID()
+            profile.pinHash = hashPin(pin, profile.pinSalt)
+        end if
+    end for
+    saveProfiles(data.profiles, data.activeId)
+end sub
+
+sub clearProfilePin(id as string)
+    data = loadProfiles()
+    for each profile in data.profiles
+        if profile.id = id then removePinFields(profile)
+    end for
+    saveProfiles(data.profiles, data.activeId)
+end sub
+
+' Dot-notation writes (profile.pinSalt = ...) store lowercase keys, and ParseJson's dictionaries
+' are case-sensitive, so Delete needs the lowercase names; the mixed-case ones are for safety.
+sub removePinFields(profile as object)
+    for each key in ["pinsalt", "pinhash", "pinSalt", "pinHash"]
+        profile.Delete(key)
+    end for
 end sub
 
 ' ---- Slideshow (shared by all users) ----

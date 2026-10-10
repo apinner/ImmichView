@@ -136,7 +136,8 @@ sub onMe(event as object)
     user = resp.data
     name = user.name
     if name = invalid or name = "" then name = user.email
-    upsertProfile(name, m.check.serverUrl, m.check.apiKey)
+    ' Signing in with the user's API key also clears their PIN (the way to reset a forgotten one).
+    upsertProfile(name, m.check.serverUrl, m.check.apiKey, true)
 
     text = "Connected as " + name
     if m.check.version <> "" then text = text + "  (Immich v" + m.check.version + ")"

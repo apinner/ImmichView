@@ -11,7 +11,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 - **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera) and a slideshow
 - **Videos:** played with the standard Roku player and trick play
 - **Screensaver:** random photos, today's memories or one album, with a slow drift against burn-in
-- **Multiple users:** each with their own server and API key, switched from the user menu at the top right
+- **Multiple users:** each with their own server and API key, a "Who's watching?" picker at launch, optional per-user PINs, and quick switching from the user menu at the top right
 
 ## Remote
 

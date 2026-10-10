@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Who's watching tile: coloured circle with the user's initial, name, and a lock badge for a PIN. -->
+<component name="ProfileTile" extends="Group">
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="focusPercent" type="float" onChange="onFocusChanged" />
+        <field id="gridHasFocus" type="boolean" onChange="onFocusChanged" />
+    </interface>
+
+    <script type="text/brightscript" uri="ProfileTile.brs" />
+
+    <children>
+        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
+        <Poster id="circle" uri="pkg:/images/circle-mask.png" translation="[6,6]" width="220" height="220" />
+        <Label id="initial" translation="[6,6]" width="220" height="220" horizAlign="center" vertAlign="center"
+            color="0xFFFFFFFF">
+            <Font role="font" uri="font:BoldSystemFontFile" size="96" />
+        </Label>
+        <Group id="lock" translation="[168,168]" visible="false">
+            <Poster uri="pkg:/images/circle-mask.png" width="56" height="56" blendColor="0x1C1B25FF" />
+            <Poster uri="pkg:/images/icon-lock.png" width="32" height="32" translation="[12,11]" blendColor="0xE0E4E8FF" />
+        </Group>
+        <Label id="name" translation="[0,248]" width="232" height="40" horizAlign="center"
+            font="font:MediumSystemFont" color="0xA0A8B0FF" />
+    </children>
+</component>

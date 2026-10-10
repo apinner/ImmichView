@@ -134,4 +134,18 @@ $g.Dispose()
 $bmp.Save((Join-Path $images 'icon-chevron.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
+# Padlock (users with a PIN): shackle arc above a rounded body.
+$bmp, $g = New-IconCanvas
+$pen = New-Object Drawing.Pen ([Drawing.Color]::White), 5
+$g.DrawArc($pen, 14, 5, 20, 24, 180, 180)
+$g.DrawLine($pen, 14, 17, 14, 23)
+$g.DrawLine($pen, 34, 17, 34, 23)
+$body = New-Object Drawing.Drawing2D.GraphicsPath
+$body.AddArc(8, 21, 10, 10, 180, 90); $body.AddArc(30, 21, 10, 10, 270, 90)
+$body.AddArc(30, 34, 10, 10, 0, 90); $body.AddArc(8, 34, 10, 10, 90, 90); $body.CloseFigure()
+$g.FillPath([Drawing.Brushes]::White, $body)
+$g.Dispose()
+$bmp.Save((Join-Path $images 'icon-lock.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
 Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, pill.9.png, logo-mark.png and icons to $images"

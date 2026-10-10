@@ -12,6 +12,8 @@ sub init()
         if profile.id = m.activeId
             title = title + "   (current)"
             focusIndex = i
+        else if profileHasPin(profile)
+            title = title + "   (PIN)"
         end if
         item = content.createChild("ContentNode")
         item.title = title
@@ -41,12 +43,35 @@ sub onSelected()
         m.top.manageUsers = true
         return
     end if
-    profile = m.profiles[index]
-    if profile.id = m.activeId
+    m.switchTo = m.profiles[index]
+    if m.switchTo.id = m.activeId
         m.top.closed = true
         return
     end if
-    setActiveProfile(profile.id)
+    if not profileHasPin(m.switchTo)
+        switchUser()
+        return
+    end if
+    m.prompt = CreateObject("roSGNode", "PinPrompt")
+    m.top.appendChild(m.prompt)
+    m.prompt.profile = m.switchTo
+    m.prompt.observeField("result", "onPinResult")
+    m.prompt.start = true
+end sub
+
+sub onPinResult()
+    result = m.prompt.result
+    m.top.removeChild(m.prompt)
+    m.prompt = invalid
+    if result = "ok"
+        switchUser()
+    else
+        m.list.setFocus(true)
+    end if
+end sub
+
+sub switchUser()
+    setActiveProfile(m.switchTo.id)
     m.top.profilesChanged = true
 end sub
 

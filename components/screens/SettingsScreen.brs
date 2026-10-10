@@ -23,7 +23,7 @@ sub focusList(list as object)
     m.lastList = list
     list.setFocus(true)
     if list.isSameNode(m.users)
-        m.hint.text = "OK: switch to this user      * : remove user"
+        m.hint.text = "OK: switch to this user      * : PIN or remove user"
     else
         m.hint.text = "OK: change"
     end if
@@ -39,6 +39,7 @@ sub refreshUsers()
     content = CreateObject("roSGNode", "ContentNode")
     for each profile in m.profiles
         title = profileDisplayName(profile) + "   -   " + serverHost(profile.serverUrl)
+        if profileHasPin(profile) then title = title + "   (PIN)"
         if profile.id = m.activeId then title = title + "   (current)"
         item = content.createChild("ContentNode")
         item.title = title
@@ -59,9 +60,100 @@ sub onUserSelected()
     end if
     profile = m.profiles[index]
     if profile.id = m.activeId then return
-    setActiveProfile(profile.id)
+    m.target = profile
+    if profileHasPin(profile)
+        runPinPrompt("verify", "switch")
+    else
+        switchToTarget()
+    end if
+end sub
+
+sub switchToTarget()
+    setActiveProfile(m.target.id)
     logDebug("switched user")
     m.top.profilesChanged = true
+end sub
+
+' ---- PIN prompts: each runs one PinPrompt, then the named next step ----
+
+sub runPinPrompt(mode as string, nextStep as string)
+    m.nextStep = nextStep
+    m.prompt = CreateObject("roSGNode", "PinPrompt")
+    m.top.appendChild(m.prompt)
+    m.prompt.profile = m.target
+    m.prompt.mode = mode
+    m.prompt.observeField("result", "onPinResult")
+    m.prompt.start = true
+end sub
+
+sub onPinResult()
+    result = m.prompt.result
+    newPin = m.prompt.newPin
+    m.top.removeChild(m.prompt)
+    m.prompt = invalid
+    if result <> "ok"
+        focusList(m.users)
+        return
+    end if
+    if m.nextStep = "switch"
+        switchToTarget()
+    else if m.nextStep = "choosePin"
+        runPinPrompt("set", "savePin")   ' after verifying the current PIN
+    else if m.nextStep = "savePin"
+        setProfilePin(m.target.id, newPin)
+        refreshUsers()
+        focusList(m.users)
+    else if m.nextStep = "clearPin"
+        clearProfilePin(m.target.id)
+        refreshUsers()
+        focusList(m.users)
+    else if m.nextStep = "remove"
+        confirmRemove(m.target)
+    end if
+end sub
+
+' ---- * on a user: PIN and remove options ----
+
+sub showUserActions(profile as object)
+    m.target = profile
+    if profileHasPin(profile)
+        m.actions = ["Change PIN", "Remove PIN", "Remove user", "Cancel"]
+    else
+        m.actions = ["Set PIN", "Remove user", "Cancel"]
+    end if
+    dlg = CreateObject("roSGNode", "StandardMessageDialog")
+    dlg.title = profileDisplayName(profile)
+    dlg.message = [serverHost(profile.serverUrl) + Chr(10) + "A PIN is asked for when switching to this user or opening the app as them. It keeps users private from each other on this Roku; it isn't a password."]
+    dlg.buttons = m.actions
+    dlg.observeField("buttonSelected", "onUserAction")
+    dlg.observeField("wasClosed", "onActionsClosed")
+    m.actionsDialog = dlg
+    m.top.getScene().dialog = dlg
+end sub
+
+sub onUserAction()
+    action = m.actions[m.actionsDialog.buttonSelected]
+    hasPin = profileHasPin(m.target)
+    if action = "Set PIN"
+        runPinPrompt("set", "savePin")
+    else if action = "Change PIN"
+        runPinPrompt("verify", "choosePin")
+    else if action = "Remove PIN"
+        runPinPrompt("verify", "clearPin")
+    else if action = "Remove user" and hasPin
+        runPinPrompt("verify", "remove")
+    else if action = "Remove user"
+        confirmRemove(m.target)
+    else
+        m.actionsDialog.close = true
+    end if
+end sub
+
+' Back or Cancel on the actions dialog; ignored when it was replaced by a PIN or remove dialog.
+sub onActionsClosed(event as object)
+    if m.prompt <> invalid or m.dialog <> invalid then return
+    if not event.getRoSGNode().isSameNode(m.actionsDialog) then return
+    focusList(m.users)
 end sub
 
 ' ---- Slideshow and screensaver ----
@@ -120,7 +212,7 @@ function onKeyEvent(key as string, press as boolean) as boolean
         return true
     else if key = "options" and m.users.hasFocus()
         index = m.users.itemFocused
-        if index >= 0 and index < m.profiles.Count() then confirmRemove(m.profiles[index])
+        if index >= 0 and index < m.profiles.Count() then showUserActions(m.profiles[index])
         return true
     end if
     return false
@@ -155,5 +247,5 @@ end sub
 
 sub onDialogClosed()
     m.dialog = invalid
-    focusList(m.users)
+    if m.prompt = invalid then focusList(m.users)
 end sub

@@ -10,7 +10,6 @@ sub init()
     m.albumStatus = m.top.findNode("albumStatus")
     m.peoplePane = m.top.findNode("peoplePane")
     m.searchPane = m.top.findNode("searchPane")
-    m.userName = m.top.findNode("userName")
     m.status = m.top.findNode("status")
     m.failed = false
     m.albumsLoaded = false
@@ -27,8 +26,14 @@ sub init()
     m.top.observeField("focusedChild", "onFocusChanged")
 
     m.tabs.tabs = ["Photos", "Albums", "People", "Search"]
-    m.filter = m.top.findNode("filter")
-    m.filter.translation = [1840 - m.filter.totalWidth, 116]
+    m.optionsHint = m.top.findNode("optionsHint")
+    m.userPill = m.top.findNode("userPill")
+    m.gearPill = m.top.findNode("gearPill")
+    m.userPill.text = profileDisplayName(loadSettings())
+    m.userPill.observeField("width", "layoutTopBar")
+    layoutTopBar()
+    m.overlay = invalid    ' open UserMenu or OptionsPanel
+    m.overlayReturn = invalid
     loadUser()
     m.timeline.query = timelineQuery()
 end sub
@@ -67,27 +72,89 @@ sub focusContent()
     end if
 end sub
 
+' ---- Top bar: user pill (fast switching) and settings gear, right-aligned ----
+
+sub layoutTopBar()
+    gearX = 1840 - m.gearPill.width
+    userX = gearX - 12 - m.userPill.width
+    m.gearPill.translation = [gearX, 32]
+    m.userPill.translation = [userX, 32]
+    m.optionsHint.translation = [userX - 24 - 400, 32]
+end sub
+
+function topBarFocused() as boolean
+    return m.userPill.isInFocusChain() or m.gearPill.isInFocusChain()
+end function
+
+function onTopBarKey(key as string) as boolean
+    if key = "right" and m.userPill.hasFocus()
+        m.gearPill.setFocus(true)
+    else if key = "left" and m.gearPill.hasFocus()
+        m.userPill.setFocus(true)
+    else if key = "down" or key = "back"
+        focusTabs()
+    else if key = "OK" and m.userPill.hasFocus()
+        openOverlay(CreateObject("roSGNode", "UserMenu"))
+    else if key = "OK"
+        m.top.navigate = { screen: "SettingsScreen" }
+    else
+        return false
+    end if
+    return true
+end function
+
+' ---- Overlays: UserMenu (dropdown under the user pill) and OptionsPanel (* button) ----
+
+sub openOverlay(overlay as object)
+    ' Remember where focus was, to return there when the overlay closes.
+    m.overlayReturn = m.tabs
+    for each node in [m.userPill, m.gearPill, m.timeline, m.albums, m.peoplePane, m.searchPane]
+        if node.isInFocusChain() then m.overlayReturn = node
+    end for
+    if overlay.subtype() = "UserMenu"
+        overlay.translation = [1840 - overlay.width, 100]
+        overlay.observeField("profilesChanged", "onUserSwitched")
+        overlay.observeField("manageUsers", "onManageUsers")
+    end if
+    overlay.observeField("closed", "closeOverlay")
+    m.top.appendChild(overlay)
+    m.overlay = overlay
+    overlay.setFocus(true)
+end sub
+
+sub closeOverlay()
+    if m.overlay = invalid then return
+    m.top.removeChild(m.overlay)
+    m.overlay = invalid
+    m.overlayReturn.setFocus(true)
+end sub
+
+sub onUserSwitched()
+    m.top.profilesChanged = true
+end sub
+
+sub onManageUsers()
+    closeOverlay()
+    m.top.navigate = { screen: "SettingsScreen" }
+end sub
+
 function onKeyEvent(key as string, press as boolean) as boolean
     if not press then return false
-    if key = "options" or (key = "OK" and m.failed)
+    if key = "options"
+        openOverlay(CreateObject("roSGNode", "OptionsPanel"))
+        return true
+    end if
+    if key = "OK" and m.failed and not topBarFocused()
         m.top.navigate = { screen: "SettingsScreen" }
         return true
     end if
-    ' Top bar: tabs on the left, photos/videos filter on the right; Left/Right move between them.
+    if topBarFocused() then return onTopBarKey(key)
     if m.tabs.isInFocusChain()
         if key = "down" or key = "OK"
             focusContent()
             return true
-        else if key = "right"
-            m.filter.setFocus(true)
-            return true
-        end if
-    else if m.filter.isInFocusChain()
-        if key = "down" or key = "OK"
-            focusContent()
-            return true
-        else if key = "left" or key = "up" or key = "back"
-            focusTabs()
+        else if key = "up"
+            m.userPill.setFocus(true)
             return true
         end if
     else if key = "up" or key = "back"
@@ -120,7 +187,7 @@ sub onUser(event as object)
 
     name = resp.data.name
     if name = invalid or name = "" then name = resp.data.email
-    m.userName.text = name + "     * Users and settings"
+    m.userPill.text = name
     profile = loadSettings()
     if profile.id <> "" and profile.name <> name then setProfileName(profile.id, name)
 end sub

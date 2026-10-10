@@ -96,4 +96,42 @@ $splash.Dispose()
 $bmp.Save((Join-Path $images 'logo-mark.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
-Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, pill.9.png and logo-mark.png to $images"
+# Small white icons for the top bar pills (tinted at runtime with blendColor), 48x48.
+function New-IconCanvas { $b = New-Object Drawing.Bitmap 48, 48; $gr = [Drawing.Graphics]::FromImage($b); $gr.SmoothingMode = 'AntiAlias'; $gr.Clear([Drawing.Color]::Transparent); return @($b, $gr) }
+
+# Gear: 8 teeth around a ring, with a hole in the middle.
+$bmp, $g = New-IconCanvas
+$points = New-Object Collections.Generic.List[Drawing.PointF]
+$teeth = 8
+for ($t = 0; $t -lt $teeth; $t++) {
+    $base = $t * 2 * [math]::PI / $teeth
+    foreach ($step in @(@(-0.30, 16.5), @(-0.17, 22.5), @(0.17, 22.5), @(0.30, 16.5))) {
+        $angle = $base + $step[0]
+        $points.Add((New-Object Drawing.PointF (24 + $step[1] * [math]::Cos($angle)), (24 + $step[1] * [math]::Sin($angle))))
+    }
+}
+$g.FillPolygon([Drawing.Brushes]::White, $points.ToArray())
+$g.CompositingMode = 'SourceCopy'
+$g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::Transparent)), 16.5, 16.5, 15, 15)
+$g.Dispose()
+$bmp.Save((Join-Path $images 'icon-gear.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+# Person: head and shoulders.
+$bmp, $g = New-IconCanvas
+$g.FillEllipse([Drawing.Brushes]::White, 14, 4, 20, 20)
+$g.FillPie([Drawing.Brushes]::White, 5, 27, 38, 38, 180, 180)
+$g.Dispose()
+$bmp.Save((Join-Path $images 'icon-person.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+# Dropdown arrow: downward chevron.
+$bmp, $g = New-IconCanvas
+$pen = New-Object Drawing.Pen ([Drawing.Color]::White), 6
+$pen.StartCap = 'Round'; $pen.EndCap = 'Round'; $pen.LineJoin = 'Round'
+$g.DrawLines($pen, [Drawing.PointF[]]@((New-Object Drawing.PointF 10, 17), (New-Object Drawing.PointF 24, 31), (New-Object Drawing.PointF 38, 17)))
+$g.Dispose()
+$bmp.Save((Join-Path $images 'icon-chevron.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
+Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, pill.9.png, logo-mark.png and icons to $images"

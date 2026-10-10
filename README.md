@@ -1,24 +1,25 @@
 # ImmichView
 
-A sideloaded Roku channel for browsing a self-hosted [Immich](https://immich.app) library (tested with Immich v3.3.1). See [CLAUDE.md](CLAUDE.md) for the design notes.
+A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (tested with Immich v3.3.1). See [CLAUDE.md](CLAUDE.md) for the design notes.
 
 ## Features
 
 - **Photos:** your whole library as a timeline grouped by month, in a justified grid like the Immich web app
-- **All / Photos / Videos filter** in the top bar, applied everywhere and remembered
+- **All / Photos / Videos filter** in the `*` View options panel, applied everywhere and remembered
 - **Albums** and **People** (named faces), each opening the same month-grouped grid
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
 - **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera) and a slideshow
 - **Videos:** played with the standard Roku player and trick play
 - **Screensaver:** random photos, today's memories or one album, with a slow drift against burn-in
-- **Multiple users:** each with their own server and API key, switchable in Settings
+- **Multiple users:** each with their own server and API key, switched from the user menu at the top right
 
 ## Remote
 
 | Where | Button | Does |
 |---|---|---|
-| Home | Up / Down | Move between the tabs and the content |
-| Anywhere on Home | `*` | Users and settings |
+| Home | Up / Down | Move between the top-right pills, the tabs and the content |
+| Top-right pills | OK | User menu (switch user) or Settings (gear) |
+| Home, albums, people | `*` | View options: show All, Photos or Videos |
 | Photo grids | ⏪ / ⏩ | Jump four rows |
 | Photo viewer | OK (or Up/Down) | Show or hide info |
 | Photo viewer | Play | Start or stop the slideshow |

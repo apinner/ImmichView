@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Small focusable pill with an optional icon, text and trailing icon (e.g. a dropdown arrow).
+    Icon only gives a round 56px button. Subtle when idle, logo lavender when focused.
+-->
+<component name="IconPill" extends="Group">
+    <interface>
+        <field id="icon" type="uri" onChange="layout" />
+        <field id="text" type="string" onChange="layout" />
+        <field id="trailingIcon" type="uri" onChange="layout" />
+        <!-- Set by layout, for right-aligning the pill. -->
+        <field id="width" type="float" />
+    </interface>
+
+    <script type="text/brightscript" uri="IconPill.brs" />
+
+    <children>
+        <Poster id="pill" uri="pkg:/images/pill.9.png" height="56" width="56" />
+        <Poster id="iconNode" width="28" height="28" translation="[14,14]" />
+        <Label id="label" translation="[0,3]" height="56" vertAlign="center" font="font:SmallBoldSystemFont" />
+        <Poster id="trailing" width="18" height="18" translation="[0,19]" />
+    </children>
+</component>

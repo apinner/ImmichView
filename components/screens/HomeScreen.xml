@@ -5,6 +5,8 @@
         <field id="navigate" type="assocarray" alwaysNotify="true" />
         <!-- Set once the Photos tab shows photos or a message (for the AppLaunchComplete beacon). -->
         <field id="ready" type="boolean" />
+        <!-- Set after switching user from the top bar; MainScene reloads. -->
+        <field id="profilesChanged" type="boolean" alwaysNotify="true" />
     </interface>
 
     <script type="text/brightscript" uri="HomeScreen.brs" />
@@ -15,12 +17,14 @@
 
     <children>
         <AppTitle translation="[80,28]" />
-        <Label id="userName" translation="[940,56]" width="900" horizAlign="right"
-            font="font:SmallSystemFont" color="0x80888FFF" />
+        <!-- Top-right: "* Options" hint, user pill (fast switching) and settings gear.
+             Up from the tabs reaches the pills; positioned by layoutTopBar(). -->
+        <Label id="optionsHint" width="400" height="56" horizAlign="right" vertAlign="center"
+            font="font:SmallSystemFont" color="0x80888FFF" text="*  Options" />
+        <IconPill id="userPill" icon="pkg:/images/icon-person.png" trailingIcon="pkg:/images/icon-chevron.png" />
+        <IconPill id="gearPill" icon="pkg:/images/icon-gear.png" />
 
         <TabBar id="tabs" translation="[80,116]" />
-        <!-- Right-aligned in init once its width is known. -->
-        <MediaFilterBar id="filter" translation="[1300,116]" />
 
         <TimelineView id="timeline" translation="[80,200]" viewHeight="866"
             emptyText="No photos in your library yet." />

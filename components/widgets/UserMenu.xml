@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dropdown from the top bar's user pill: switch user, or go to user management in Settings. -->
+<component name="UserMenu" extends="Group">
+    <interface>
+        <!-- Set after switching user; the screen passes it on to MainScene. -->
+        <field id="profilesChanged" type="boolean" alwaysNotify="true" />
+        <field id="manageUsers" type="boolean" alwaysNotify="true" />
+        <field id="closed" type="boolean" alwaysNotify="true" />
+        <!-- Set by init from the number of rows, for right-aligning the menu. -->
+        <field id="width" type="float" value="560" />
+    </interface>
+
+    <script type="text/brightscript" uri="UserMenu.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Poster id="card" uri="pkg:/images/pill.9.png" width="560" blendColor="0x3A3950FF" />
+        <MarkupList id="list" translation="[16,16]" itemComponentName="ListItem" drawFocusFeedback="false"
+            itemSize="[528,64]" itemSpacing="[0,6]" vertFocusAnimationStyle="floatingFocus" />
+    </children>
+</component>

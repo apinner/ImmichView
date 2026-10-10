@@ -123,7 +123,7 @@ function pushScreen(name as string, params = invalid as dynamic) as object
         m.homeReady = false
         screen.observeField("ready", "onHomeReady")
     end if
-    if name = "SettingsScreen" then screen.observeField("profilesChanged", "onProfilesChanged")
+    if screen.hasField("profilesChanged") then screen.observeField("profilesChanged", "onProfilesChanged")
     if screen.hasField("done") then screen.observeField("done", "onScreenDone")
     if params <> invalid then screen.update(params)
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "View options" panel that slides in from the left when * is pressed: All / Photos / Videos. -->
+<component name="OptionsPanel" extends="Group">
+    <interface>
+        <field id="closed" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="OptionsPanel.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+
+    <children>
+        <Rectangle id="dim" width="1920" height="1080" color="0x00000099" opacity="0" />
+        <Group id="panel" translation="[-600,0]">
+            <Rectangle width="600" height="1080" color="0x1C1B25FF" />
+            <Label text="View options" translation="[48,72]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+            <Label text="Show" translation="[48,176]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
+            <MarkupList id="list" translation="[32,236]" itemComponentName="ListItem" drawFocusFeedback="false"
+                itemSize="[536,72]" itemSpacing="[0,12]" numRows="3" vertFocusAnimationStyle="floatingFocus" />
+            <Label text="OK to choose      Back or * to close" translation="[48,1000]" width="520"
+                font="font:SmallestSystemFont" color="0x80888FFF" />
+        </Group>
+        <Animation id="slide" duration="0.2" easeFunction="outQuad">
+            <Vector2DFieldInterpolator key="[0.0, 1.0]" keyValue="[[-600,0],[0,0]]" fieldToInterp="panel.translation" />
+            <FloatFieldInterpolator key="[0.0, 1.0]" keyValue="[0.0, 1.0]" fieldToInterp="dim.opacity" />
+        </Animation>
+    </children>
+</component>

@@ -2,22 +2,16 @@ sub init()
     m.title = m.top.findNode("title")
     m.count = m.top.findNode("count")
     m.timeline = m.top.findNode("timeline")
-    m.filter = m.top.findNode("filter")
-    m.filter.translation = [1840 - m.filter.totalWidth, 56]
+    m.panel = invalid
 
     m.timeline.observeField("itemSelected", "onItemSelected")
     m.timeline.observeField("totalCount", "updateCount")
-    m.timeline.observeField("exitedTop", "focusFilter")
     m.global.observeField("mediaFilter", "updateCount")
     m.top.observeField("focusedChild", "onFocusChanged")
 end sub
 
 sub onFocusChanged()
     if m.top.hasFocus() then m.timeline.setFocus(true)
-end sub
-
-sub focusFilter()
-    m.filter.setFocus(true)
 end sub
 
 sub onSourceSet()
@@ -42,11 +36,18 @@ sub onItemSelected()
     m.top.navigate = assetNavigation(m.timeline, m.timeline.itemSelected)
 end sub
 
+' * opens the View options panel (photos/videos filter).
 function onKeyEvent(key as string, press as boolean) as boolean
-    if not press then return false
-    if m.filter.isInFocusChain() and (key = "down" or key = "OK")
-        m.timeline.setFocus(true)
-        return true
-    end if
-    return false
+    if not press or key <> "options" then return false
+    m.panel = CreateObject("roSGNode", "OptionsPanel")
+    m.panel.observeField("closed", "onPanelClosed")
+    m.top.appendChild(m.panel)
+    m.panel.setFocus(true)
+    return true
 end function
+
+sub onPanelClosed()
+    m.top.removeChild(m.panel)
+    m.panel = invalid
+    m.timeline.setFocus(true)
+end sub

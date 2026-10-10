@@ -17,11 +17,9 @@
         <Label id="subtitle" text="Connect to your Immich server" translation="[160,200]"
             font="font:MediumSystemFont" color="0xA0A8B0FF" />
 
-        <LabelList id="menu" translation="[160,300]" itemSize="[1200,72]" itemSpacing="[0,12]"
+        <MarkupList itemComponentName="ListItem" drawFocusFeedback="false" id="menu" translation="[160,300]" itemSize="[1200,72]" itemSpacing="[0,12]"
             numRows="3" vertFocusAnimationStyle="floatingFocus"
-            color="0xE0E4E8FF" focusedColor="0x2D0F47FF"
-            focusBitmapUri="pkg:/images/pill.9.png" focusBitmapBlendColor="0xC6A1E7FF"
-            focusFootprintBitmapUri="pkg:/images/pill.9.png" focusFootprintBlendColor="0x4A2D66FF" />
+            />
 
         <Label id="status" translation="[160,620]" width="1600" wrap="true"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />

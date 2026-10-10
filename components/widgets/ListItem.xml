@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    MarkupList row: a title in a rounded pill when focused (logo lavender), or a muted pill
+    marking the position in a list that doesn't have focus. Drawn here rather than with
+    LabelList's focus bitmap so the text can be centred precisely.
+-->
+<component name="ListItem" extends="Group">
+    <interface>
+        <field id="itemContent" type="node" onChange="onContentChanged" />
+        <field id="width" type="float" onChange="onSizeChanged" />
+        <field id="height" type="float" onChange="onSizeChanged" />
+        <field id="focusPercent" type="float" onChange="updateStyle" />
+        <field id="listHasFocus" type="boolean" onChange="updateStyle" />
+    </interface>
+
+    <script type="text/brightscript" uri="ListItem.brs" />
+
+    <children>
+        <Poster id="pill" uri="pkg:/images/pill.9.png" visible="false" />
+        <Label id="label" translation="[32,3]" vertAlign="center"
+            font="font:MediumSystemFont" color="0xE0E4E8FF" />
+    </children>
+</component>

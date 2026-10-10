@@ -26,6 +26,8 @@ sub onTabsChanged()
         pill.width = width
         pill.height = 56
 
+        ' Centring uses the font's line box (room for descenders); +3px centres the letters.
+        label.translation = [0, 3]
         label.width = width
         label.height = 56
         label.horizAlign = "center"

@@ -14,7 +14,7 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [x] **Deep linking.** `supports_input_launch=1`; handle `contentId` (an Immich asset ID) and
       `mediaType` at launch and through `roInput` while running. Videos play straight away,
       photos open in the viewer, invalid links land on Home without errors.
-- [ ] **Signed package script.** Build the release zip and have the Roku's packager sign it.
+- [x] **Signed package script.** `tools/package.ps1` installs the release build, has the Roku sign it, and saves `out/packages/ImmichView-<version>.pkg`.
 - [ ] **Static Analysis.** Run Roku's analyzer (in the Developer Dashboard upload, or the CLI
       tool) and fix anything it reports.
 - [ ] Pre-certification test pass on a real Roku: launch time under 15 s, Back on Home exits,
@@ -23,7 +23,7 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 ## 2. Accounts and signing (Alex)
 
 - [ ] Roku developer account (developer.roku.com), enrolled to publish channels.
-- [ ] Generate the signing key on one Roku (`genkey` over telnet port 8080). Keep the
+- [x] Generate the signing key on one Roku (`genkey` over telnet port 8080). Keep the
       **DevID and password** safe (they go in `.env`, never in git) and keep the first signed
       package: it's the only way to restore the key onto another Roku (`rekey`).
 

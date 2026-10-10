@@ -48,6 +48,6 @@ The dev launch parameters (`serverUrl`, `apiKey`, `screensaver`) only exist in d
 
 ## Privacy, support and licence
 
-- [Privacy policy](https://apinner.github.io/RokuImmichClient/privacy.html) and [support page](https://apinner.github.io/RokuImmichClient/) (source in `docs/`).
+- [Privacy policy](https://apinner.github.io/ImmichView/privacy.html) and [support page](https://apinner.github.io/ImmichView/) (source in `docs/`).
 - MIT licensed; see [LICENSE](LICENSE).
 - ImmichView is an unofficial app. It is not affiliated with or endorsed by Immich or FUTO.

@@ -25,7 +25,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\tools\relaunch.ps1 -Screensaver` opens the screensaver directly (dev launch param `screensaver=preview`).
 - Dev vs release: the manifest has `bs_const=DEV=false`; `deploy.ps1` rewrites it to `true` in the zip unless `-Release`. `#if DEV` guards the dev launch params and `logDebug`. Never ship a DEV build.
 - `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
-- Both Rokus take `-RokuHost` (deploy, relaunch, deeplink): Guest Bedroom 10.10.10.163 (default `ROKU_HOST`), Living Room 10.10.10.164.
+- **Test only on the Guest Bedroom Roku (10.10.10.163, the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
 - `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill). Channel posters and splash screens in `images/` are supplied artwork; don't regenerate them.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.

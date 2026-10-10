@@ -35,8 +35,10 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
       it's unofficial and not affiliated with or endorsed by Immich or FUTO.
 - [ ] Description, category, keywords, rating questionnaire.
 - [ ] Screenshots (taken from the app with `tools/screenshot.ps1`).
-- [ ] Privacy policy URL. ImmichView only talks to the user's own Immich server and collects
-      nothing; the policy still has to be published at a public URL.
+- [ ] Privacy policy and support pages: written in `docs/` (privacy.html, index.html). Served by GitHub
+      Pages once the repo is public: https://apinner.github.io/RokuImmichClient/privacy.html and
+      https://apinner.github.io/RokuImmichClient/ (support). Alex: make the repo public, then
+      Settings > Pages > Deploy from branch `main` / `docs`.
 - [ ] Support contact (URL, email, phone) and admin/technical contacts.
 - [ ] **Reviewer access.** Roku's testers need a working Immich server URL and API key with
       sample photos and videos (a demo account, not your personal library).

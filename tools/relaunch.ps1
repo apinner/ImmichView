@@ -5,8 +5,9 @@
     If IMMICH_URL and IMMICH_API_KEY are set in .env they are passed as launch
     parameters, so the channel is signed in even though sideloading wiped its registry.
     -Screensaver opens the screensaver instead of the app (for testing it).
+    -RokuHost targets another Roku than ROKU_HOST.
 #>
-param([int]$Seconds = 10, [switch]$Screensaver)
+param([int]$Seconds = 10, [switch]$Screensaver, [string]$RokuHost)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -14,8 +15,9 @@ $config = @{}
 foreach ($line in Get-Content (Join-Path $root '.env')) {
     if ($line -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$') { $config[$Matches[1]] = $Matches[2] }
 }
-$rokuHost = $config['ROKU_HOST']
-$launchUrl = "http://${rokuHost}:8060/launch/dev"
+$targetHost = $config['ROKU_HOST']
+if ($RokuHost) { $targetHost = $RokuHost }
+$launchUrl = "http://${targetHost}:8060/launch/dev"
 if ($config['IMMICH_URL'] -and $config['IMMICH_API_KEY']) {
     $launchUrl += '?serverUrl=' + [uri]::EscapeDataString($config['IMMICH_URL']) +
         '&apiKey=' + [uri]::EscapeDataString($config['IMMICH_API_KEY'])
@@ -25,11 +27,11 @@ if ($Screensaver) {
 }
 
 $client = New-Object Net.Sockets.TcpClient
-$client.Connect($rokuHost, 8085)
+$client.Connect($targetHost, 8085)
 $stream = $client.GetStream()
 $stream.ReadTimeout = 500
 try {
-    & curl.exe -s -m 10 -X POST "http://${rokuHost}:8060/keypress/Home" | Out-Null
+    & curl.exe -s -m 10 -X POST "http://${targetHost}:8060/keypress/Home" | Out-Null
     Start-Sleep 2
     & curl.exe -s -m 10 -X POST $launchUrl | Out-Null
 

@@ -27,7 +27,10 @@ if ($Screensaver) {
     $manifestFile = 'manifest.screensaver'
     $include = @('source\screensaver.brs', 'source\common', 'components\screensaver', 'components\tasks',
         'components\widgets\ProgressRing.xml', 'components\widgets\ProgressRing.brs',
-        'images\channel-poster-screensaver_fhd.png', 'images\channel-poster-screensaver_hd.png', 'images\ring-half.png', 'images\ring-track.png')
+        'images\channel-poster-screensaver_fhd.png', 'images\channel-poster-screensaver_hd.png', 'images\ring-half.png', 'images\ring-track.png',
+        'images\splash-screen_fhd.jpg', 'images\splash-screen_hd.jpg', 'images\splash-screen_sd.jpg')
+    # The dev-only Main; release builds leave it out (Roku doesn't allow Main in a screensaver).
+    if (-not $Release) { $include += 'source\screensaver-dev.brs' }
     $zipName = 'immich-roku-screensaver.zip'
 } else {
     $manifestFile = 'manifest'

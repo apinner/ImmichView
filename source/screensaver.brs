@@ -19,13 +19,3 @@ sub RunScreenSaver(params = invalid as dynamic)
         if percent <> invalid then logDebug("memory warning: " + percent.ToStr() + "%")
     end while
 end sub
-
-#if DEV
-' Dev builds only (Roku doesn't allow Main in a screensaver): launching the sideloaded
-' screensaver (tools\relaunch.ps1 -Screensaver) shows it straight away, signed in from the
-' launch parameters because sideloading wiped the registry.
-sub Main(args as dynamic)
-    applyDevLaunchSettings(args)
-    RunScreenSaver(args)
-end sub
-#end if

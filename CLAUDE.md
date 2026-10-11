@@ -33,6 +33,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - Dot-notation (`aa.pinSalt = x`) stores lowercase keys and `ParseJson` dictionaries are case-sensitive, so `Delete`/lookups by string must use the lowercase key.
 - Don't open the next dialog from inside a dialog's `wasClosed` observer: Roku clears `scene.dialog` afterwards and dismisses it. `PinPrompt` reports its result via a short Timer for this reason.
 - `drive.ps1` sends a step's keys 250 ms apart; put a key that opens a dialog in its own step, or the following keys can be lost.
+- The screensaver manifest must not have `title=` (only `screensaver_title`), and its release source must contain no `Main`: either makes Static Analysis treat it as an app with an in-channel screensaver (Req 4.5). The dev `Main` lives in `source/screensaver-dev.brs`, which release builds leave out.
 - Certification (from 1 Oct 2026): keep `rsg_version=1.3` in both manifests and the memory monitor (`source/common/Memory.brs`) in both apps' main loops.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 

@@ -22,6 +22,13 @@ sub init()
     m.advanceTimer.observeField("fire", "showNext")
     m.retryTimer.observeField("fire", "onRetry")
     m.moveMessageTimer.observeField("fire", "moveMessage")
+    m.ring = m.top.findNode("ring")
+    m.captionTime = m.top.findNode("captionTime")
+    m.captionDate = m.top.findNode("captionDate")
+    m.captionPlace = m.top.findNode("captionPlace")
+    m.clockTimer = m.top.findNode("clockTimer")
+    m.clockTimer.observeField("fire", "onClockTick")
+    m.twelveHour = (CreateObject("roDeviceInfo").GetClockFormat() = "12h")
 
     m.queue = []          ' slides waiting: { id, date, place }
     m.memorySlides = invalid
@@ -31,6 +38,7 @@ sub init()
     m.waitingForPhotos = true
     m.failures = 0
     m.corner = 0
+    m.slide = invalid     ' slide whose caption is showing
 
     profile = loadSettings()
     if not hasSettings(profile)
@@ -48,6 +56,7 @@ sub init()
     m.secondsPerPhoto = loadSlideshowSeconds()
     if m.secondsPerPhoto < minSecondsPerPhoto() then m.secondsPerPhoto = minSecondsPerPhoto()
     m.advanceTimer.duration = m.secondsPerPhoto
+    if m.settings.showClock then m.clockTimer.control = "start"
     fetchBatch()
 end sub
 
@@ -227,6 +236,10 @@ sub presentPending()
     m.frontIndex = backIndex()
     m.advanceTimer.control = "stop"
     m.advanceTimer.control = "start"
+    ' A few pixels' shift per photo, against burn-in.
+    m.ring.translation = [1792 + randomBetween(-6, 6), 952 + randomBetween(-6, 6)]
+    m.ring.visible = true
+    m.ring.countdown = m.secondsPerPhoto
 end sub
 
 ' Slow zoom in or out plus a small shift, so nothing sits still on screen.
@@ -251,34 +264,61 @@ function randomBetween(low as integer, high as integer) as integer
     return low + Rnd(high - low + 1) - 1
 end function
 
-' Date and place in a different corner for each photo.
+' Caption in a different corner for each photo.
 sub updateCaption(slide as object)
     m.caption.opacity = 0
-    show = m.settings.showCaption and slide.date <> ""
-    m.top.findNode("captionFade").fieldToInterp = "caption.opacity"
-    m.caption.visible = show
-    if not show then return
+    m.slide = slide
+    m.corner = (m.corner + 1) MOD 4
+    layoutCaption()
+end sub
 
-    dateLabel = m.top.findNode("captionDate")
-    placeLabel = m.top.findNode("captionPlace")
-    dateLabel.text = slide.date
-    placeLabel.text = slide.place
-    width = dateLabel.boundingRect().width
-    if placeLabel.boundingRect().width > width then width = placeLabel.boundingRect().width
+' The time (if turned on) above the date and place (if turned on), sized to fit, in m.corner.
+sub layoutCaption()
+    showClock = m.settings.showClock
+    showDate = m.settings.showCaption and m.slide <> invalid and m.slide.date <> ""
+    m.caption.visible = showClock or showDate
+    if not m.caption.visible then return
+
+    m.captionTime.visible = showClock
+    m.captionDate.visible = showDate
+    m.captionPlace.visible = showDate and m.slide.place <> ""
+    width = 0
+    bottom = 0
+    if showClock
+        m.captionTime.text = formatClock(m.twelveHour)
+        width = m.captionTime.boundingRect().width
+        bottom = 8 + m.captionTime.boundingRect().height
+    end if
+    if showDate
+        m.captionDate.text = m.slide.date
+        m.captionDate.translation = [24, bottom + 14]
+        if m.captionDate.boundingRect().width > width then width = m.captionDate.boundingRect().width
+        bottom = bottom + 70
+        if m.slide.place <> ""
+            m.captionPlace.text = m.slide.place
+            m.captionPlace.translation = [24, bottom - 8]
+            if m.captionPlace.boundingRect().width > width then width = m.captionPlace.boundingRect().width
+            bottom = bottom + 38
+        end if
+    else
+        bottom = bottom + 8
+    end if
     width = width + 48
-    height = 70
-    if slide.place <> "" then height = 108
 
     back = m.top.findNode("captionBack")
     back.width = width
-    back.height = height
+    back.height = bottom
 
-    m.corner = (m.corner + 1) MOD 4
     x = 80
     y = 80
     if m.corner = 1 or m.corner = 2 then x = 1920 - 80 - width
-    if m.corner >= 2 then y = 1080 - 80 - height
+    if m.corner >= 2 then y = 1080 - 80 - bottom
+    if m.corner = 2 then y = y - 88   ' clear of the countdown ring
     m.caption.translation = [x, y]
+end sub
+
+sub onClockTick()
+    if m.caption.visible and m.captionTime.text <> formatClock(m.twelveHour) then layoutCaption()
 end sub
 
 ' ---- Messages and errors ----
@@ -300,6 +340,8 @@ sub onRetry()
 end sub
 
 sub showMessage(text as string)
+    m.ring.stop = true
+    m.ring.visible = false
     m.message.text = text
     m.message.visible = true
     moveMessage()

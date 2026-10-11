@@ -187,8 +187,30 @@ function loadScreensaverSettings() as object
         albumId: sec.Read("ssAlbumId")
         albumName: sec.Read("ssAlbumName")
         showCaption: sec.Read("ssCaption") <> "off"
+        showClock: sec.Read("ssClock") = "on"
     }
 end function
+
+sub saveScreensaverClock(show as boolean)
+    saveOnOff("ssClock", show)
+end sub
+
+' ---- Photo viewer (shared by all users) ----
+
+' Names of the people in a photo, small at the bottom left. Off unless turned on.
+function loadShowPeopleNames() as boolean
+    return registrySection().Read("showPeople") = "on"
+end function
+
+sub saveShowPeopleNames(show as boolean)
+    saveOnOff("showPeople", show)
+end sub
+
+sub saveOnOff(key as string, value as boolean)
+    sec = registrySection()
+    if value then sec.Write(key, "on") else sec.Write(key, "off")
+    sec.Flush()
+end sub
 
 sub saveScreensaverSource(source as string, albumId as string, albumName as string)
     sec = registrySection()
@@ -199,9 +221,7 @@ sub saveScreensaverSource(source as string, albumId as string, albumName as stri
 end sub
 
 sub saveScreensaverCaption(show as boolean)
-    sec = registrySection()
-    if show then sec.Write("ssCaption", "on") else sec.Write("ssCaption", "off")
-    sec.Flush()
+    saveOnOff("ssCaption", show)
 end sub
 
 function screensaverSourceLabel(settings as object) as string

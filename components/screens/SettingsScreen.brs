@@ -160,12 +160,12 @@ end sub
 
 sub refreshOptions()
     screensaver = loadScreensaverSettings()
-    caption = "Off"
-    if screensaver.showCaption then caption = "On"
     titles = [
         "Time per photo:   " + loadSlideshowSeconds().ToStr() + " seconds"
+        "Show people's names on photos:   " + onOff(loadShowPeopleNames())
         "Screensaver photos:   " + screensaverSourceLabel(screensaver)
-        "Screensaver shows date and place:   " + caption
+        "Screensaver shows date and place:   " + onOff(screensaver.showCaption)
+        "Screensaver shows the time:   " + onOff(screensaver.showClock)
     ]
     content = CreateObject("roSGNode", "ContentNode")
     for each title in titles
@@ -182,12 +182,21 @@ sub onOptionSelected()
     if index = 0
         cycleSlideshowInterval()
     else if index = 1
-        m.top.navigate = { screen: "ScreensaverSourceScreen" }
+        saveShowPeopleNames(not loadShowPeopleNames())
     else if index = 2
+        m.top.navigate = { screen: "ScreensaverSourceScreen" }
+    else if index = 3
         saveScreensaverCaption(not loadScreensaverSettings().showCaption)
-        refreshOptions()
+    else if index = 4
+        saveScreensaverClock(not loadScreensaverSettings().showClock)
     end if
+    refreshOptions()
 end sub
+
+function onOff(value as boolean) as string
+    if value then return "On"
+    return "Off"
+end function
 
 sub cycleSlideshowInterval()
     intervals = slideshowIntervals()

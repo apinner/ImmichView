@@ -2,6 +2,8 @@
 <!--
     System screensaver: crossfades full-screen photos with a slow zoom/drift (against burn-in).
     Photos come from random library photos, today's memories or one album (see Settings).
+    A countdown ring shows the time left on each photo; the caption (date and place, and the
+    time if turned on) moves to a different corner for each photo.
 -->
 <component name="ScreensaverScene" extends="Scene">
     <script type="text/brightscript" uri="ScreensaverScene.brs" />
@@ -21,9 +23,15 @@
 
         <Group id="caption" opacity="0">
             <Rectangle id="captionBack" color="0x00000090" />
-            <Label id="captionDate" translation="[24,14]" font="font:MediumBoldSystemFont" color="0xFFFFFFFF" />
-            <Label id="captionPlace" translation="[24,62]" font="font:SmallSystemFont" color="0xE0E4E8FF" />
+            <Label id="captionTime" translation="[24,8]" color="0xFFFFFFFF">
+                <Font role="font" uri="font:BoldSystemFontFile" size="72" />
+            </Label>
+            <Label id="captionDate" font="font:MediumBoldSystemFont" color="0xFFFFFFFF" />
+            <Label id="captionPlace" font="font:SmallSystemFont" color="0xE0E4E8FF" />
         </Group>
+
+        <!-- Time left on the current photo. -->
+        <ProgressRing id="ring" translation="[1792,952]" visible="false" />
 
         <Label id="message" width="1000" wrap="true" horizAlign="center" visible="false"
             font="font:MediumSystemFont" color="0xA0A8B0FF" />
@@ -31,6 +39,7 @@
         <Timer id="advanceTimer" repeat="false" />
         <Timer id="retryTimer" duration="60" repeat="false" />
         <Timer id="moveMessageTimer" duration="20" repeat="true" />
+        <Timer id="clockTimer" duration="1" repeat="true" />
 
         <Animation id="fade" duration="1.5" easeFunction="linear">
             <FloatFieldInterpolator id="fadeIn" key="[0.0, 1.0]" keyValue="[0.0, 1.0]" fieldToInterp="photoA.opacity" />

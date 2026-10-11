@@ -21,11 +21,17 @@ sub init()
     m.fadeOut = m.top.findNode("fadeOut")
     m.slideTimer = m.top.findNode("slideTimer")
     m.slideTimer.observeField("fire", "onSlideTimer")
+    m.names = m.top.findNode("names")
+    m.namesText = m.top.findNode("namesText")
+    m.namesShadow = m.top.findNode("namesShadow")
+    m.ring = m.top.findNode("ring")
+    m.showPeople = loadShowPeopleNames()
 
     agent = createAuthAgent()
     m.posters = []
     m.posterIndex = []      ' asset index each poster holds, -1 if none
     m.readyUri = {}         ' poster id -> uri that finished loading
+    m.kenBurns = {}         ' poster id -> its Ken Burns animation
     for each id in ["p0", "p1", "p2"]
         poster = m.top.findNode(id)
         poster.setHttpAgent(agent)
@@ -33,6 +39,7 @@ sub init()
         m.posters.Push(poster)
         m.posterIndex.Push(-1)
         m.readyUri[id] = ""
+        m.kenBurns[id] = createKenBurns(poster)
     end for
 
     m.index = -1
@@ -72,7 +79,7 @@ sub showIndex(index as integer, fadeSeconds as float)
     else
         m.message.text = "Loading..."
     end if
-    if m.info.visible then loadInfo()
+    if m.info.visible or m.showPeople then loadDetails()
 
     ' Ask for the next month early so moving on doesn't stall.
     if m.index >= m.timeline.assetCount - 10 and m.timeline.hasMore then m.timeline.callFunc("requestMore")
@@ -151,7 +158,10 @@ end function
 sub loadInto(slot as integer, index as integer)
     poster = m.posters[slot]
     m.posterIndex[slot] = index
-    if m.shown = invalid or not poster.isSameNode(m.shown) then poster.opacity = 0
+    if m.shown = invalid or not poster.isSameNode(m.shown)
+        poster.opacity = 0
+        settleKenBurns(poster, false)
+    end if
     uri = thumbnailUrl(assetAt(index).assetId, "preview")
     if poster.uri <> uri
         m.readyUri[poster.id] = ""
@@ -206,9 +216,11 @@ sub presentTarget()
             m.fade.duration = m.fadeSeconds
             m.fade.control = "start"
         end if
+        if m.slideshow then startKenBurns(target) else settleKenBurns(target, false)
         m.shown = target
     end if
     if m.slideshow then restartSlideTimer()
+    updateNames()
 end sub
 
 ' ---- Slideshow ----
@@ -226,6 +238,7 @@ sub toggleSlideshow()
         slideshowAdvance()
     else
         restartSlideTimer()
+        if m.shown <> invalid then startKenBurns(m.shown)
     end if
 end sub
 
@@ -233,12 +246,17 @@ sub stopSlideshow(message as string)
     m.slideshow = false
     m.slideTimer.control = "stop"
     m.pendingNext = ""
+    m.ring.stop = true
+    m.ring.visible = false
+    if m.shown <> invalid then settleKenBurns(m.shown, true)
     showToast(message)
 end sub
 
 sub restartSlideTimer()
     m.slideTimer.control = "stop"
     m.slideTimer.control = "start"
+    m.ring.visible = true
+    m.ring.countdown = m.slideTimer.duration
 end sub
 
 sub onSlideTimer()
@@ -267,14 +285,79 @@ sub slideshowAdvance()
     stopSlideshow("No photos to show in a slideshow")
 end sub
 
-' ---- Info overlay ----
+' ---- Ken Burns (slideshow only) ----
+
+' One animation per poster, so the outgoing photo keeps moving while it fades out.
+function createKenBurns(poster as object) as object
+    anim = m.top.createChild("Animation")
+    scale = anim.createChild("Vector2DFieldInterpolator")
+    scale.key = [0.0, 1.0]
+    scale.fieldToInterp = poster.id + ".scale"
+    move = anim.createChild("Vector2DFieldInterpolator")
+    move.key = [0.0, 1.0]
+    move.fieldToInterp = poster.id + ".translation"
+    return { anim: anim, scale: scale, move: move }
+end function
+
+' A slow zoom in, zoom out or pan across, lasting through the next crossfade.
+sub startKenBurns(poster as object)
+    zoom = 1.15
+    ' Room to pan at full zoom without showing the edge of a full-screen photo.
+    roomX = Int((zoom - 1) * 960)
+    roomY = Int((zoom - 1) * 540)
+    x = randomBetween(roomX \ 2, roomX)
+    if Rnd(2) = 1 then x = -x
+    point = [x, randomBetween(-roomY, roomY)]
+    style = Rnd(3)
+    if style = 1
+        scales = [[1.0, 1.0], [zoom, zoom]]
+        moves = [[0, 0], point]
+    else if style = 2
+        scales = [[zoom, zoom], [1.0, 1.0]]
+        moves = [point, [0, 0]]
+    else
+        scales = [[zoom, zoom], [zoom, zoom]]
+        moves = [point, [-point[0], -point[1]]]
+    end if
+
+    kb = m.kenBurns[poster.id]
+    kb.anim.control = "stop"
+    kb.anim.easeFunction = "linear"
+    kb.scale.keyValue = scales
+    kb.move.keyValue = moves
+    kb.anim.duration = loadSlideshowSeconds() + slideshowFade() + 1
+    kb.anim.control = "start"
+end sub
+
+' Back to the plain full-screen fit: eased when the slideshow stops, at once otherwise.
+sub settleKenBurns(poster as object, animate as boolean)
+    kb = m.kenBurns[poster.id]
+    kb.anim.control = "stop"
+    if animate
+        kb.anim.easeFunction = "outQuad"
+        kb.scale.keyValue = [poster.scale, [1.0, 1.0]]
+        kb.move.keyValue = [poster.translation, [0, 0]]
+        kb.anim.duration = 0.6
+        kb.anim.control = "start"
+    else
+        poster.scale = [1.0, 1.0]
+        poster.translation = [0, 0]
+    end if
+end sub
+
+function randomBetween(low as integer, high as integer) as integer
+    return low + Rnd(high - low + 1) - 1
+end function
+
+' ---- Asset details: info overlay and people's names ----
 
 sub toggleInfo()
     m.info.visible = not m.info.visible
-    if m.info.visible then loadInfo()
+    if m.info.visible then loadDetails()
+    updateNames()
 end sub
 
-sub loadInfo()
+sub loadDetails()
     assetId = assetAt(m.index).assetId
     if m.infoCache.DoesExist(assetId)
         renderInfo(m.infoCache[assetId])
@@ -293,7 +376,22 @@ sub onInfo(event as object)
     end if
     summary = summarizeAsset(resp.data)
     m.infoCache[resp.data.id] = summary
-    if resp.data.id = assetAt(m.index).assetId then renderInfo(summary)
+    if resp.data.id = assetAt(m.index).assetId
+        renderInfo(summary)
+        updateNames()
+    end if
+end sub
+
+' Names of the people in the photo on screen (hidden under the info overlay). They change
+' when the new photo appears, not when it starts loading.
+sub updateNames()
+    m.names.visible = m.showPeople and not m.info.visible
+    if not m.showPeople then return
+    text = ""
+    summary = m.infoCache[assetAt(m.index).assetId]
+    if summary <> invalid and m.shown <> invalid and m.shown.isSameNode(m.target) then text = summary.people
+    m.namesText.text = text
+    m.namesShadow.text = text
 end sub
 
 function summarizeAsset(data as object) as object
@@ -311,8 +409,17 @@ function summarizeAsset(data as object) as object
     if exif.iso <> invalid and exif.iso > 0 then exposure.Push("ISO " + exif.iso.ToStr())
     if exif.focalLength <> invalid and exif.focalLength > 0 then exposure.Push(formatOneDecimal(exif.focalLength) + " mm")
 
+    names = []
+    if data.people <> invalid
+        for each person in data.people
+            hidden = (person.isHidden <> invalid and person.isHidden)
+            if person.name <> invalid and person.name <> "" and not hidden then names.Push(person.name)
+        end for
+    end if
+
     return {
         date: formatPhotoDate(data.localDateTime)
+        people: joinNonEmpty(names, ", ")
         place: joinNonEmpty([exif.city, exif.state, exif.country], ", ")
         camera: joinNonEmpty([camera, joinNonEmpty(exposure, "   ")], "      ")
         name: data.originalFileName
@@ -368,6 +475,10 @@ sub close()
     m.slideshow = false
     m.slideTimer.control = "stop"
     m.fade.control = "stop"
+    m.ring.stop = true
+    for each id in m.kenBurns
+        m.kenBurns[id].anim.control = "stop"
+    end for
     m.timeline.unobserveFieldScoped("assetCount")
     m.timeline.jumpToIndex = m.index
 end sub

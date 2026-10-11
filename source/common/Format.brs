@@ -72,3 +72,17 @@ function formatItemCount(count as dynamic) as string
     if count = 1 then return "1 item"
     return count.ToStr() + " items"
 end function
+
+' The current local time, "15:07" or "3:07 PM" (twelveHour).
+function formatClock(twelveHour as boolean) as string
+    dt = CreateObject("roDateTime")
+    dt.ToLocalTime()
+    hours = dt.GetHours()
+    minutes = padTwo(dt.GetMinutes())
+    if not twelveHour then return padTwo(hours) + ":" + minutes
+    suffix = " AM"
+    if hours >= 12 then suffix = " PM"
+    hours = hours MOD 12
+    if hours = 0 then hours = 12
+    return hours.ToStr() + ":" + minutes + suffix
+end function

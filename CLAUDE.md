@@ -26,7 +26,8 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - Dev vs release: the manifest has `bs_const=DEV=false`; `deploy.ps1` rewrites it to `true` in the zip unless `-Release`. `#if DEV` guards the dev launch params and `logDebug`. Never ship a DEV build.
 - `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
 - **Test only on the Guest Bedroom Roku (10.10.10.163, the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
-- `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill). Channel posters and splash screens in `images/` are supplied artwork; don't regenerate them.
+- `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill, countdown ring, and the title logo cropped from `art/ImmichView-icon.png`). Channel posters and splash screens in `images/` are supplied artwork (from the brand kit); don't regenerate them.
+- The focus highlight is a plain white outline (`focus.9.png`, `focus-ring.png`). A soft glow was tried and rejected; keep the outline.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dot-notation (`aa.pinSalt = x`) stores lowercase keys and `ParseJson` dictionaries are case-sensitive, so `Delete`/lookups by string must use the lowercase key.
 - Don't open the next dialog from inside a dialog's `wasClosed` observer: Roku clears `scene.dialog` afterwards and dismisses it. `PinPrompt` reports its result via a short Timer for this reason.
@@ -51,9 +52,10 @@ components/
   MainScene.xml/.brs
   screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, PinPrompt, ProfileTile, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, PinPrompt, ProfileTile, ProgressRing, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
   screensaver/        ' ScreensaverScene and its components
-images/               ' Icons, splash, focus art
+images/               ' Icons, splash, focus art (shipped)
+art/                  ' Brand kit: logo SVGs and the icon PNG that make-images.ps1 crops the title logo from (not shipped)
 ```
 
 ## Architecture rules

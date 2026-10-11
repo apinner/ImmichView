@@ -2,6 +2,7 @@
 <!--
     Full-screen photo viewer with info overlay and slideshow. Steps through a TimelineView's
     assets (loading more months as needed). Three posters hold previous / current / next.
+    Slideshows add a slow Ken Burns zoom and pan, and a countdown ring for the time left.
 -->
 <component name="PhotoViewer" extends="Group">
     <interface>
@@ -20,13 +21,24 @@
         <Rectangle width="1920" height="1080" color="0x000000FF" />
         <Group id="stage">
             <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" opacity="0" />
+                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
             <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" opacity="0" />
+                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
             <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" opacity="0" />
+                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
         </Group>
         <Rectangle id="fadeDummy" width="0" height="0" />
+
+        <!-- People in the photo (optional, Settings), small and translucent at the bottom left. -->
+        <Group id="names" translation="[64,1000]" opacity="0.7" visible="false">
+            <Label id="namesShadow" translation="[2,2]" width="1400" height="32"
+                font="font:SmallestSystemFont" color="0x000000FF" />
+            <Label id="namesText" width="1400" height="32"
+                font="font:SmallestSystemFont" color="0xFFFFFFFF" />
+        </Group>
+
+        <!-- Time left on the current photo during a slideshow. -->
+        <ProgressRing id="ring" translation="[1792,952]" visible="false" />
 
         <Label id="message" translation="[160,500]" width="1600" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />

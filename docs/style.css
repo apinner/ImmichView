@@ -29,3 +29,4 @@ a { color: var(--accent); }
 code { font-size: 0.95em; }
 .meta, .back { color: var(--muted); margin-top: 0; }
 .disclaimer { margin-top: 3em; color: var(--muted); font-size: 0.9rem; }
+.logo { display: block; max-width: 100%; height: auto; margin-left: -8px; }

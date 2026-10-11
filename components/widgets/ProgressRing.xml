@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Countdown donut (slideshow and screensaver): a translucent purple ring, 64x64, that empties
+    clockwise from 12 o'clock over `countdown` seconds. Each half of the ring is a half-ring
+    image rotating inside a clipping rectangle for its side.
+-->
+<component name="ProgressRing" extends="Group">
+    <interface>
+        <!-- Seconds; setting it starts a full ring emptying. -->
+        <field id="countdown" type="float" alwaysNotify="true" onChange="onCountdown" />
+        <field id="stop" type="boolean" alwaysNotify="true" onChange="onStop" />
+    </interface>
+
+    <script type="text/brightscript" uri="ProgressRing.brs" />
+
+    <children>
+        <Poster uri="pkg:/images/ring-track.png" width="64" height="64" blendColor="0xA274D4FF" opacity="0.25" />
+        <Group opacity="0.8">
+            <Group clippingRect="[0,0,32,64]">
+                <Poster id="leftArc" uri="pkg:/images/ring-half.png" width="64" height="64"
+                    scaleRotateCenter="[32,32]" rotation="3.14159265" blendColor="0xA274D4FF" />
+            </Group>
+            <Group clippingRect="[32,0,32,64]">
+                <Poster id="rightArc" uri="pkg:/images/ring-half.png" width="64" height="64"
+                    scaleRotateCenter="[32,32]" rotation="6.2831853" blendColor="0xA274D4FF" />
+            </Group>
+        </Group>
+
+        <!-- ring-half.png is the right half; rotation is anticlockwise in radians. The right
+             side empties over the first half of the time, then the left side. -->
+        <Animation id="anim" easeFunction="linear">
+            <FloatFieldInterpolator key="[0.0, 0.5, 1.0]" keyValue="[6.2831853, 3.14159265, 3.14159265]" fieldToInterp="rightArc.rotation" />
+            <FloatFieldInterpolator key="[0.0, 0.5, 1.0]" keyValue="[3.14159265, 3.14159265, 0.0]" fieldToInterp="leftArc.rotation" />
+        </Animation>
+    </children>
+</component>

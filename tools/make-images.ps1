@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Regenerates the simple UI images in images/ (play badge icon, focus frame 9-patch).
+    Regenerates the simple UI images in images/ (icons, focus frames, masks, pill, countdown ring).
 #>
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -61,6 +61,28 @@ $g.Dispose()
 $bmp.Save((Join-Path $images 'focus-ring.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
+# Slideshow countdown donut (ProgressRing), drawn at 2x: 128x128, ring 14px thick. ring-track.png
+# is the whole ring; ring-half.png is only its right half, rotated in clipped halves to show
+# the time left. Both white, tinted at runtime.
+function New-RingPath { $p = New-Object Drawing.Drawing2D.GraphicsPath; $p.AddEllipse(1, 1, 126, 126); $p.AddEllipse(15, 15, 98, 98); return $p }
+$bmp = New-Object Drawing.Bitmap 128, 128
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.Clear([Drawing.Color]::Transparent)
+$g.FillPath([Drawing.Brushes]::White, (New-RingPath))
+$g.Dispose()
+$bmp.Save((Join-Path $images 'ring-track.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+$bmp = New-Object Drawing.Bitmap 128, 128
+$g = [Drawing.Graphics]::FromImage($bmp)
+$g.SmoothingMode = 'AntiAlias'
+$g.Clear([Drawing.Color]::Transparent)
+$g.SetClip((New-Object Drawing.Rectangle 64, 0, 64, 128))
+$g.FillPath([Drawing.Brushes]::White, (New-RingPath))
+$g.Dispose()
+$bmp.Save((Join-Path $images 'ring-half.png'), [Drawing.Imaging.ImageFormat]::Png)
+$bmp.Dispose()
+
 # Pill 9-patch for tabs: 56px-tall white rounded rectangle (fully rounded ends), tinted at
 # runtime with blendColor. Only the centre column/row stretch.
 $bmp = New-Object Drawing.Bitmap 58, 58
@@ -75,27 +97,20 @@ $bmp.Save((Join-Path $images 'pill.9.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
 # Logo mark for the in-app title: the flower from the supplied splash artwork, cropped to a
-# square (centred on the emblem) with rounded corners, 128x128 (shown at 64x64).
-$splash = [Drawing.Image]::FromFile((Join-Path $images 'splash-screen_fhd.jpg'))
-$bmp = New-Object Drawing.Bitmap 128, 128
+# Logo mark for the in-app title: the icon from the brand kit (art/ImmichView-icon.png), cropped
+# to the artwork, 146x128 (shown at 73x64).
+$icon = [Drawing.Image]::FromFile((Join-Path (Split-Path $PSScriptRoot -Parent) 'art\ImmichView-icon.png'))
+$bmp = New-Object Drawing.Bitmap 146, 128
 $g = [Drawing.Graphics]::FromImage($bmp)
 $g.SmoothingMode = 'AntiAlias'
 $g.InterpolationMode = 'HighQualityBicubic'
+$g.PixelOffsetMode = 'HighQuality'
 $g.Clear([Drawing.Color]::Transparent)
-$radius = 28
-$path = New-Object Drawing.Drawing2D.GraphicsPath
-$path.AddArc(0, 0, $radius * 2, $radius * 2, 180, 90)
-$path.AddArc(128 - $radius * 2, 0, $radius * 2, $radius * 2, 270, 90)
-$path.AddArc(128 - $radius * 2, 128 - $radius * 2, $radius * 2, $radius * 2, 0, 90)
-$path.AddArc(0, 128 - $radius * 2, $radius * 2, $radius * 2, 90, 90)
-$path.CloseFigure()
-$g.SetClip($path)
-$g.DrawImage($splash, (New-Object Drawing.Rectangle 0, 0, 128, 128), (New-Object Drawing.Rectangle 717, 225, 480, 480), [Drawing.GraphicsUnit]::Pixel)
+$g.DrawImage($icon, (New-Object Drawing.Rectangle 0, 0, 146, 128), (New-Object Drawing.Rectangle 84, 204, 1880, 1640), [Drawing.GraphicsUnit]::Pixel)
 $g.Dispose()
-$splash.Dispose()
+$icon.Dispose()
 $bmp.Save((Join-Path $images 'logo-mark.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
-
 # Small white icons for the top bar pills (tinted at runtime with blendColor), 48x48.
 function New-IconCanvas { $b = New-Object Drawing.Bitmap 48, 48; $gr = [Drawing.Graphics]::FromImage($b); $gr.SmoothingMode = 'AntiAlias'; $gr.Clear([Drawing.Color]::Transparent); return @($b, $gr) }
 
@@ -148,4 +163,4 @@ $g.Dispose()
 $bmp.Save((Join-Path $images 'icon-lock.png'), [Drawing.Imaging.ImageFormat]::Png)
 $bmp.Dispose()
 
-Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, pill.9.png, logo-mark.png and icons to $images"
+Write-Host "Wrote play.png, focus.9.png, circle-mask.png, focus-ring.png, ring-track.png, ring-half.png, pill.9.png, logo-mark.png and icons to $images"

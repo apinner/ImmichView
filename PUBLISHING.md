@@ -42,6 +42,7 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [x] Privacy policy and support pages (source in `docs/`), live on GitHub Pages from the public repo
       apinner/ImmichView: https://apinner.github.io/ImmichView/privacy.html and
       https://apinner.github.io/ImmichView/ (support).
+- [x] Terms of use page (Roku requires one): https://apinner.github.io/ImmichView/terms.html, covering both apps.
 - [ ] Support contact (URL, email, phone) and admin/technical contacts.
 - [ ] **Reviewer access.** Roku's testers need a working Immich server URL and API key with
       sample photos and videos (a demo account, not your personal library).

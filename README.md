@@ -50,6 +50,6 @@ The dev launch parameters (`serverUrl`, `apiKey`) and the screensaver's dev `Mai
 
 ## Privacy, support and licence
 
-- [Privacy policy](https://apinner.github.io/ImmichView/privacy.html) and [support page](https://apinner.github.io/ImmichView/) (source in `docs/`).
+- [Privacy policy](https://apinner.github.io/ImmichView/privacy.html), [terms of use](https://apinner.github.io/ImmichView/terms.html) and [support page](https://apinner.github.io/ImmichView/) (source in `docs/`).
 - MIT licensed; see [LICENSE](LICENSE).
 - ImmichView is an unofficial app. It is not affiliated with or endorsed by Immich or FUTO.

@@ -27,7 +27,7 @@ if ($Screensaver) {
     $manifestFile = 'manifest.screensaver'
     $include = @('source\screensaver.brs', 'source\common', 'components\screensaver', 'components\tasks',
         'components\widgets\ProgressRing.xml', 'components\widgets\ProgressRing.brs',
-        'images\channel-poster_fhd.png', 'images\channel-poster_hd.png', 'images\ring-half.png', 'images\ring-track.png')
+        'images\channel-poster-screensaver_fhd.png', 'images\channel-poster-screensaver_hd.png', 'images\ring-half.png', 'images\ring-track.png')
     $zipName = 'immich-roku-screensaver.zip'
 } else {
     $manifestFile = 'manifest'

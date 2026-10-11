@@ -9,7 +9,7 @@
             "host": "${env:ROKU_HOST}",
             "password": "${env:ROKU_DEV_PASSWORD}",
             "rootDir": "${workspaceFolder}",
-            "files": ["manifest", "source/**/*", "components/**/*", "images/**/*"],
+            "files": ["manifest", "source/main.brs", "source/common/**/*", "components/**/*", "!components/screensaver/**/*", "images/**/*"],
             "bsConst": { "DEV": true },
             "stopOnEntry": false
         }

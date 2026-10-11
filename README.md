@@ -10,7 +10,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
 - **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera), optional names of the people in each photo, and a slideshow with a slow Ken Burns zoom and pan and a countdown ring
 - **Videos:** played with the standard Roku player and trick play
-- **Screensaver:** random photos, today's memories or one album, with a slow drift against burn-in, a countdown ring and an optional clock
+- **Screensaver** (the companion ImmichView Screensaver app): random photos, today's memories or one album, with a slow drift against burn-in, a countdown ring and an optional clock
 - **Multiple users:** each with their own server and API key, a "Who's watching?" picker at launch, optional per-user PINs, and quick switching from the user menu at the top right
 
 ## Remote
@@ -25,7 +25,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 | Photo viewer | Play | Start or stop the slideshow |
 | Photo viewer, on a video | OK / Play | Play the video |
 
-Turn on the screensaver in Roku **Settings > Theme > Screensavers > ImmichView**; choose its photos in ImmichView's Settings.
+The screensaver is a separate app, **ImmichView Screensaver** (Roku only allows screensavers as standalone apps). Add it, then pick it in Roku **Settings > Theme > Screensavers > ImmichView**. It shows the photos of the user last chosen in ImmichView; choose its photos, caption and clock in ImmichView's Settings.
 
 ## Immich server tips
 
@@ -42,9 +42,11 @@ Turn on the screensaver in Roku **Settings > Theme > Screensavers > ImmichView**
    - from PowerShell: `.\deploy.ps1`, then `.\tools\relaunch.ps1` to sign in from `.env` and see the debug log
 4. In the channel, enter your server URL and an API key.
 
-More tools: `tools\screenshot.ps1`, `tools\drive.ps1` (scripted remote keys), `tools\relaunch.ps1 -Screensaver`. Debug output: `telnet <roku-ip> 8085`.
+The screensaver app: `.\deploy.ps1 -Screensaver` (replaces the sideloaded ImmichView; a Roku holds one sideloaded app), then `.\tools\relaunch.ps1 -Screensaver` to show it. Both apps share `source/common`; the screensaver's manifest is `manifest.screensaver`.
 
-The dev launch parameters (`serverUrl`, `apiKey`, `screensaver`) only exist in dev builds (`bs_const DEV=true`, which `deploy.ps1` sets); release builds compile them out.
+More tools: `tools\screenshot.ps1`, `tools\drive.ps1` (scripted remote keys), `tools\package.ps1 [-Screensaver]` (signed store packages). Debug output: `telnet <roku-ip> 8085`.
+
+The dev launch parameters (`serverUrl`, `apiKey`) and the screensaver's dev `Main` only exist in dev builds (`bs_const DEV=true`, which `deploy.ps1` sets); release builds compile them out.
 
 ## Privacy, support and licence
 

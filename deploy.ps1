@@ -8,17 +8,33 @@
     Uses the curl.exe that ships with Windows, so Node isn't needed.
     Builds a dev build (bs_const DEV=true: debug logging and dev launch parameters) unless
     -Release is given, which keeps the manifest's DEV=false as in store builds.
+    Two apps come from this repo: ImmichView (default) and, with -Screensaver, the separate
+    ImmichView Screensaver app (manifest.screensaver; Roku only allows standalone screensavers).
+    A Roku holds one sideloaded app at a time, so installing one replaces the other.
 .EXAMPLE
     .\deploy.ps1                          # build and install on ROKU_HOST
+    .\deploy.ps1 -Screensaver             # build and install the screensaver app instead
     .\deploy.ps1 -RokuHost 10.10.10.164   # install on another Roku
     .\deploy.ps1 -Release                 # install a release build (as published)
     .\deploy.ps1 -ZipOnly                 # just build out\immich-roku.zip
 #>
-param([switch]$ZipOnly, [string]$RokuHost, [switch]$Release)
+param([switch]$ZipOnly, [string]$RokuHost, [switch]$Release, [switch]$Screensaver)
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
-$include = @('manifest', 'source', 'components', 'images')
+# Files and folders in each app; the manifest is written into the zip separately.
+if ($Screensaver) {
+    $manifestFile = 'manifest.screensaver'
+    $include = @('source\screensaver.brs', 'source\common', 'components\screensaver', 'components\tasks',
+        'components\widgets\ProgressRing.xml', 'components\widgets\ProgressRing.brs',
+        'images\channel-poster_fhd.png', 'images\channel-poster_hd.png', 'images\ring-half.png', 'images\ring-track.png')
+    $zipName = 'immich-roku-screensaver.zip'
+} else {
+    $manifestFile = 'manifest'
+    $include = @('source\main.brs', 'source\common', 'components', 'images')
+    $exclude = @('components\screensaver')
+    $zipName = 'immich-roku.zip'
+}
 
 function Read-DotEnv([string]$path) {
     $values = @{}
@@ -36,19 +52,18 @@ function New-ChannelZip([string]$zipPath, [bool]$devBuild) {
     if (Test-Path $zipPath) { Remove-Item $zipPath }
     $zip = [System.IO.Compression.ZipFile]::Open($zipPath, 'Create')
     try {
+        $text = Get-Content (Join-Path $root $manifestFile) -Raw
+        if ($devBuild) { $text = $text -replace '(?m)^bs_const=DEV=false', 'bs_const=DEV=true' }
+        $writer = New-Object IO.StreamWriter ($zip.CreateEntry('manifest').Open())
+        $writer.Write($text)
+        $writer.Dispose()
         foreach ($item in $include) {
             $path = Join-Path $root $item
-            if (-not (Test-Path $path)) { continue }
+            if (-not (Test-Path $path)) { throw "Missing $item" }
             foreach ($file in Get-ChildItem $path -Recurse -File) {
-                $entry = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
-                if ($entry -eq 'manifest' -and $devBuild) {
-                    $text = (Get-Content $file.FullName -Raw) -replace '(?m)^bs_const=DEV=false', 'bs_const=DEV=true'
-                    $writer = New-Object IO.StreamWriter ($zip.CreateEntry($entry).Open())
-                    $writer.Write($text)
-                    $writer.Dispose()
-                } else {
-                    [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $entry, 'Optimal')
-                }
+                $relative = $file.FullName.Substring($root.Length + 1)
+                if ($exclude | Where-Object { $relative.StartsWith($_ + '\') }) { continue }
+                [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $relative.Replace('\', '/'), 'Optimal')
             }
         }
     } finally {
@@ -58,7 +73,7 @@ function New-ChannelZip([string]$zipPath, [bool]$devBuild) {
 
 $outDir = Join-Path $root 'out'
 New-Item -ItemType Directory -Force $outDir | Out-Null
-$zipPath = Join-Path $outDir 'immich-roku.zip'
+$zipPath = Join-Path $outDir $zipName
 New-ChannelZip $zipPath (-not $Release)
 if ($Release) { Write-Host "Built $zipPath (release)" } else { Write-Host "Built $zipPath (dev)" }
 if ($ZipOnly) { return }

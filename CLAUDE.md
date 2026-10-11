@@ -1,6 +1,6 @@
 # ImmichView (Immich client for Roku)
 
-A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-hosted Immich server. Developed by sideloading; being prepared for the Roku Channel Store (see PUBLISHING.md for the checklist).
+A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-hosted Immich server, plus a companion screensaver app built from the same repo. Developed by sideloading; being prepared for the Roku Channel Store (see PUBLISHING.md for the checklist).
 
 ## Goals
 
@@ -22,7 +22,8 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\deploy.ps1` zips and sideloads (curl.exe, no Node). Sideloading wipes the channel registry.
 - `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
 - `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`). Key names: `Info` is the `*` button (opens Settings on Home), `Lit_x` types a character into a keyboard dialog.
-- `.\tools\relaunch.ps1 -Screensaver` opens the screensaver directly (dev launch param `screensaver=preview`).
+- **Two apps:** Roku only allows screensavers as standalone apps (bundling one blocks publishing), so the screensaver is a separate channel, **ImmichView Screensaver** (`manifest.screensaver`: `source/screensaver.brs`, `source/common`, `components/screensaver`, `components/tasks`, ProgressRing, a few images). The app's `manifest` must not have `screensaver_title`. Both are signed with the same key, so they share a registry: the screensaver reads ImmichView's active user and the screensaver options set in ImmichView's Settings.
+- `.\deploy.ps1 -Screensaver` / `.\tools\package.ps1 -Screensaver` build the screensaver app. A Roku holds one sideloaded app, so it replaces the dev ImmichView; `.\deploy.ps1` puts the app back. With the screensaver sideloaded, `.\tools\relaunch.ps1 -Screensaver` shows it straight away (a DEV-only `Main` in `screensaver.brs`; release builds have none, as Roku requires).
 - Dev vs release: the manifest has `bs_const=DEV=false`; `deploy.ps1` rewrites it to `true` in the zip unless `-Release`. `#if DEV` guards the dev launch params and `logDebug`. Never ship a DEV build.
 - `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
 - **Test only on the Guest Bedroom Roku (10.10.10.163, the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
@@ -44,10 +45,12 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 ## Project layout
 
 ```
-manifest
+manifest              ' ImmichView
+manifest.screensaver  ' ImmichView Screensaver (deploy.ps1 writes it into that zip as manifest)
 source/
   main.brs            ' Sub Main() – app entry
-  screensaver.brs     ' Sub RunScreenSaver(params) – screensaver entry
+  screensaver.brs     ' Sub RunScreenSaver(params) – screensaver app entry
+  common/             ' Shared helpers (both apps), incl. DevLaunch.brs (dev launch params)
 components/
   MainScene.xml/.brs
   screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
@@ -115,7 +118,7 @@ Format notes:
 - Keyboard and voice input (voice comes through the keyboard dialog). Smart search results shown in the same grid component. People search by face thumbnails.
 
 ### Screensaver
-- Manifest: `screensaver_title=ImmichView`. Entry point `Sub RunScreenSaver(params)` in `source/screensaver.brs`, which creates `ScreensaverScene`.
+- Separate app (ImmichView Screensaver, `manifest.screensaver`) with `screensaver_title=ImmichView`. Entry point `Sub RunScreenSaver(params)` in `source/screensaver.brs`, which creates `ScreensaverScene`. No user input, deep links or `Main` in release builds (Roku screensaver rules).
 - Uses the stored server URL and key (same registry section). If not configured, show a simple "Open Immich app to set up" message.
 - Photos only by default. Fetch a batch of random assets (or album/memories, per setting), cycle with crossfade at the configured interval, refill the batch when it runs low. Include a slow pan/position shift to avoid burn-in.
 

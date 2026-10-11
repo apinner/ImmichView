@@ -2,13 +2,15 @@
 .SYNOPSIS
     Builds the signed store package: installs a release build on the test Roku, has the Roku's
     packager sign it with the key from genkey, and downloads out\packages\ImmichView-<version>.pkg.
-    Then reinstalls the dev build (unless -KeepRelease).
+    Then reinstalls the dev build (unless -KeepRelease). -Screensaver packages the ImmichView
+    Screensaver app instead (out\packages\ImmichViewScreensaver-<version>.pkg). Both must be signed
+    with the same key so they share a registry (the screensaver reads ImmichView's users).
 .DESCRIPTION
     Needs ROKU_HOST, ROKU_DEV_PASSWORD and ROKU_SIGN_PASSWORD in .env. The Roku must hold the
     signing key (genkey, or rekey from an earlier package). Keep every published package: a
     package plus ROKU_SIGN_PASSWORD is the only way to restore the key onto a Roku.
 #>
-param([switch]$KeepRelease)
+param([switch]$KeepRelease, [switch]$Screensaver)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -22,22 +24,24 @@ $user = "rokudev:$($config['ROKU_DEV_PASSWORD'])"
 $signPassword = $config['ROKU_SIGN_PASSWORD']
 if (-not $signPassword) { throw 'Set ROKU_SIGN_PASSWORD in .env (from genkey).' }
 
-$manifest = Get-Content (Join-Path $root 'manifest')
+if ($Screensaver) { $manifestFile = 'manifest.screensaver'; $appName = 'ImmichViewScreensaver' } else { $manifestFile = 'manifest'; $appName = 'ImmichView' }
+$deployArgs = @(); if ($Screensaver) { $deployArgs += '-Screensaver' }
+$manifest = Get-Content (Join-Path $root $manifestFile)
 function ManifestValue([string]$key) {
     $line = $manifest | Where-Object { $_ -match "^$key=" } | Select-Object -First 1
     return ($line -replace '^[^=]*=', '').Trim()
 }
 $version = '{0}.{1}.{2}' -f (ManifestValue 'major_version'), (ManifestValue 'minor_version'), [int](ManifestValue 'build_version')
-if ((ManifestValue 'bs_const') -ne 'DEV=false') { throw 'manifest must have bs_const=DEV=false for store builds.' }
+if ((ManifestValue 'bs_const') -ne 'DEV=false') { throw "$manifestFile must have bs_const=DEV=false for store builds." }
 
-Write-Host "Installing release build $version on $targetHost ..."
-& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'deploy.ps1') -Release
+Write-Host "Installing $appName release build $version on $targetHost ..."
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'deploy.ps1') -Release @deployArgs
 if ($LASTEXITCODE -ne 0) { throw 'Release install failed.' }
 
 Write-Host 'Signing ...'
 $pkgTime = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 $response = & curl.exe --silent --show-error --max-time 180 --digest --user $user `
-    -F 'mysubmit=Package' -F "app_name=ImmichView/$version" -F "passwd=$signPassword" -F "pkg_time=$pkgTime" `
+    -F 'mysubmit=Package' -F "app_name=$appName/$version" -F "passwd=$signPassword" -F "pkg_time=$pkgTime" `
     "http://$targetHost/plugin_package"
 if ($LASTEXITCODE -ne 0) { throw "Packaging request failed (curl exit code $LASTEXITCODE)." }
 $text = $response -join "`n"
@@ -50,7 +54,7 @@ if (-not $match.Success) {
 
 $outDir = Join-Path $root 'out\packages'
 New-Item -ItemType Directory -Force $outDir | Out-Null
-$pkgPath = Join-Path $outDir "ImmichView-$version.pkg"
+$pkgPath = Join-Path $outDir "$appName-$version.pkg"
 & curl.exe --silent --show-error --max-time 120 --digest --user $user -o $pkgPath "http://$targetHost/pkgs/$($match.Groups[1].Value)"
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path $pkgPath) -or (Get-Item $pkgPath).Length -lt 1024) { throw 'Package download failed.' }
 Write-Host "Signed package: $pkgPath ($([math]::Round((Get-Item $pkgPath).Length / 1KB)) KB)"
@@ -58,5 +62,5 @@ Write-Host 'Keep a copy of this package with ROKU_SIGN_PASSWORD: together they r
 
 if (-not $KeepRelease) {
     Write-Host 'Reinstalling the dev build ...'
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'deploy.ps1') | Out-Null
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'deploy.ps1') @deployArgs | Out-Null
 }

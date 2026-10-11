@@ -1,12 +1,14 @@
 # Publishing ImmichView to the Roku Channel Store
 
 Checklist for taking ImmichView from a sideloaded dev channel to a public channel.
+
+There are **two store apps**: ImmichView and **ImmichView Screensaver**. Roku only allows screensavers as standalone apps; an app with `screensaver_title` in its manifest is blocked from publishing (the bundled screensaver was split out on 2026-10-11). Both are built from this repo and must be signed with the same key so the screensaver can read ImmichView's users (apps packaged under one developer ID share a registry).
 Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or details.
 
 ## 1. Certification requirements in the app (code)
 
 - [x] **Release vs dev builds.** Release builds turn off debug logging and the dev-only launch
-      parameters (`serverUrl`/`apiKey`/`screensaver=preview`), which would let anyone on the
+      parameters (`serverUrl`/`apiKey`, and the screensaver's dev `Main`), which would let anyone on the
       network reconfigure the channel. Controlled by `bs_const=DEV` in the manifest; `deploy.ps1`
       builds dev by default.
 - [x] **Launch beacons.** `AppLaunchComplete` when Home has rendered (or deep-linked playback
@@ -14,7 +16,9 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [x] **Deep linking.** `supports_input_launch=1`; handle `contentId` (an Immich asset ID) and
       `mediaType` at launch and through `roInput` while running. Videos play straight away,
       photos open in the viewer, invalid links land on Home without errors.
-- [x] **Signed package script.** `tools/package.ps1` installs the release build, has the Roku sign it, and saves `out/packages/ImmichView-<version>.pkg`.
+- [x] **Signed package script.** `tools/package.ps1` installs the release build, has the Roku sign it, and saves `out/packages/ImmichView-<version>.pkg`; `-Screensaver` does the same for `ImmichViewScreensaver-<version>.pkg`.
+- [x] **Screensaver as its own app** (`manifest.screensaver`; no user input, deep links or `Main` in release builds).
+- [ ] Check on a Roku that the published screensaver reads ImmichView's users (shared registry). Sideloading can't show this, since a Roku holds one sideloaded app.
 - [ ] **Static Analysis.** Run Roku's analyzer (in the Developer Dashboard upload, or the CLI
       tool) and fix anything it reports.
 - [x] Pre-certification test pass on the test Roku: launch about 2 s to AppLaunchComplete (limit 15 s),
@@ -33,7 +37,7 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [ ] Channel name: **ImmichView** (decided). Before publishing, email the Immich team (address in the
       Commercial Guidelines section of docs.immich.app/FAQ) as notification; the app and listing say
       it's unofficial and not affiliated with or endorsed by Immich or FUTO.
-- [ ] Description, category, keywords, rating questionnaire.
+- [ ] Description, category, keywords, rating questionnaire, for both apps. The screensaver's listing should say it needs ImmichView set up first.
 - [ ] Screenshots (taken from the app with `tools/screenshot.ps1`).
 - [x] Privacy policy and support pages (source in `docs/`), live on GitHub Pages from the public repo
       apinner/ImmichView: https://apinner.github.io/ImmichView/privacy.html and
@@ -46,4 +50,4 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 
 ## 4. Submit
 
-- [ ] Upload the signed package, pass Static Analysis, submit for review, answer any feedback.
+- [ ] Upload both signed packages, pass Static Analysis, submit for review, answer any feedback. Publish ImmichView first (or together): the screensaver is useless without it.

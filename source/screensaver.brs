@@ -9,10 +9,14 @@ sub RunScreenSaver(params = invalid as dynamic)
     screen.setMessagePort(port)
     screen.CreateScene("ScreensaverScene")
     screen.show()
+    ' The screensaver holds only two photos at a time, so warnings are just logged.
+    memory = startMemoryMonitor(port)
 
     while true
         msg = wait(0, port)
         if type(msg) = "roSGScreenEvent" and msg.isScreenClosed() then return
+        percent = memoryWarningPercent(msg, memory)
+        if percent <> invalid then logDebug("memory warning: " + percent.ToStr() + "%")
     end while
 end sub
 

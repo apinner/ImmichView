@@ -17,6 +17,9 @@ sub Main(args as dynamic)
     deepLink = deepLinkFrom(args)
     if deepLink <> invalid then scene.deepLink = deepLink
 
+    ' Memory warnings go to MainScene, which has the screens free what they can.
+    memory = startMemoryMonitor(port)
+
     while true
         msg = wait(0, port)
         msgType = type(msg)
@@ -29,6 +32,9 @@ sub Main(args as dynamic)
                 deepLink = deepLinkFrom(msg.getInfo())
                 if deepLink <> invalid then scene.deepLink = deepLink
             end if
+        else
+            percent = memoryWarningPercent(msg, memory)
+            if percent <> invalid then scene.memoryWarning = Int(percent)
         end if
     end while
 end sub

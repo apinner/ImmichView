@@ -4,6 +4,8 @@
         <field id="exitApp" type="boolean" alwaysNotify="true" />
         <!-- { contentId, mediaType } from launch parameters or roInput (set by Main). -->
         <field id="deepLink" type="assocarray" alwaysNotify="true" onChange="onDeepLink" />
+        <!-- Memory use in percent of the app's limit, from Main's memory monitor. -->
+        <field id="memoryWarning" type="integer" alwaysNotify="true" onChange="onMemoryWarning" />
     </interface>
 
     <script type="text/brightscript" uri="MainScene.brs" />

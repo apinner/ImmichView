@@ -1,9 +1,10 @@
 title=ImmichView Screensaver
 major_version=1
 minor_version=0
-build_version=00001
+build_version=00002
 ui_resolutions=fhd
 mm_icon_focus_fhd=pkg:/images/channel-poster-screensaver_fhd.png
 mm_icon_focus_hd=pkg:/images/channel-poster-screensaver_hd.png
 screensaver_title=ImmichView
+rsg_version=1.3
 bs_const=DEV=false

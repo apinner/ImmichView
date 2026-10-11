@@ -482,3 +482,7 @@ sub close()
     m.timeline.unobserveFieldScoped("assetCount")
     m.timeline.jumpToIndex = m.index
 end sub
+
+sub onLowMemory()
+    m.infoCache = {}
+end sub

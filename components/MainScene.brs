@@ -218,3 +218,13 @@ function onKeyEvent(key as string, press as boolean) as boolean
     end if
     return true
 end function
+
+' ---- Memory ----
+
+' Roku warns as the app nears its memory limit: screens with a lowMemory field free caches.
+sub onMemoryWarning()
+    logDebug("memory warning: " + m.top.memoryWarning.ToStr() + "% of the app's limit")
+    for each screen in m.screens
+        if screen.hasField("lowMemory") then screen.lowMemory = true
+    end for
+end sub

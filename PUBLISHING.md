@@ -20,7 +20,13 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
 - [x] **Screensaver as its own app** (`manifest.screensaver`; no user input, deep links or `Main` in release builds).
 - [ ] Check on a Roku that the published screensaver reads ImmichView's users (shared registry). Sideloading can't show this, since a Roku holds one sideloaded app.
 - [ ] **Static Analysis.** Run Roku's analyzer (in the Developer Dashboard upload, or the CLI
-      tool) and fix anything it reports.
+      tool) and fix anything it reports. First run (ImmichView 1.0.2, 2026-10-11), fixed in 1.0.3:
+      - Memory monitoring (required from 1 Oct 2026): `source/common/Memory.brs` uses roAppMemoryMonitor
+        (with the low general memory event as fallback); warnings reach MainScene, which tells screens to free caches.
+      - `rsg_version=1.3` in both manifests (required from 1 Oct 2026); in the Dashboard set the
+        **minimum firmware to 15.1**.
+      - getUserData / Customer Account errors: ImmichView has no accounts of its own (users enter their own
+        server and API key), so in the Dashboard set **Customer Account Requirement to No**; no RFI needed.
 - [x] Pre-certification test pass on the test Roku: launch about 2 s to AppLaunchComplete (limit 15 s),
       Back on Home exits, unreachable server and rejected key show clear messages with a path to
       Settings, add/remove user, screensaver, stress-tested grids and viewer.

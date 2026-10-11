@@ -9,6 +9,8 @@
         <!-- { timeline: TimelineView node, index } -->
         <field id="open" type="assocarray" onChange="onOpen" />
         <field id="navigate" type="assocarray" alwaysNotify="true" />
+        <!-- Set by MainScene on a memory warning: drops cached photo details. -->
+        <field id="lowMemory" type="boolean" alwaysNotify="true" onChange="onLowMemory" />
     </interface>
 
     <script type="text/brightscript" uri="PhotoViewer.brs" />

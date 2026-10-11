@@ -1,7 +1,7 @@
 title=ImmichView
 major_version=1
 minor_version=0
-build_version=00002
+build_version=00003
 ui_resolutions=fhd
 mm_icon_focus_fhd=pkg:/images/channel-poster_fhd.png
 mm_icon_focus_hd=pkg:/images/channel-poster_hd.png
@@ -11,4 +11,5 @@ splash_screen_sd=pkg:/images/splash-screen_sd.jpg
 splash_color=#0E0618
 splash_min_time=1500
 supports_input_launch=1
+rsg_version=1.3
 bs_const=DEV=false

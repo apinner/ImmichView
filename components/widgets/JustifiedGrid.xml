@@ -3,7 +3,8 @@
     Justified photo grid (like the Immich web timeline): photos are grouped under a header
     (e.g. a month), rows fill the full width and each row's height is chosen so its photos
     keep their aspect ratio. Only rows near the viewport have nodes.
-    Feed it with appendGroup = { title, items: [{ assetId, ratio, isVideo, durationMs }] }.
+    Feed it with appendGroup = { title, items: [{ assetId, ratio, isVideo, durationMs }] }
+    (or prependGroup to add a group above the others).
     An empty title adds no header; continues = true flows the items on from the previous group.
 -->
 <component name="JustifiedGrid" extends="Group">
@@ -14,6 +15,8 @@
         <field id="spacing" type="float" value="8" />
 
         <field id="appendGroup" type="assocarray" onChange="onAppendGroup" />
+        <!-- Same shape as appendGroup, added above everything (keeps the focused photo in place). -->
+        <field id="prependGroup" type="assocarray" onChange="onPrependGroup" />
         <field id="clear" type="boolean" alwaysNotify="true" onChange="onClear" />
 
         <!-- Index into all appended items. -->
@@ -22,6 +25,10 @@
         <field id="itemSelected" type="integer" alwaysNotify="true" />
         <!-- Set when Up is pressed on the first row (lets the parent move focus elsewhere). -->
         <field id="exitedTop" type="boolean" alwaysNotify="true" />
+        <!-- When exitLeft is set, Left on the first photo of a row sets exitedLeft instead of
+             moving to the end of the row above. -->
+        <field id="exitLeft" type="boolean" />
+        <field id="exitedLeft" type="boolean" alwaysNotify="true" />
     </interface>
 
     <script type="text/brightscript" uri="JustifiedGrid.brs" />

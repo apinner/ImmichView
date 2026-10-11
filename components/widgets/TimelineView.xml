@@ -4,6 +4,8 @@
     - query: timeline buckets (e.g. "albumId=...&order=desc"), grouped by month
     - searchText: smart (CLIP) search results, in relevance order
     Either way it pages in more as focus nears the end, and PhotoViewer can step through it.
+    The timeline can also start at any month (jumpToMonth) and loads newer months above as
+    focus nears the top.
 -->
 <component name="TimelineView" extends="Group">
     <interface>
@@ -16,7 +18,8 @@
 
         <!-- { index, asset } of the selected item -->
         <field id="itemSelected" type="assocarray" alwaysNotify="true" />
-        <field id="exitedTop" type="boolean" alias="grid.exitedTop" />
+        <!-- Up on the first row, with no newer months left to load above. -->
+        <field id="exitedTop" type="boolean" alwaysNotify="true" />
         <field id="jumpToIndex" type="integer" alias="grid.jumpToItem" />
         <!-- Total items in the timeline (sum of bucket counts); -1 for search. -->
         <field id="totalCount" type="integer" value="-1" />
@@ -28,6 +31,14 @@
         <field id="hasMore" type="boolean" />
         <function name="getAsset" />
         <function name="requestMore" />
+
+        <!-- Months (timeline mode): [{ timeBucket, count }] in timeline order. Left on the first
+             photo of a row sets jumpRequested, with monthIndex the focused photo's month; the
+             screen shows a MonthPanel and calls jumpToMonth(index). -->
+        <field id="months" type="array" />
+        <field id="monthIndex" type="integer" />
+        <field id="jumpRequested" type="boolean" alwaysNotify="true" />
+        <function name="jumpToMonth" />
     </interface>
 
     <script type="text/brightscript" uri="TimelineView.brs" />

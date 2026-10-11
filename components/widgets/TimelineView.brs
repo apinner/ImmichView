@@ -28,6 +28,8 @@ sub init()
 
     m.grid.observeField("itemFocused", "onItemFocused")
     m.grid.observeField("itemSelected", "onItemSelected")
+    m.grid.observeField("exitedTop", "onGridExitedTop")
+    m.grid.observeField("exitedLeft", "onGridExitedLeft")
     m.top.observeField("focusedChild", "onFocusChanged")
     m.global.observeField("mediaFilter", "onFilterChanged")
 end sub
@@ -65,11 +67,22 @@ end sub
 sub resetData()
     m.assets = []
     m.buckets = []
-    m.nextBucket = 0
+    resetLoadedMonths(0)
     m.nextPage = 1
-    m.loading = false
-    m.top.assetCount = 0
     m.top.hasMore = false
+end sub
+
+' Forgets the loaded photos; the timeline will load from month index first onwards.
+sub resetLoadedMonths(first as integer)
+    m.assets = []
+    m.firstBucket = first   ' earliest loaded bucket index (newer months load above it)
+    m.nextBucket = first    ' next bucket to load below
+    m.monthStarts = []      ' { start, bucket }: first asset index of each loaded month
+    m.task = invalid
+    m.prevTask = invalid
+    m.loading = false
+    m.loadingPrev = false
+    m.top.assetCount = 0
 end sub
 
 ' True if this response belongs to the request in flight (not one superseded by a new query).
@@ -81,6 +94,7 @@ end function
 
 sub onQueryChanged()
     m.mode = "timeline"
+    m.grid.exitLeft = true
     m.status.text = "Loading..."
     m.task = startApiRequest(currentSettings(), "GET", "/api/timeline/buckets?" + m.top.query, "onBuckets")
 end sub
@@ -96,9 +110,12 @@ sub onBuckets(event as object)
     end if
     m.buckets = resp.data
     total = 0
+    months = []
     for each bucket in m.buckets
         total = total + bucket.count
+        months.Push({ timeBucket: bucket.timeBucket, count: bucket.count })
     end for
+    m.top.months = months
     m.top.totalCount = total
     m.top.hasMore = m.buckets.Count() > 0
     if m.buckets.Count() = 0
@@ -112,9 +129,7 @@ end sub
 sub loadNextBucket()
     if m.loading or m.nextBucket >= m.buckets.Count() then return
     m.loading = true
-    bucket = m.buckets[m.nextBucket].timeBucket
-    path = "/api/timeline/bucket?" + m.top.query + "&timeBucket=" + escapeQueryValue(bucket)
-    m.task = startApiRequest(currentSettings(), "GET", path, "onBucket")
+    m.task = startApiRequest(currentSettings(), "GET", bucketPath(m.nextBucket), "onBucket")
 end sub
 
 sub onBucket(event as object)
@@ -130,10 +145,15 @@ sub onBucket(event as object)
         return
     end if
 
-    title = formatMonthYear(m.buckets[m.nextBucket].timeBucket)
+    bucketIndex = m.nextBucket
     m.nextBucket = m.nextBucket + 1
     m.top.hasMore = m.nextBucket < m.buckets.Count()
-    added = appendBucket(title, resp.data)
+    items = bucketItems(resp.data)
+    added = items.Count()
+    if added > 0
+        m.monthStarts.Push({ start: m.assets.Count(), bucket: bucketIndex })
+        appendItems({ title: formatMonthYear(m.buckets[bucketIndex].timeBucket), items: items })
+    end if
     if m.assets.Count() > 0 then m.status.text = ""
     if added = 0 and not m.top.hasMore and m.assets.Count() = 0
         ' The filter matched nothing in any month.
@@ -147,8 +167,8 @@ sub onBucket(event as object)
 end sub
 
 ' Bucket responses are column arrays: id[], isImage[], duration[], ratio[], ...
-' Returns how many items matched the filter (and were added).
-function appendBucket(title as string, data as object) as integer
+' Returns the items that match the filter.
+function bucketItems(data as object) as object
     ids = data.id
     items = []
     for i = 0 to ids.Count() - 1
@@ -161,14 +181,99 @@ function appendBucket(title as string, data as object) as integer
             items.Push({ assetId: ids[i], ratio: ratio, isVideo: isVideo, durationMs: durationMs })
         end if
     end for
-    if items.Count() > 0 then appendItems({ title: title, items: items })
-    return items.Count()
+    return items
 end function
+
+' ---- Months: jumping to one, and loading newer months above ----
+
+function bucketPath(index as integer) as string
+    return "/api/timeline/bucket?" + m.top.query + "&timeBucket=" + escapeQueryValue(m.buckets[index].timeBucket)
+end function
+
+' Index of the month the photo at assetIndex belongs to.
+function monthAt(assetIndex as integer) as integer
+    month = m.firstBucket
+    for each entry in m.monthStarts
+        if entry.start > assetIndex then exit for
+        month = entry.bucket
+    end for
+    return month
+end function
+
+' Shows the given month: straight there if it's loaded, else the timeline starts again at it
+' (loading every month in between would take far too long on a big library).
+function jumpToMonth(index as integer) as boolean
+    if m.mode <> "timeline" or index < 0 or index >= m.buckets.Count() then return false
+    for each entry in m.monthStarts
+        if entry.bucket = index
+            m.grid.jumpToItem = entry.start
+            return true
+        end if
+    end for
+    m.grid.clear = true
+    resetLoadedMonths(index)
+    m.top.hasMore = true
+    m.status.text = "Loading..."
+    loadMore()
+    return true
+end function
+
+sub onGridExitedLeft()
+    if m.mode <> "timeline" or m.buckets.Count() < 2 then return
+    m.top.monthIndex = monthAt(m.grid.itemFocused)
+    m.top.jumpRequested = true
+end sub
+
+' Up on the first row: load the next newer month if there is one, else let the screen move focus.
+sub onGridExitedTop()
+    if m.mode = "timeline" and m.firstBucket > 0
+        loadPrevious()
+    else
+        m.top.exitedTop = true
+    end if
+end sub
+
+sub loadPrevious()
+    if m.mode <> "timeline" or m.loadingPrev or m.firstBucket <= 0 then return
+    m.loadingPrev = true
+    m.prevTask = startApiRequest(currentSettings(), "GET", bucketPath(m.firstBucket - 1), "onPreviousBucket")
+end sub
+
+sub onPreviousBucket(event as object)
+    if m.prevTask = invalid or not event.getRoSGNode().isSameNode(m.prevTask) then return
+    resp = event.getData()
+    m.prevTask = invalid
+    m.loadingPrev = false
+    if not resp.ok
+        logDebug("previous bucket load failed: " + resp.status.ToStr())
+        return
+    end if
+    m.firstBucket = m.firstBucket - 1
+    items = bucketItems(resp.data)
+    if items.Count() = 0
+        loadPrevious()  ' nothing in that month matches the filter
+        return
+    end if
+
+    added = items.Count()
+    for each entry in m.monthStarts
+        entry.start = entry.start + added
+    end for
+    m.monthStarts.Unshift({ start: 0, bucket: m.firstBucket })
+    assets = []
+    assets.Append(items)
+    assets.Append(m.assets)
+    m.assets = assets
+    m.top.assetCount = m.assets.Count()
+    m.grid.prependGroup = { title: formatMonthYear(m.buckets[m.firstBucket].timeBucket), items: items }
+    logDebug("items loaded above: " + added.ToStr())
+end sub
 
 ' ---- Smart search ----
 
 sub onSearchTextChanged()
     m.mode = "search"
+    m.grid.exitLeft = false
     m.grid.clear = true
     resetData()
     m.top.totalCount = -1
@@ -260,6 +365,7 @@ end sub
 sub onItemFocused()
     remaining = m.assets.Count() - m.grid.itemFocused
     if remaining <= loadAheadItems() then loadMore()
+    if m.mode = "timeline" and m.firstBucket > 0 and m.grid.itemFocused < loadAheadItems() then loadPrevious()
 end sub
 
 sub onItemSelected()

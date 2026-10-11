@@ -17,7 +17,7 @@
             font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
         <Label id="count" translation="[80,122]" width="800"
             font="font:SmallSystemFont" color="0x80888FFF" />
-        <Label translation="[1440,56]" width="400" height="56" horizAlign="right" vertAlign="center"
+        <Label id="hint" translation="[1200,56]" width="640" height="56" horizAlign="right" vertAlign="center"
             font="font:SmallSystemFont" color="0x80888FFF" text="*  Options" />
 
         <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="Nothing here yet." />

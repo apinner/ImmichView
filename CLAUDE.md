@@ -57,7 +57,7 @@ components/
   MainScene.xml/.brs
   screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, PinPrompt, ProfileTile, ProgressRing, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, MonthPanel (Jump to), PinPrompt, ProfileTile, ProgressRing, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art (shipped)
 art/                  ' Brand kit: logo SVGs and the icon PNG that make-images.ps1 crops the title logo from (not shipped)

@@ -6,6 +6,8 @@ sub init()
 
     m.timeline.observeField("itemSelected", "onItemSelected")
     m.timeline.observeField("totalCount", "updateCount")
+    m.timeline.observeField("jumpRequested", "openMonthPanel")
+    m.timeline.observeField("months", "updateHint")
     m.global.observeField("mediaFilter", "updateCount")
     m.top.observeField("focusedChild", "onFocusChanged")
 end sub
@@ -36,15 +38,39 @@ sub onItemSelected()
     m.top.navigate = assetNavigation(m.timeline, m.timeline.itemSelected)
 end sub
 
+' "Jump to date" only when there's more than one month to jump between.
+sub updateHint()
+    hint = "*  Options"
+    if m.timeline.months.Count() > 1 then hint = Chr(8592) + "  Jump to date        " + hint
+    m.top.findNode("hint").text = hint
+end sub
+
 ' * opens the View options panel (photos/videos filter).
 function onKeyEvent(key as string, press as boolean) as boolean
     if not press or key <> "options" then return false
-    m.panel = CreateObject("roSGNode", "OptionsPanel")
+    openPanel(CreateObject("roSGNode", "OptionsPanel"))
+    return true
+end function
+
+' Left on the first photo of a row: the Jump to panel (months).
+sub openMonthPanel()
+    panel = CreateObject("roSGNode", "MonthPanel")
+    panel.months = m.timeline.months
+    panel.current = m.timeline.monthIndex
+    panel.observeField("chosen", "onMonthChosen")
+    openPanel(panel)
+end sub
+
+sub onMonthChosen()
+    m.timeline.callFunc("jumpToMonth", m.panel.chosen)
+end sub
+
+sub openPanel(panel as object)
+    m.panel = panel
     m.panel.observeField("closed", "onPanelClosed")
     m.top.appendChild(m.panel)
     m.panel.setFocus(true)
-    return true
-end function
+end sub
 
 sub onPanelClosed()
     m.top.removeChild(m.panel)

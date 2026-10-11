@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    "Jump to" panel that slides in from the left (Left on the first photo of a row in a
+    timeline): years on the left, that year's months with photo counts on the right.
+    OK on a month, or on a year for its first month, sets chosen to the month's index.
+-->
+<component name="MonthPanel" extends="Group">
+    <interface>
+        <!-- [{ timeBucket, count }] in timeline order (TimelineView.months). -->
+        <field id="months" type="array" onChange="onMonthsSet" />
+        <!-- Month index to start on (TimelineView.monthIndex). -->
+        <field id="current" type="integer" onChange="onMonthsSet" />
+        <field id="chosen" type="integer" alwaysNotify="true" />
+        <field id="closed" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="MonthPanel.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+
+    <children>
+        <Rectangle id="dim" width="1920" height="1080" color="0x00000099" opacity="0" />
+        <Group id="panel" translation="[-680,0]">
+            <Rectangle width="680" height="1080" color="0x1C1B25FF" />
+            <Label text="Jump to" translation="[48,72]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+            <MarkupList id="years" translation="[32,176]" itemComponentName="ListItem" drawFocusFeedback="false"
+                itemSize="[184,72]" itemSpacing="[0,12]" numRows="9" vertFocusAnimationStyle="floatingFocus" />
+            <MarkupList id="monthList" translation="[240,176]" itemComponentName="ListItem" drawFocusFeedback="false"
+                itemSize="[408,72]" itemSpacing="[0,12]" numRows="9" vertFocusAnimationStyle="floatingFocus" />
+            <Label text="OK to jump      Back to close" translation="[48,1000]"
+                width="600" font="font:SmallestSystemFont" color="0x80888FFF" />
+        </Group>
+        <Animation id="slide" duration="0.2" easeFunction="outQuad">
+            <Vector2DFieldInterpolator key="[0.0, 1.0]" keyValue="[[-680,0],[0,0]]" fieldToInterp="panel.translation" />
+            <FloatFieldInterpolator key="[0.0, 1.0]" keyValue="[0.0, 1.0]" fieldToInterp="dim.opacity" />
+        </Animation>
+    </children>
+</component>

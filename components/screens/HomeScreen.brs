@@ -20,6 +20,7 @@ sub init()
     m.timeline.observeField("exitedTop", "focusTabs")
     m.timeline.observeField("loaded", "onTimelineLoaded")
     m.timeline.observeField("itemSelected", "onTimelineSelected")
+    m.timeline.observeField("jumpRequested", "openMonthPanel")
     m.albums.observeField("itemSelected", "onAlbumSelected")
     m.peoplePane.observeField("personSelected", "onPersonSelected")
     m.searchPane.observeField("itemSelected", "onSearchResultSelected")
@@ -53,9 +54,16 @@ sub onTabChanged()
     for i = 0 to m.panes.Count() - 1
         m.panes[i].visible = (i = selected) and not m.failed
     end for
+    ' Left on the first photo of a row opens the Jump to panel on the Photos tab only.
+    if selected = 0 then m.optionsHint.text = optionsHintText(true) else m.optionsHint.text = optionsHintText(false)
     if selected = 1 and not m.albumsLoaded then loadAlbums()
     if selected = 2 then m.peoplePane.load = true
 end sub
+
+function optionsHintText(withJump as boolean) as string
+    if withJump then return Chr(8592) + "  Jump to date        *  Options"
+    return "*  Options"
+end function
 
 sub focusTabs()
     m.tabs.setFocus(true)
@@ -79,7 +87,7 @@ sub layoutTopBar()
     userX = gearX - 12 - m.userPill.width
     m.gearPill.translation = [gearX, 32]
     m.userPill.translation = [userX, 32]
-    m.optionsHint.translation = [userX - 24 - 400, 32]
+    m.optionsHint.translation = [userX - 24 - 640, 32]
 end sub
 
 function topBarFocused() as boolean
@@ -103,7 +111,8 @@ function onTopBarKey(key as string) as boolean
     return true
 end function
 
-' ---- Overlays: UserMenu (dropdown under the user pill) and OptionsPanel (* button) ----
+' ---- Overlays: UserMenu (dropdown under the user pill), OptionsPanel (* button) and
+' MonthPanel (Left on the first photo of a row in the timeline) ----
 
 sub openOverlay(overlay as object)
     ' Remember where focus was, to return there when the overlay closes.
@@ -111,7 +120,11 @@ sub openOverlay(overlay as object)
     for each node in [m.userPill, m.gearPill, m.timeline, m.albums, m.peoplePane, m.searchPane]
         if node.isInFocusChain() then m.overlayReturn = node
     end for
-    if overlay.subtype() = "UserMenu"
+    if overlay.subtype() = "MonthPanel"
+        overlay.months = m.timeline.months
+        overlay.current = m.timeline.monthIndex
+        overlay.observeField("chosen", "onMonthChosen")
+    else if overlay.subtype() = "UserMenu"
         overlay.translation = [1840 - overlay.width, 100]
         overlay.observeField("profilesChanged", "onUserSwitched")
         overlay.observeField("manageUsers", "onManageUsers")
@@ -127,6 +140,14 @@ sub closeOverlay()
     m.top.removeChild(m.overlay)
     m.overlay = invalid
     m.overlayReturn.setFocus(true)
+end sub
+
+sub openMonthPanel()
+    openOverlay(CreateObject("roSGNode", "MonthPanel"))
+end sub
+
+sub onMonthChosen()
+    m.timeline.callFunc("jumpToMonth", m.overlay.chosen)
 end sub
 
 sub onUserSwitched()

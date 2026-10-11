@@ -26,6 +26,7 @@ sub resetState()
     m.stickyX = invalid ' remembered column centre for repeated up/down
     m.scrollY = 0
     m.lastGroupHasHeader = false
+    m.groups = []       ' { title, start, count } per header group, for laying out again
 end sub
 
 sub onClear()
@@ -50,13 +51,10 @@ sub onAppendGroup()
     start = m.items.Count()
     if group.continues <> invalid and group.continues and m.rows.Count() > 0
         start = reopenLastRow()
-    else if group.title <> invalid and group.title <> ""
-        if m.rows.Count() > 0 then m.contentHeight = m.contentHeight + 24
-        m.headers.Push({ top: m.contentHeight, title: group.title })
-        m.contentHeight = m.contentHeight + headerHeight()
-        m.lastGroupHasHeader = true
+        m.groups.Peek().count = m.groups.Peek().count + group.items.Count()
     else
-        m.lastGroupHasHeader = false
+        startGroup(group.title)
+        m.groups.Push({ title: group.title, start: start, count: group.items.Count() })
     end if
 
     for each item in group.items
@@ -71,6 +69,65 @@ sub onAppendGroup()
     else
         refreshVisibleNodes()
     end if
+end sub
+
+' Starts a new group: a header when it has a title (with a gap above, except at the top).
+sub startGroup(title as dynamic)
+    if title <> invalid and title <> ""
+        if m.rows.Count() > 0 then m.contentHeight = m.contentHeight + 24
+        m.headers.Push({ top: m.contentHeight, title: title })
+        m.contentHeight = m.contentHeight + headerHeight()
+        m.lastGroupHasHeader = true
+    else
+        m.lastGroupHasHeader = false
+    end if
+end sub
+
+' Adds a group above all the others (an earlier month when scrolling back up). Everything
+' is laid out again, and the view scrolls by the added height so the screen doesn't move.
+sub onPrependGroup()
+    group = m.top.prependGroup
+    if group.items = invalid or group.items.Count() = 0 then return
+    added = group.items.Count()
+
+    screenOffset = 0
+    if m.focus >= 0 then screenOffset = m.rows[m.itemRow[m.focus]].top - m.scrollY
+
+    items = []
+    items.Append(group.items)
+    items.Append(m.items)
+    m.items = items
+    for each g in m.groups
+        g.start = g.start + added
+    end for
+    m.groups.Unshift({ title: group.title, start: 0, count: added })
+    layoutAll()
+
+    if m.focus < 0
+        setFocusIndex(0, false)
+        return
+    end if
+    m.focus = m.focus + added
+    m.anim.control = "stop"
+    m.scrollY = m.rows[m.itemRow[m.focus]].top - screenOffset
+    if m.scrollY < 0 then m.scrollY = 0
+    m.content.translation = [0, -m.scrollY]
+    setFocusIndex(m.focus, false)
+    updateSticky()
+end sub
+
+' Lays out every group from scratch (rows, headers and on-screen nodes).
+sub layoutAll()
+    m.rowsGroup.removeChildrenIndex(m.rowsGroup.getChildCount(), 0)
+    m.nodes = {}
+    m.rows = []
+    m.headers = []
+    m.itemRow = []
+    m.contentHeight = 0
+    for each g in m.groups
+        startGroup(g.title)
+        layoutRows(g.start, g.start + g.count)
+    end for
 end sub
 
 ' Takes the last (partial) row back out so new items can fill it. Returns its first item.
@@ -371,6 +428,10 @@ function onKeyEvent(key as string, press as boolean) as boolean
     if key = "right"
         return moveToItem(m.focus + 1)
     else if key = "left"
+        if m.top.exitLeft and m.focus = m.rows[m.itemRow[m.focus]].start
+            m.top.exitedLeft = true
+            return true
+        end if
         return moveToItem(m.focus - 1)
     else if key = "down"
         return moveRows(1)

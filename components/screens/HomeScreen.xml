@@ -17,10 +17,10 @@
 
     <children>
         <AppTitle translation="[80,28]" />
-        <!-- Top-right: "* Options" hint, user pill (fast switching) and settings gear.
+        <!-- Top-right: "* Options" hint (plus "Jump to date" on the Photos tab), user pill (fast switching) and settings gear.
              Up from the tabs reaches the pills; positioned by layoutTopBar(). -->
-        <Label id="optionsHint" width="400" height="56" horizAlign="right" vertAlign="center"
-            font="font:SmallSystemFont" color="0x80888FFF" text="*  Options" />
+        <Label id="optionsHint" width="640" height="56" horizAlign="right" vertAlign="center"
+            font="font:SmallSystemFont" color="0x80888FFF" text="&#x2190;  Jump to date        *  Options" />
         <IconPill id="userPill" icon="pkg:/images/icon-person.png" trailingIcon="pkg:/images/icon-chevron.png" />
         <IconPill id="gearPill" icon="pkg:/images/icon-gear.png" />
 

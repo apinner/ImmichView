@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Timeline scrubber down the left of a photo grid (like the Immich web app's, which is on the
-    right): years spaced by how many photos each period has; the year on screen is brighter.
+    right): a dot for each month and year labels, spaced by how many photos each period has;
+    a thin lavender line marks the month on screen and its year is brighter.
     Focused (Left on the first photo of a row), a cursor steps month by month (Up/Down) or a
     year at a time (Rewind/Fast forward), repeating while held; OK sets chosen, Right or Back
     sets closed.
@@ -25,7 +26,11 @@
 
     <children>
         <Rectangle id="line" translation="[67,0]" width="2" color="0x4A4960FF" />
+        <!-- A dot for each month (skipping ones too close together), and the year labels. -->
+        <Group id="dots" />
         <Group id="labels" />
+        <!-- The month on screen: a thin lavender line across the rail. -->
+        <Rectangle id="marker" translation="[53,0]" width="30" height="2" color="0xC6A1E7FF" visible="false" />
 
         <!-- While focused: the cursor's month in a lavender pill beside the rail, and the keys. -->
         <Group id="cursorGroup" visible="false">

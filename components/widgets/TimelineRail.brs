@@ -8,6 +8,11 @@ function minLabelGap() as integer
     return 30
 end function
 
+' Month dots closer together than this are skipped, so they don't merge into a line.
+function minDotGap() as integer
+    return 7
+end function
+
 ' Holding a key: pause before repeating, then the repeat interval, faster after a while.
 function holdDelay() as float
     return 0.4
@@ -20,6 +25,8 @@ end function
 
 sub init()
     m.line = m.top.findNode("line")
+    m.dots = m.top.findNode("dots")
+    m.marker = m.top.findNode("marker")
     m.labels = m.top.findNode("labels")
     m.cursorGroup = m.top.findNode("cursorGroup")
     m.bubble = m.top.findNode("bubble")
@@ -45,6 +52,7 @@ sub onMonthsSet()
     m.months = m.top.months
     if m.months = invalid then m.months = []
     m.labels.removeChildrenIndex(m.labels.getChildCount(), 0)
+    m.dots.removeChildrenIndex(m.dots.getChildCount(), 0)
     m.ys = []
     m.yearLabels = []
     height = m.top.railHeight
@@ -60,10 +68,15 @@ sub onMonthsSet()
     usable = height - 2 * railPadding()
     seen = 0
     lastLabelY = -1000
+    lastDotY = -1000
     for i = 0 to m.months.Count() - 1
         y = railPadding() + Int(usable * seen / total)
         m.ys.Push(y)
         seen = seen + m.months[i].count
+        if y - lastDotY >= minDotGap()
+            addDot(y)
+            lastDotY = y
+        end if
         year = yearAt(i)
         newYear = (i = 0) or (year <> yearAt(i - 1))
         if newYear and y - lastLabelY >= minLabelGap()
@@ -72,6 +85,15 @@ sub onMonthsSet()
         end if
     end for
     updateCurrentYear()
+end sub
+
+sub addDot(y as integer)
+    dot = m.dots.createChild("Poster")
+    dot.uri = "pkg:/images/circle-mask.png"
+    dot.width = 6
+    dot.height = 6
+    dot.translation = [65, y - 3]
+    dot.blendColor = "0x6A6F7AFF"
 end sub
 
 function addYearLabel(year as string, y as integer) as object
@@ -96,6 +118,8 @@ end function
 ' when its label was skipped for space.
 sub updateCurrentYear()
     index = m.top.current
+    m.marker.visible = (index >= 0 and index < m.ys.Count())
+    if m.marker.visible then m.marker.translation = [53, m.ys[index] - 1]
     currentLabel = invalid
     if index >= 0 and index < m.months.Count()
         for each entry in m.yearLabels

@@ -48,6 +48,8 @@
             <Label id="stickyLabel" height="52" vertAlign="bottom"
                 font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
         </Group>
+        <!-- Holding a direction (or Rewind/Fast forward) keeps moving until the key is released. -->
+        <Timer id="holdTimer" repeat="true" duration="0.4" />
         <Animation id="scrollAnim" duration="0.15" easeFunction="outQuad">
             <Vector2DFieldInterpolator id="scrollInterp" key="[0.0, 1.0]" fieldToInterp="content.translation" />
         </Animation>

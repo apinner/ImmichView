@@ -11,6 +11,10 @@ sub init()
     m.anim = m.top.findNode("scrollAnim")
     m.interp = m.top.findNode("scrollInterp")
     m.agent = createAuthAgent()
+    m.holdTimer = m.top.findNode("holdTimer")
+    m.holdTimer.observeField("fire", "onHoldTimer")
+    m.holdKey = ""
+    m.holdSteps = 0
     resetState()
     m.top.observeField("focusedChild", "onFocusChanged")
 end sub
@@ -40,6 +44,7 @@ end sub
 
 sub onFocusChanged()
     m.focusFrame.visible = m.top.hasFocus() and m.focus >= 0
+    if not m.top.hasFocus() then stopHold()
 end sub
 
 ' ---- Layout ----
@@ -423,24 +428,75 @@ function moveRows(delta as integer) as boolean
     return true
 end function
 
-function onKeyEvent(key as string, press as boolean) as boolean
-    if not press or m.focus < 0 then return false
+' ---- Moving focus: one step per press, repeating while the key is held ----
+
+function isMoveKey(key as string) as boolean
+    return key = "up" or key = "down" or key = "left" or key = "right" or key = "fastforward" or key = "rewind"
+end function
+
+' One step for a direction key. True if focus moved within the grid (false at an edge, or
+' when leaving it: Up on the first row, Left on the first photo of a row).
+function stepKey(key as string) as boolean
+    before = m.focus
     if key = "right"
-        return moveToItem(m.focus + 1)
+        moveToItem(m.focus + 1)
     else if key = "left"
         if m.top.exitLeft and m.focus = m.rows[m.itemRow[m.focus]].start
             m.top.exitedLeft = true
-            return true
+            return false
         end if
-        return moveToItem(m.focus - 1)
+        moveToItem(m.focus - 1)
     else if key = "down"
-        return moveRows(1)
+        moveRows(1)
     else if key = "up"
-        return moveRows(-1)
+        moveRows(-1)
     else if key = "fastforward"
-        return moveRows(4)
+        moveRows(4)
     else if key = "rewind"
-        return moveRows(-4)
+        moveRows(-4)
+    end if
+    return m.focus <> before
+end function
+
+sub startHold(key as string)
+    m.holdKey = key
+    m.holdSteps = 0
+    m.holdTimer.control = "stop"
+    m.holdTimer.duration = 0.4
+    m.holdTimer.control = "start"
+end sub
+
+sub stopHold()
+    m.holdKey = ""
+    m.holdTimer.control = "stop"
+end sub
+
+' After a pause, keeps stepping (faster after a while) until the key is released or an edge.
+sub onHoldTimer()
+    if m.holdKey = "" or not m.top.hasFocus() or not stepKey(m.holdKey)
+        stopHold()
+        return
+    end if
+    m.holdSteps = m.holdSteps + 1
+    interval = 0.12
+    if m.holdSteps > 8 then interval = 0.07
+    if m.holdKey = "fastforward" or m.holdKey = "rewind" then interval = 0.25
+    if m.holdTimer.duration <> interval
+        m.holdTimer.control = "stop"
+        m.holdTimer.duration = interval
+        m.holdTimer.control = "start"
+    end if
+end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if not press
+        if key = m.holdKey then stopHold()
+        return false
+    end if
+    if m.focus < 0 then return false
+    if isMoveKey(key)
+        if stepKey(key) then startHold(key)
+        return true
     else if key = "OK"
         m.top.itemSelected = m.focus
         return true

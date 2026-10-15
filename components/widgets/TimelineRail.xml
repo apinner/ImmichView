@@ -28,7 +28,7 @@
         <Rectangle id="line" translation="[67,0]" width="2" color="0x4A4960FF" />
         <!-- The month on screen: a thin, semi-transparent lavender line under its year label and
              across the rail, stopping short of the photos. -->
-        <Rectangle id="marker" translation="[0,0]" width="72" height="2" color="0xC6A1E7A0" visible="false" />
+        <Rectangle id="marker" translation="[0,0]" width="72" height="3" color="0xC6A1E7A0" visible="false" />
         <Group id="labels" />
 
         <!-- While focused: the cursor's month in a lavender pill beside the rail, and the keys. -->

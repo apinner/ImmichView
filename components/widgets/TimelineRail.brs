@@ -68,7 +68,7 @@ sub onMonthsSet()
         year = yearAt(i)
         newYear = (i = 0) or (year <> yearAt(i - 1))
         if newYear and y - lastLabelY >= minLabelGap()
-            m.yearLabels.Push({ first: i, node: addYearLabel(year, y) })
+            m.yearLabels.Push({ first: i, year: year, node: addYearLabel(yearText(year), y) })
             lastLabelY = y
         end if
     end for
@@ -87,6 +87,18 @@ function addYearLabel(year as string, y as integer) as object
     label.text = year
     return label
 end function
+
+' "2026" while the rail has focus, "'26" (with a typographic apostrophe) otherwise: quieter beside the photos.
+function yearText(year as string) as string
+    if m.top.hasFocus() then return year
+    return Chr(8217) + Right(year, 2)
+end function
+
+sub updateYearTexts()
+    for each entry in m.yearLabels
+        entry.node.text = yearText(entry.year)
+    end for
+end sub
 
 function yearColor(isCurrent as boolean) as string
     if isCurrent then return "0xFFFFFFFF"
@@ -116,6 +128,7 @@ sub onFocusChanged()
     focused = m.top.hasFocus()
     m.cursorGroup.visible = focused
     m.hint.visible = focused
+    updateYearTexts()
     if focused then moveCursor(m.cursorIndex) else stopHold()
 end sub
 

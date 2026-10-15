@@ -1,3 +1,8 @@
+' Smallest profile photo (pixels) shown in the 220px circle; smaller ones look blurred.
+function minPhotoSize() as integer
+    return 160
+end function
+
 ' Circle colours, from the logo's purples; users take them in turn.
 function tileColors() as object
     return ["0x8B57C3FF", "0x6E3997FF", "0xA274D4FF", "0x572C78FF", "0x7E4FB8FF"]
@@ -56,7 +61,9 @@ sub showPhoto()
     m.photo.uri = url
 end sub
 
-' The initial shows until the photo has loaded, and stays if it can't be.
+' The initial shows until the photo has loaded, and stays if it can't be, or if the photo is
+' too small to look sharp in the circle (e.g. a 96px default avatar from a sign-in provider).
 sub onPhotoStatus()
-    m.photoMask.visible = (m.photo.loadStatus = "ready" and m.photo.uri <> "")
+    sharp = (m.photo.bitmapWidth >= minPhotoSize() and m.photo.bitmapHeight >= minPhotoSize())
+    m.photoMask.visible = (m.photo.loadStatus = "ready" and m.photo.uri <> "" and sharp)
 end sub

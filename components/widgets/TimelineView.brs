@@ -454,6 +454,7 @@ sub onItemFocused()
     remaining = m.assets.Count() - m.grid.itemFocused
     if remaining <= loadAheadItems() then loadMore()
     if m.mode = "timeline" and m.firstBucket > 0 and m.grid.itemFocused < loadAheadItems() then loadPrevious()
+    if m.mode = "timeline" then m.top.monthIndex = monthAt(m.grid.itemFocused)
 end sub
 
 sub onItemSelected()

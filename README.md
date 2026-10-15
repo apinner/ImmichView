@@ -4,7 +4,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 
 ## Features
 
-- **Photos:** your whole library as a timeline grouped by month, in a justified grid like the Immich web app, with a Jump to panel (years and months) for going straight to any month
+- **Photos:** your whole library as a timeline grouped by month, in a justified grid like the Immich web app, with a timeline down the left for going straight to any month
 - **All / Photos / Videos filter** in the `*` View options panel, applied everywhere and remembered
 - **Albums**, **People** (named faces) and **Places** (every town and city in your photos), each opening the same month-grouped grid
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
@@ -21,7 +21,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 | Top-right pills | OK | User menu (switch user) or Settings (gear) |
 | Home, albums, people | `*` | View options: show All, Photos or Videos |
 | Photo grids | ⏪ / ⏩ | Jump four rows |
-| Photo grids (timeline, albums, people) | Left on the first photo of a row | Jump to: pick a year and month; newer months load as you scroll back up |
+| Photo grids (timeline, albums, people) | Left on the first photo of a row | Timeline on the left: Up/Down a month, ⏪ / ⏩ a year, OK to go there (newer months load as you scroll back up) |
 | Photo viewer | OK (or Up/Down) | Show or hide info |
 | Photo viewer | Play | Start or stop the slideshow |
 | Photo viewer, on a video | OK / Play | Play the video |

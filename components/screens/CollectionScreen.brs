@@ -6,8 +6,12 @@ sub init()
 
     m.timeline.observeField("itemSelected", "onItemSelected")
     m.timeline.observeField("totalCount", "updateCount")
-    m.timeline.observeField("jumpRequested", "openMonthPanel")
-    m.timeline.observeField("months", "updateHint")
+    m.rail = m.top.findNode("rail")
+    m.timeline.observeField("jumpRequested", "focusRail")
+    m.timeline.observeField("months", "onMonths")
+    m.timeline.observeField("monthIndex", "onMonthIndex")
+    m.rail.observeField("chosen", "onRailChosen")
+    m.rail.observeField("closed", "onRailClosed")
     m.global.observeField("mediaFilter", "updateCount")
     m.top.observeField("focusedChild", "onFocusChanged")
 end sub
@@ -59,17 +63,33 @@ function onKeyEvent(key as string, press as boolean) as boolean
     return true
 end function
 
-' Left on the first photo of a row: the Jump to panel (months).
-sub openMonthPanel()
-    panel = CreateObject("roSGNode", "MonthPanel")
-    panel.months = m.timeline.months
-    panel.current = m.timeline.monthIndex
-    panel.observeField("chosen", "onMonthChosen")
-    openPanel(panel)
+' ---- Timeline scrubber (left margin), when there's more than one month ----
+
+sub onMonths()
+    months = m.timeline.months
+    m.rail.months = months
+    m.rail.visible = (months <> invalid and months.Count() > 1)
+    updateHint()
 end sub
 
-sub onMonthChosen()
-    m.timeline.callFunc("jumpToMonth", m.panel.chosen)
+sub onMonthIndex()
+    m.rail.current = m.timeline.monthIndex
+end sub
+
+' Left on the first photo of a row.
+sub focusRail()
+    if not m.rail.visible then return
+    m.rail.cursor = m.timeline.monthIndex
+    m.rail.setFocus(true)
+end sub
+
+sub onRailChosen()
+    m.timeline.callFunc("jumpToMonth", m.rail.chosen)
+    m.timeline.setFocus(true)
+end sub
+
+sub onRailClosed()
+    m.timeline.setFocus(true)
 end sub
 
 sub openPanel(panel as object)

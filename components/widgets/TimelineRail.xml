@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Timeline scrubber down the left of a photo grid (like the Immich web app's, which is on the
+    right): years spaced by how many photos each period has, and a mark at the month on screen.
+    Focused (Left on the first photo of a row), a cursor steps month by month (Up/Down) or a
+    year at a time (Rewind/Fast forward); OK sets chosen, Right or Back sets closed.
+    Sits in the 80px left margin; the month label and hint draw over the grid.
+-->
+<component name="TimelineRail" extends="Group">
+    <interface>
+        <!-- [{ timeBucket, count }] in timeline order (TimelineView.months). -->
+        <field id="months" type="array" onChange="onMonthsSet" />
+        <!-- Month index on screen (TimelineView.monthIndex). -->
+        <field id="current" type="integer" value="-1" onChange="updateMarker" />
+        <field id="railHeight" type="float" value="860" onChange="onMonthsSet" />
+        <!-- Month index to start the cursor on when focused. -->
+        <field id="cursor" type="integer" onChange="onCursorSet" />
+        <field id="chosen" type="integer" alwaysNotify="true" />
+        <field id="closed" type="boolean" alwaysNotify="true" />
+    </interface>
+
+    <script type="text/brightscript" uri="TimelineRail.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
+
+    <children>
+        <Rectangle id="line" translation="[67,0]" width="2" color="0x4A4960FF" />
+        <Group id="labels" />
+        <Rectangle id="marker" translation="[60,0]" width="16" height="4" color="0xC6A1E7FF" visible="false" />
+
+        <!-- While focused: the cursor's month in a lavender pill, and the keys. -->
+        <Group id="cursorGroup" visible="false">
+            <Rectangle id="cursorTick" translation="[56,-3]" width="24" height="6" color="0xC6A1E7FF" />
+            <Poster id="bubble" uri="pkg:/images/pill.9.png" blendColor="0xC6A1E7FF" translation="[88,-28]" height="56" />
+            <Label id="bubbleText" translation="[110,-25]" height="56" vertAlign="center"
+                font="font:SmallBoldSystemFont" color="0x24232FFF" />
+        </Group>
+        <Group id="hint" visible="false">
+            <Rectangle id="hintBack" width="1040" height="44" color="0x1C1B25E6" />
+            <Label translation="[20,0]" height="44" vertAlign="center" font="font:SmallestSystemFont" color="0xA0A8B0FF"
+                text="Up / Down  month      Rewind / Fast forward  year      OK  go      Right  back" />
+        </Group>
+    </children>
+</component>

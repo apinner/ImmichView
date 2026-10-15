@@ -37,10 +37,10 @@
         <function name="requestMore" />
 
         <!-- Months (timeline mode): [{ timeBucket, count }] in timeline order. Left on the first
-             photo of a row sets jumpRequested, with monthIndex the focused photo's month; the
-             screen shows a MonthPanel and calls jumpToMonth(index). -->
+             photo of a row sets jumpRequested; monthIndex follows the focused photo's month. The
+             screen moves focus to its TimelineRail and calls jumpToMonth(index). -->
         <field id="months" type="array" />
-        <field id="monthIndex" type="integer" />
+        <field id="monthIndex" type="integer" value="-1" />
         <field id="jumpRequested" type="boolean" alwaysNotify="true" />
         <function name="jumpToMonth" />
     </interface>

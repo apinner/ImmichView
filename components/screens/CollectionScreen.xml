@@ -23,5 +23,7 @@
             font="font:SmallSystemFont" color="0x80888FFF" text="*  Options" />
 
         <TimelineView id="timeline" translation="[80,170]" viewHeight="890" emptyText="Nothing here yet." />
+        <!-- Timeline scrubber in the left margin (albums and people; places have no month list). -->
+        <TimelineRail id="rail" translation="[0,170]" railHeight="890" visible="false" />
     </children>
 </component>

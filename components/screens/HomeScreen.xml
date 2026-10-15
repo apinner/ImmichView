@@ -29,6 +29,8 @@
 
         <TimelineView id="timeline" translation="[80,200]" viewHeight="866"
             emptyText="No photos in your library yet." />
+        <!-- Timeline scrubber in the left margin (Photos tab). -->
+        <TimelineRail id="rail" translation="[0,200]" railHeight="866" visible="false" />
 
         <Group id="albumsPane" visible="false">
             <!-- 5 x 328 + 4 x 30 = 1760 wide -->

@@ -17,6 +17,8 @@ sub init()
     m.status = m.top.findNode("status")
     m.failed = false
     m.albumsLoaded = false
+    m.retryTimer = m.top.findNode("retryTimer")
+    m.retryTimer.observeField("fire", "retryConnection")
     ' Tab index -> content pane, in TabBar order.
     m.panes = [m.timeline, m.albumsPane, m.peoplePane, m.placesPane, m.searchPane]
 
@@ -50,7 +52,9 @@ sub init()
 end sub
 
 sub onFocusChanged()
-    if m.top.hasFocus() then focusContent()
+    if not m.top.hasFocus() then return
+    focusContent()
+    if m.failed then retryConnection()  ' e.g. back from Settings
 end sub
 
 sub onTimelineLoaded()
@@ -223,6 +227,7 @@ end function
 ' ---- Current user ----
 
 sub loadUser()
+    if m.userTask <> invalid then return
     m.userTask = startApiRequest(currentSettings(), "GET", "/api/users/me", "onUser")
 end sub
 
@@ -230,16 +235,19 @@ sub onUser(event as object)
     resp = event.getData()
     m.userTask = invalid
     if not resp.ok
+        firstFailure = not m.failed
         m.failed = true
         for each pane in m.panes
             pane.visible = false
         end for
         m.rail.visible = false
-        m.status.text = describeApiError(resp) + Chr(10) + Chr(10) + "Press OK for Settings."
-        focusTabs()
+        m.status.text = describeApiError(resp) + Chr(10) + Chr(10) + "Trying again every few seconds. Press OK for Settings."
+        if firstFailure then focusTabs()
+        m.retryTimer.control = "start"
         m.top.ready = true
         return
     end if
+    if m.failed then recoverConnection()
 
     name = resp.data.name
     if name = invalid or name = "" then name = resp.data.email
@@ -383,4 +391,22 @@ sub onPlaceSelected()
         screen: "CollectionScreen"
         params: { source: { title: item.title, subtitle: item.subtitle, search: search } }
     }
+end sub
+
+' ---- Reconnecting: while the server can't be reached, try again every few seconds ----
+
+sub retryConnection()
+    loadUser()
+end sub
+
+' The server answered again: clear the message and load everything afresh.
+sub recoverConnection()
+    m.failed = false
+    m.retryTimer.control = "stop"
+    m.status.text = ""
+    m.albumsLoaded = false
+    m.placesLoaded = false
+    onTabChanged()
+    m.timeline.reload = true
+    logDebug("server reachable again")
 end sub

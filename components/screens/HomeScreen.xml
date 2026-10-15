@@ -54,6 +54,8 @@
         </Group>
         <SearchPane id="searchPane" visible="false" />
 
+        <!-- While the server can't be reached, tries again every 10 s. -->
+        <Timer id="retryTimer" duration="10" repeat="true" />
         <Label id="status" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" />
     </children>

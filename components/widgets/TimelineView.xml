@@ -15,6 +15,8 @@
         <!-- A metadata search filter, e.g. { city, state, country } for a place: newest first,
              grouped by month. -->
         <field id="metadataSearch" type="assocarray" onChange="onMetadataSearchChanged" />
+        <!-- Set to load everything again from the start (e.g. after the server came back). -->
+        <field id="reload" type="boolean" alwaysNotify="true" onChange="onFilterChanged" />
         <field id="viewHeight" type="float" alias="grid.viewHeight" />
         <field id="emptyText" type="string" value="No photos here yet." />
         <!-- Status label position relative to the view. -->

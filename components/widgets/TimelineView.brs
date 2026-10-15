@@ -34,7 +34,7 @@ sub init()
     m.global.observeField("mediaFilter", "onFilterChanged")
 end sub
 
-' ---- Photos / videos filter (m.global.mediaFilter) ----
+' ---- Photos / videos filter (m.global.mediaFilter); also used by the reload field ----
 ' The timeline API can't filter by type, so bucket items are filtered here; search asks the server.
 
 function matchesFilter(isVideo as boolean) as boolean

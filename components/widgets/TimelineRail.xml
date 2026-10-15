@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Timeline scrubber down the left of a photo grid (like the Immich web app's, which is on the
-    right): a dot for each month and year labels, spaced by how many photos each period has;
-    a thin lavender line marks the month on screen and its year is brighter.
+    right): year labels spaced by how many photos each period has; a thin semi-transparent
+    lavender line marks the month on screen and its year is brighter.
     Focused (Left on the first photo of a row), a cursor steps month by month (Up/Down) or a
     year at a time (Rewind/Fast forward), repeating while held; OK sets chosen, Right or Back
     sets closed.
@@ -26,14 +26,15 @@
 
     <children>
         <Rectangle id="line" translation="[67,0]" width="2" color="0x4A4960FF" />
-        <!-- A dot for each month (skipping ones too close together), and the year labels. -->
-        <Group id="dots" />
+        <!-- The month on screen: a thin, semi-transparent lavender line under its year label and
+             across the rail, stopping short of the photos. -->
+        <Rectangle id="marker" translation="[0,0]" width="72" height="2" color="0xC6A1E7A0" visible="false" />
         <Group id="labels" />
-        <!-- The month on screen: a thin lavender line across the rail. -->
-        <Rectangle id="marker" translation="[53,0]" width="30" height="2" color="0xC6A1E7FF" visible="false" />
 
         <!-- While focused: the cursor's month in a lavender pill beside the rail, and the keys. -->
         <Group id="cursorGroup" visible="false">
+            <!-- The cursor's place on the rail. -->
+            <Poster uri="pkg:/images/circle-mask.png" translation="[62,-6]" width="12" height="12" blendColor="0xC6A1E7FF" />
             <Poster id="bubble" uri="pkg:/images/pill.9.png" blendColor="0xC6A1E7FF" translation="[76,-28]" height="56" />
             <Label id="bubbleText" translation="[98,-25]" height="56" vertAlign="center"
                 font="font:SmallBoldSystemFont" color="0x24232FFF" />

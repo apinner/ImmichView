@@ -10,6 +10,7 @@ sub init()
     refreshOptions()
     version = CreateObject("roAppInfo").GetVersion()
     m.top.findNode("about").text = "ImmichView " + version + "   -   Unofficial app, not affiliated with or endorsed by Immich or FUTO."
+    checkServer()
 end sub
 
 ' Also runs when returning from the screensaver photo picker.
@@ -270,4 +271,43 @@ end sub
 sub onDialogClosed()
     m.dialog = invalid
     if m.prompt = invalid then focusList(m.users)
+end sub
+
+' ---- Server status (top right): ping, then version ----
+
+sub checkServer()
+    showStatus("Checking server...", "0x80888FFF")
+    m.statusTask = startApiRequest(currentSettings(), "GET", "/api/server/ping", "onPing")
+end sub
+
+sub onPing(event as object)
+    resp = event.getData()
+    m.statusTask = invalid
+    if not resp.ok
+        showStatus("Offline   " + Chr(183) + "   " + describeApiError(resp), "0xE5484DFF")
+        return
+    end if
+    m.statusTask = startApiRequest(currentSettings(), "GET", "/api/server/version", "onVersion")
+end sub
+
+sub onVersion(event as object)
+    resp = event.getData()
+    m.statusTask = invalid
+    parts = ["Online"]
+    if resp.ok and resp.data.major <> invalid
+        parts.Push("Immich v" + resp.data.major.ToStr() + "." + resp.data.minor.ToStr() + "." + resp.data.patch.ToStr())
+    end if
+    parts.Push(serverHost(m.global.serverUrl))
+    showStatus(parts.Join("   " + Chr(183) + "   "), "0x4CC38AFF")
+end sub
+
+' Right-aligned to the screen margin (the label sizes to its text), with the dot before it.
+sub showStatus(text as string, color as string)
+    label = m.top.findNode("statusText")
+    label.text = text
+    width = label.boundingRect().width
+    label.translation = [1760 - width, 88]
+    dot = m.top.findNode("statusDot")
+    dot.blendColor = color
+    dot.translation = [1760 - width - 28, 100]
 end sub

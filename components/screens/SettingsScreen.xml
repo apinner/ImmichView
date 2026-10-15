@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Settings: switch, add and remove users; slideshow speed; people's names; options for the ImmichView Screensaver app (photos, caption, clock). -->
+<!-- Settings: the server's status; switch, add and remove users; slideshow speed; people's names; options for the ImmichView Screensaver app (photos, caption, clock). -->
 <component name="SettingsScreen" extends="Group">
     <interface>
         <field id="navigate" type="assocarray" alwaysNotify="true" />
@@ -10,9 +10,14 @@
     <script type="text/brightscript" uri="SettingsScreen.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 
     <children>
         <Label text="Settings" translation="[160,80]" font="font:LargeBoldSystemFont" color="0xFFFFFFFF" />
+        <!-- The current user's server: a coloured dot, online or offline, Immich version and host. -->
+        <Poster id="statusDot" uri="pkg:/images/circle-mask.png" width="16" height="16" blendColor="0x80888FFF" />
+        <Label id="statusText" translation="[1500,88]" height="40" vertAlign="center"
+            font="font:SmallSystemFont" color="0xA0A8B0FF" text="Checking server..." />
 
         <Label text="Users" translation="[160,180]" font="font:MediumBoldSystemFont" color="0xE0E4E8FF" />
         <MarkupList itemComponentName="ListItem" drawFocusFeedback="false" id="users" translation="[160,256]" itemSize="[1200,72]" itemSpacing="[0,12]"

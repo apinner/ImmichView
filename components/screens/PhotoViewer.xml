@@ -30,20 +30,27 @@
             <Poster id="b2" width="1920" height="1080" loadDisplayMode="scaleToZoom" opacity="0" />
         </Group>
         <Rectangle id="backsDim" width="1920" height="1080" color="0x00000080" visible="false" />
-        <!-- Each photo poster is sized to the photo and centred (so the background shows beside
-             it) inside a full-screen frame k0-k2 that the Ken Burns animation moves. -->
+        <!-- Each photo poster is sized to the photo and centred, so the background shows beside it.
+             The Ken Burns animation moves its frame k0-k2 inside a clipping window c0-c2 the size
+             of the photo, so the picture drifts while its edges stay still (moving edges flicker). -->
         <Group id="stage">
-            <Group id="k0" scaleRotateCenter="[960,540]">
-                <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                    loadDisplayMode="scaleToFit" opacity="0" />
+            <Group id="c0">
+                <Group id="k0" scaleRotateCenter="[960,540]">
+                    <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                        loadDisplayMode="scaleToFit" opacity="0" />
+                </Group>
             </Group>
-            <Group id="k1" scaleRotateCenter="[960,540]">
-                <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                    loadDisplayMode="scaleToFit" opacity="0" />
+            <Group id="c1">
+                <Group id="k1" scaleRotateCenter="[960,540]">
+                    <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                        loadDisplayMode="scaleToFit" opacity="0" />
+                </Group>
             </Group>
-            <Group id="k2" scaleRotateCenter="[960,540]">
-                <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                    loadDisplayMode="scaleToFit" opacity="0" />
+            <Group id="c2">
+                <Group id="k2" scaleRotateCenter="[960,540]">
+                    <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                        loadDisplayMode="scaleToFit" opacity="0" />
+                </Group>
             </Group>
         </Group>
         <Rectangle id="fadeDummy" width="0" height="0" />

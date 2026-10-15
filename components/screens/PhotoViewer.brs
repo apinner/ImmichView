@@ -245,7 +245,11 @@ sub fitPoster(poster as object, ratio as dynamic)
     poster.height = height
     poster.loadWidth = width
     poster.loadHeight = height
-    poster.translation = [Int((1920 - width) / 2), Int((1080 - height) / 2)]
+    x = Int((1920 - width) / 2)
+    y = Int((1080 - height) / 2)
+    poster.translation = [x, y]
+    ' The Ken Burns movement happens inside this fixed window, so the edges never move.
+    poster.getParent().getParent().clippingRect = [x, y, width, height]
 end sub
 
 function isReady(poster as object) as boolean
@@ -274,9 +278,9 @@ sub presentTarget()
         target.opacity = 1
     else
         m.fade.control = "stop"
-        frame = target.getParent()
-        m.stage.removeChild(frame)
-        m.stage.appendChild(frame)
+        window = target.getParent().getParent()
+        m.stage.removeChild(window)
+        m.stage.appendChild(window)
         back = m.backs[target.id]
         m.backsGroup.removeChild(back)
         m.backsGroup.appendChild(back)
@@ -386,9 +390,9 @@ end function
 ' A slow, subtle zoom in, zoom out or pan across (5%), lasting through the next crossfade.
 sub startKenBurns(poster as object)
     zoom = 1.05
-    ' Room to pan at full zoom without showing the edge of a full-screen photo.
-    roomX = Int((zoom - 1) * 960)
-    roomY = Int((zoom - 1) * 540)
+    ' Room to pan at full zoom without the picture leaving its window (the photo's size).
+    roomX = Int((zoom - 1) * poster.width / 2)
+    roomY = Int((zoom - 1) * poster.height / 2)
     x = randomBetween(roomX \ 2, roomX)
     if Rnd(2) = 1 then x = -x
     point = [x, randomBetween(-roomY, roomY)]

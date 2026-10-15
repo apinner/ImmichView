@@ -163,6 +163,7 @@ sub refreshOptions()
     titles = [
         "Time per photo:   " + loadSlideshowSeconds().ToStr() + " seconds"
         "Show people's names on photos:   " + onOff(loadShowPeopleNames())
+        "Photo background:   " + photoBackgroundLabel(loadPhotoBackground())
         "Screensaver photos:   " + screensaverSourceLabel(screensaver)
         "Screensaver shows date and place:   " + onOff(screensaver.showCaption)
         "Screensaver shows the time:   " + onOff(screensaver.showClock)
@@ -184,10 +185,12 @@ sub onOptionSelected()
     else if index = 1
         saveShowPeopleNames(not loadShowPeopleNames())
     else if index = 2
-        m.top.navigate = { screen: "ScreensaverSourceScreen" }
+        cyclePhotoBackground()
     else if index = 3
-        saveScreensaverCaption(not loadScreensaverSettings().showCaption)
+        m.top.navigate = { screen: "ScreensaverSourceScreen" }
     else if index = 4
+        saveScreensaverCaption(not loadScreensaverSettings().showCaption)
+    else if index = 5
         saveScreensaverClock(not loadScreensaverSettings().showClock)
     end if
     refreshOptions()
@@ -197,6 +200,16 @@ function onOff(value as boolean) as string
     if value then return "On"
     return "Off"
 end function
+
+sub cyclePhotoBackground()
+    options = photoBackgrounds()
+    current = loadPhotoBackground()
+    nextValue = options[0]
+    for i = 0 to options.Count() - 2
+        if options[i] = current then nextValue = options[i + 1]
+    end for
+    savePhotoBackground(nextValue)
+end sub
 
 sub cycleSlideshowInterval()
     intervals = slideshowIntervals()

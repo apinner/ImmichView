@@ -8,7 +8,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 - **All / Photos / Videos filter** in the `*` View options panel, applied everywhere and remembered
 - **Albums** and **People** (named faces), each opening the same month-grouped grid
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
-- **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera), optional names of the people in each photo, and a slideshow with a slow Ken Burns zoom and pan and a countdown ring
+- **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera), optional names of the people in each photo, a choice of background beside photos that don't fill the screen (default, black, ambient glow or blur), and a slideshow with a slow Ken Burns zoom and pan and a countdown ring
 - **Videos:** played with the standard Roku player and trick play
 - **Screensaver** (the companion ImmichView Screensaver app): random photos, today's memories or one album, with a slow drift against burn-in, a countdown ring and an optional clock
 - **Multiple users:** each with their own server and API key, a "Who's watching?" picker at launch, optional per-user PINs, and quick switching from the user menu at the top right

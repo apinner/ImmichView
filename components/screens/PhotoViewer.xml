@@ -20,14 +20,31 @@
     <script type="text/brightscript" uri="pkg:/source/common/Settings.brs" />
 
     <children>
-        <Rectangle width="1920" height="1080" color="0x000000FF" />
+        <!-- Behind photos that don't fill the screen (Settings > Photo background): the app
+             colour, black, or the photo's thumbnail stretched to fill (blur) or tiny and dim
+             (ambient glow). Each back poster mirrors its photo poster's opacity. -->
+        <Rectangle id="backdrop" width="1920" height="1080" color="0x24232FFF" />
+        <Group id="backs" visible="false">
+            <Poster id="b0" width="1920" height="1080" loadDisplayMode="scaleToZoom" opacity="0" />
+            <Poster id="b1" width="1920" height="1080" loadDisplayMode="scaleToZoom" opacity="0" />
+            <Poster id="b2" width="1920" height="1080" loadDisplayMode="scaleToZoom" opacity="0" />
+        </Group>
+        <Rectangle id="backsDim" width="1920" height="1080" color="0x00000080" visible="false" />
+        <!-- Each photo poster is sized to the photo and centred (so the background shows beside
+             it) inside a full-screen frame k0-k2 that the Ken Burns animation moves. -->
         <Group id="stage">
-            <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
-            <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
-            <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
-                loadDisplayMode="scaleToFit" scaleRotateCenter="[960,540]" opacity="0" />
+            <Group id="k0" scaleRotateCenter="[960,540]">
+                <Poster id="p0" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                    loadDisplayMode="scaleToFit" opacity="0" />
+            </Group>
+            <Group id="k1" scaleRotateCenter="[960,540]">
+                <Poster id="p1" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                    loadDisplayMode="scaleToFit" opacity="0" />
+            </Group>
+            <Group id="k2" scaleRotateCenter="[960,540]">
+                <Poster id="p2" width="1920" height="1080" loadWidth="1920" loadHeight="1080"
+                    loadDisplayMode="scaleToFit" opacity="0" />
+            </Group>
         </Group>
         <Rectangle id="fadeDummy" width="0" height="0" />
 

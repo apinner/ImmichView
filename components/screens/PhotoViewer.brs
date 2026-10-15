@@ -32,15 +32,23 @@ sub init()
     m.posterIndex = []      ' asset index each poster holds, -1 if none
     m.readyUri = {}         ' poster id -> uri that finished loading
     m.kenBurns = {}         ' poster id -> its Ken Burns animation
+    m.backs = {}            ' poster id -> its background poster (blur / ambient glow)
+    m.backsGroup = m.top.findNode("backs")
     for each id in ["p0", "p1", "p2"]
         poster = m.top.findNode(id)
         poster.setHttpAgent(agent)
         poster.observeField("loadStatus", "onPosterStatus")
+        poster.observeField("opacity", "onPosterOpacity")
+        back = m.top.findNode("b" + Right(id, 1))
+        back.setHttpAgent(agent)
+        m.backs[id] = back
         m.posters.Push(poster)
         m.posterIndex.Push(-1)
         m.readyUri[id] = ""
         m.kenBurns[id] = createKenBurns(poster)
     end for
+
+    applyPhotoBackground(loadPhotoBackground())
 
     m.index = -1
     m.target = invalid      ' poster for m.index
@@ -176,11 +184,68 @@ sub loadInto(slot as integer, index as integer)
         poster.opacity = 0
         settleKenBurns(poster, false)
     end if
-    uri = thumbnailUrl(assetAt(index).assetId, "preview")
+    asset = assetAt(index)
+    assetId = asset.assetId
+    uri = thumbnailUrl(assetId, "preview")
     if poster.uri <> uri
         m.readyUri[poster.id] = ""
+        fitPoster(poster, asset.ratio)
         poster.uri = uri
     end if
+    if m.backsGroup.visible then m.backs[poster.id].uri = thumbnailUrl(assetId, "thumbnail")
+end sub
+
+' ---- Background behind photos that don't fill the screen (Settings > Photo background) ----
+
+sub applyPhotoBackground(mode as string)
+    dimmer = m.top.findNode("backsDim")
+    if mode = "default"
+        m.top.findNode("backdrop").color = "0x24232FFF"
+    else
+        m.top.findNode("backdrop").color = "0x000000FF"
+    end if
+    stretched = (mode = "glow" or mode = "blur")
+    m.backsGroup.visible = stretched
+    dimmer.visible = stretched
+    if not stretched then return
+    ' The photo's thumbnail, loaded tiny and stretched over the screen: the scaling blurs
+    ' it, and smaller is softer. The glow is softer and dimmer than the blur.
+    if mode = "glow"
+        size = [24, 14]
+        dimmer.color = "0x000000A0"
+    else
+        size = [96, 54]
+        dimmer.color = "0x00000070"
+    end if
+    for each id in m.backs
+        m.backs[id].loadWidth = size[0]
+        m.backs[id].loadHeight = size[1]
+    end for
+end sub
+
+' Each background fades in and out with its photo.
+sub onPosterOpacity(event as object)
+    m.backs[event.getRoSGNode().id].opacity = event.getData()
+end sub
+
+' Sizes the poster to the photo's shape, centred, so whatever is behind shows beside it.
+' (A full-screen poster draws the empty sides itself.) Without a known ratio it fills the
+' screen and letterboxes the photo inside.
+sub fitPoster(poster as object, ratio as dynamic)
+    width = 1920
+    height = 1080
+    if ratio <> invalid and ratio > 0
+        if ratio >= 1920 / 1080
+            height = Int(1920 / ratio + 0.5)
+        else
+            width = Int(1080 * ratio + 0.5)
+        end if
+    end if
+    poster.width = width
+    poster.height = height
+    poster.loadWidth = width
+    poster.loadHeight = height
+    poster.translation = [Int((1920 - width) / 2), Int((1080 - height) / 2)]
 end sub
 
 function isReady(poster as object) as boolean
@@ -209,8 +274,12 @@ sub presentTarget()
         target.opacity = 1
     else
         m.fade.control = "stop"
-        m.stage.removeChild(target)
-        m.stage.appendChild(target)
+        frame = target.getParent()
+        m.stage.removeChild(frame)
+        m.stage.appendChild(frame)
+        back = m.backs[target.id]
+        m.backsGroup.removeChild(back)
+        m.backsGroup.appendChild(back)
         for each poster in m.posters
             if not poster.isSameNode(target) and (m.shown = invalid or not poster.isSameNode(m.shown)) then poster.opacity = 0
         end for
@@ -307,10 +376,10 @@ function createKenBurns(poster as object) as object
     anim = m.top.createChild("Animation")
     scale = anim.createChild("Vector2DFieldInterpolator")
     scale.key = [0.0, 1.0]
-    scale.fieldToInterp = poster.id + ".scale"
+    scale.fieldToInterp = poster.getParent().id + ".scale"
     move = anim.createChild("Vector2DFieldInterpolator")
     move.key = [0.0, 1.0]
-    move.fieldToInterp = poster.id + ".translation"
+    move.fieldToInterp = poster.getParent().id + ".translation"
     return { anim: anim, scale: scale, move: move }
 end function
 
@@ -350,13 +419,13 @@ sub settleKenBurns(poster as object, animate as boolean)
     kb.anim.control = "stop"
     if animate
         kb.anim.easeFunction = "outQuad"
-        kb.scale.keyValue = [poster.scale, [1.0, 1.0]]
-        kb.move.keyValue = [poster.translation, [0, 0]]
+        kb.scale.keyValue = [poster.getParent().scale, [1.0, 1.0]]
+        kb.move.keyValue = [poster.getParent().translation, [0, 0]]
         kb.anim.duration = 0.6
         kb.anim.control = "start"
     else
-        poster.scale = [1.0, 1.0]
-        poster.translation = [0, 0]
+        poster.getParent().scale = [1.0, 1.0]
+        poster.getParent().translation = [0, 0]
     end if
 end sub
 

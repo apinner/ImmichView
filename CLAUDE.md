@@ -36,6 +36,8 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - The screensaver manifest must not have `title=` (only `screensaver_title`), and its release source must contain no `Main`: either makes Static Analysis treat it as an app with an in-channel screensaver (Req 4.5). The dev `Main` lives in `source/screensaver-dev.brs`, which release builds leave out.
 - Certification (from 1 Oct 2026): keep `rsg_version=1.3` in both manifests and the memory monitor (`source/common/Memory.brs`) in both apps' main loops.
 - Some files play as sound over black with no error (VP9 in MP4 on the 3820): the Video node reports `videoFormat` "none". VideoPlayer checks 2 s after playback starts and shows a message. ECP `/query/media-player` shows `video="none"` for these, even for store builds.
+- A Poster with `loadDisplayMode="scaleToFit"` larger than its image draws the empty sides opaque (in the scene colour), hiding anything behind it. PhotoViewer sizes each poster to the photo's ratio (`fitPoster`) so the Photo background shows beside it.
+- Check `query/active-app` is `dev` before driving keys: if the dev app failed to compile, key presses land on the Roku home screen and can open other apps.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
 ## Tech stack and tooling

@@ -206,6 +206,33 @@ sub saveShowPeopleNames(show as boolean)
     saveOnOff("showPeople", show)
 end sub
 
+' Behind photos that don't fill the screen: "default" (the app colour), "black", "glow"
+' (a dim wash of the photo's colours) or "blur" (a blurred copy of the photo).
+function photoBackgrounds() as object
+    return ["default", "black", "glow", "blur"]
+end function
+
+function loadPhotoBackground() as string
+    value = registrySection().Read("photoBackground")
+    for each option in photoBackgrounds()
+        if option = value then return value
+    end for
+    return "default"
+end function
+
+sub savePhotoBackground(value as string)
+    sec = registrySection()
+    sec.Write("photoBackground", value)
+    sec.Flush()
+end sub
+
+function photoBackgroundLabel(value as string) as string
+    if value = "black" then return "Black"
+    if value = "glow" then return "Ambient glow"
+    if value = "blur" then return "Blur"
+    return "Default"
+end function
+
 sub saveOnOff(key as string, value as boolean)
     sec = registrySection()
     if value then sec.Write(key, "on") else sec.Write(key, "off")

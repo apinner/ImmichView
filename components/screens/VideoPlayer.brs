@@ -28,11 +28,12 @@ end sub
 ' The stored transcode (/video/playback) plays first: it reliably has sound. If it can't play
 ' (portrait taller than 1080, VP9...), Immich's real-time transcoding is asked for variants
 ' (main.m3u8: 480/720/1080... in H.264 and HEVC) and the largest this Roku can decode plays.
-' Roku reports no audio track for those HLS streams (unconfirmed whether they're silent).
+' Roku plays those HLS streams silently (muxed fMP4 audio), so a notice says so.
 
 sub onAssetSet()
     m.assetId = m.top.asset.assetId
     m.triedRealtime = false
+    m.noticeShown = false
     logDebug("play video " + m.assetId)
     playStoredTranscode()
 end sub
@@ -168,6 +169,7 @@ sub onStateChanged()
     if m.error.visible then return
     if state = "playing"
         m.ignoreFinished = false
+        if m.current <> invalid and m.current.codec <> "mp4" and not m.noticeShown then showNoSoundNotice()
         if not m.top.playbackStarted
             m.top.playbackStarted = true
             m.pictureCheck.control = "start"
@@ -239,3 +241,13 @@ function onKeyEvent(key as string, press as boolean) as boolean
     end if
     return false
 end function
+
+' Immich's real-time HLS segments carry video and AAC together, and Roku plays them silently.
+sub showNoSoundNotice()
+    m.noticeShown = true
+    text = m.top.findNode("noticeText")
+    m.top.findNode("noticeBack").width = text.boundingRect().width + 48
+    anim = m.top.findNode("noticeAnim")
+    anim.control = "stop"
+    anim.control = "start"
+end sub

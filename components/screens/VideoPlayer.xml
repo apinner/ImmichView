@@ -20,6 +20,16 @@
         <Video id="video" width="1920" height="1080" enableUI="true" />
         <!-- A moment after playback starts: checks Roku found a video track it can decode. -->
         <Timer id="pictureCheck" duration="2" repeat="false" />
+        <!-- Shown for a few seconds when a real-time (HLS) version plays: Roku gets no sound from it. -->
+        <Group id="notice" translation="[80,60]" opacity="0">
+            <Rectangle id="noticeBack" height="64" color="0x000000C0" />
+            <Label id="noticeText" translation="[24,0]" height="64" vertAlign="center"
+                font="font:SmallSystemFont" color="0xFFFFFFFF"
+                text="No sound: Roku can't play the audio in Immich's real-time version of this video." />
+        </Group>
+        <Animation id="noticeAnim" duration="7" easeFunction="linear">
+            <FloatFieldInterpolator key="[0.0, 0.08, 0.85, 1.0]" keyValue="[0.0, 1.0, 1.0, 0.0]" fieldToInterp="notice.opacity" />
+        </Animation>
         <Label id="error" translation="[260,420]" width="1400" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" visible="false" />
     </children>

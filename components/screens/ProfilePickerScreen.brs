@@ -14,7 +14,10 @@ sub init()
         profile = m.profiles[i]
         if profile.id = data.activeId then focusIndex = i
         item = content.createChild("ContentNode")
-        item.update({ title: profileDisplayName(profile), colorIndex: i, hasPin: profileHasPin(profile), isAdd: false }, true)
+        item.update({
+            title: profileDisplayName(profile), colorIndex: i, hasPin: profileHasPin(profile), isAdd: false
+            photoUrl: profileAvatar(profile), serverUrl: profile.serverUrl, apiKey: profile.apiKey
+        }, true)
     end for
     item = content.createChild("ContentNode")
     item.update({ title: "Add user", colorIndex: 0, hasPin: false, isAdd: true }, true)
@@ -29,6 +32,33 @@ sub init()
 
     m.grid.observeField("itemSelected", "onSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
+    refreshAvatars()
+end sub
+
+' Asks Immich for each user's profile photo (with their own server and key), so a photo
+' added or changed since last time shows; the tiles start with the remembered one.
+sub refreshAvatars()
+    m.userTasks = []
+    for each profile in m.profiles
+        m.userTasks.Push(startApiRequest({ serverUrl: profile.serverUrl, apiKey: profile.apiKey }, "GET", "/api/users/me", "onUserInfo"))
+    end for
+end sub
+
+sub onUserInfo(event as object)
+    resp = event.getData()
+    if not resp.ok then return
+    for i = 0 to m.userTasks.Count() - 1
+        if m.userTasks[i] <> invalid and event.getRoSGNode().isSameNode(m.userTasks[i])
+            m.userTasks[i] = invalid
+            profile = m.profiles[i]
+            url = avatarUrlFor(profile.serverUrl, resp.data)
+            if url <> profileAvatar(profile)
+                setProfileAvatar(profile.id, url)
+                m.grid.content.getChild(i).photoUrl = url
+            end if
+            return
+        end if
+    end for
 end sub
 
 sub onFocusChanged()

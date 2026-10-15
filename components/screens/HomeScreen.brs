@@ -219,6 +219,8 @@ sub onUser(event as object)
     m.userPill.text = name
     profile = loadSettings()
     if profile.id <> "" and profile.name <> name then setProfileName(profile.id, name)
+    avatar = avatarUrlFor(m.global.serverUrl, resp.data)
+    if profile.id <> "" and profileAvatar(profile) <> avatar then setProfileAvatar(profile.id, avatar)
 end sub
 
 ' ---- Photos tab ----

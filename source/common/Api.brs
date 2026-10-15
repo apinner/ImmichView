@@ -23,9 +23,14 @@ end function
 
 ' HTTP agent carrying the API key, for Poster and Video nodes.
 function createAuthAgent() as object
+    return createAuthAgentFor(m.global.serverUrl, m.global.apiKey)
+end function
+
+' The same for a given server and key (e.g. another user's profile photo).
+function createAuthAgentFor(serverUrl as string, apiKey as string) as object
     agent = CreateObject("roHttpAgent")
-    agent.AddHeader("x-api-key", m.global.apiKey)
-    if LCase(Left(m.global.serverUrl, 8)) = "https://"
+    agent.AddHeader("x-api-key", apiKey)
+    if LCase(Left(serverUrl, 8)) = "https://"
         agent.SetCertificatesFile("common:/certs/ca-bundle.crt")
         agent.InitClientCertificates()
     end if

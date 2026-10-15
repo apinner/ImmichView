@@ -66,6 +66,27 @@ sub setActiveProfile(id as string)
     saveProfiles(loadProfiles().profiles, id)
 end sub
 
+' The user's Immich profile photo URL ("" if they have none), remembered so the Who's
+' watching tiles show it straight away.
+function profileAvatar(profile as dynamic) as string
+    if profile = invalid or profile.avatar = invalid then return ""
+    return profile.avatar
+end function
+
+sub setProfileAvatar(id as string, url as string)
+    data = loadProfiles()
+    for each profile in data.profiles
+        if profile.id = id then profile.avatar = url
+    end for
+    saveProfiles(data.profiles, data.activeId)
+end sub
+
+' The profile photo URL from an Immich /users/me response, or "".
+function avatarUrlFor(serverUrl as string, user as object) as string
+    if user.profileImagePath = invalid or user.profileImagePath = "" then return ""
+    return serverUrl + "/api/users/" + user.id + "/profile-image"
+end function
+
 sub setProfileName(id as string, name as string)
     data = loadProfiles()
     for each profile in data.profiles

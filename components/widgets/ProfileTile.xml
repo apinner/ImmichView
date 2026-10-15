@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Who's watching tile: coloured circle with the user's initial, name, and a lock badge for a PIN. -->
+<!-- Who's watching tile: the user's Immich profile photo in a circle (or, without one, a coloured
+     circle with their initial), their name, and a lock badge for a PIN. -->
 <component name="ProfileTile" extends="Group">
     <interface>
         <field id="itemContent" type="node" onChange="onContentChanged" />
@@ -8,6 +9,7 @@
     </interface>
 
     <script type="text/brightscript" uri="ProfileTile.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 
     <children>
         <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
@@ -16,6 +18,10 @@
             color="0xFFFFFFFF">
             <Font role="font" uri="font:BoldSystemFontFile" size="96" />
         </Label>
+        <!-- Shown over the initial once it has loaded. -->
+        <MaskGroup id="photoMask" translation="[6,6]" maskUri="pkg:/images/circle-mask.png" maskSize="[220,220]" visible="false">
+            <Poster id="photo" width="220" height="220" loadWidth="220" loadHeight="220" loadDisplayMode="scaleToZoom" />
+        </MaskGroup>
         <Group id="lock" translation="[168,168]" visible="false">
             <Poster uri="pkg:/images/circle-mask.png" width="56" height="56" blendColor="0x1C1B25FF" />
             <Poster uri="pkg:/images/icon-lock.png" width="32" height="32" translation="[12,11]" blendColor="0xE0E4E8FF" />

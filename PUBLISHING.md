@@ -29,6 +29,10 @@ Owner: **code** = in this repo, **Alex** = needs your accounts, decisions or det
         server and API key), so in the Dashboard set **Customer Account Requirement to No**; no RFI needed.
       - Screensaver 1.0.2 got two Req 4.5 "in-channel screensaver" errors because its manifest had `title=`
         (marks a package as an app). 1.0.3 has only `screensaver_title`, no `Main` in release builds, and splash screens.
+      - The installed ImmichView Screensaver beta was listed as an app (type `appl`): opening it hung on the
+        splash and Preview was black. A sideloaded release build (no `Main`) registers as a pure screensaver
+        instead. Set the screensaver channel's app type in the Dashboard to **Theme** (wallpaper, screensavers
+        and sounds), not an app type.
 - [x] Pre-certification test pass on the test Roku: launch about 2 s to AppLaunchComplete (limit 15 s),
       Back on Home exits, unreachable server and rejected key show clear messages with a path to
       Settings, add/remove user, screensaver, stress-tested grids and viewer.

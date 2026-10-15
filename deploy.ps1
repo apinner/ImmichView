@@ -56,7 +56,11 @@ function New-ChannelZip([string]$zipPath, [bool]$devBuild) {
     $zip = [System.IO.Compression.ZipFile]::Open($zipPath, 'Create')
     try {
         $text = Get-Content (Join-Path $root $manifestFile) -Raw
-        if ($devBuild) { $text = $text -replace '(?m)^bs_const=DEV=false', 'bs_const=DEV=true' }
+        if ($devBuild) {
+            $text = $text -replace '(?m)^bs_const=DEV=false', 'bs_const=DEV=true'
+            # Tells the sideloaded screensaver apart from an installed one in Settings > Theme > Screensavers.
+            $text = $text -replace '(?m)^screensaver_title=ImmichView\s*$', 'screensaver_title=ImmichView (dev)'
+        }
         $writer = New-Object IO.StreamWriter ($zip.CreateEntry('manifest').Open())
         $writer.Write($text)
         $writer.Dispose()

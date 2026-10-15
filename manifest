@@ -1,7 +1,7 @@
 title=ImmichView
 major_version=1
 minor_version=0
-build_version=00006
+build_version=00007
 ui_resolutions=fhd
 mm_icon_focus_fhd=pkg:/images/channel-poster_fhd.png
 mm_icon_focus_hd=pkg:/images/channel-poster_hd.png

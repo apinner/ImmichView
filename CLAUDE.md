@@ -40,6 +40,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - Some files play as sound over black with no error (VP9 in MP4 on the 3820): the Video node reports `videoFormat` "none". VideoPlayer checks 2 s after playback starts and shows a message. ECP `/query/media-player` shows `video="none"` for these, even for store builds.
 - A Poster with `loadDisplayMode="scaleToFit"` larger than its image draws the empty sides opaque (in the scene colour), hiding anything behind it. PhotoViewer sizes each poster to the photo's ratio (`fitPoster`) so the Photo background shows beside it.
 - Check `query/active-app` is `dev` before driving keys: if the dev app failed to compile, key presses land on the Roku home screen and can open other apps.
+- Roku can't rotate video: a Video node's `rotation` is ignored by the video plane (size and position apply). Tested 2026-10-15 on the 3820 with a sideways-recorded clip (EXIF orientation 6). Immich's stored and real-time copies keep the rotation flag (landscape frames plus a 90-degree matrix), so such videos play sideways on Roku.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
 ## Tech stack and tooling

@@ -22,6 +22,9 @@ sub init()
     m.line = m.top.findNode("line")
     m.marker = m.top.findNode("marker")
     m.labels = m.top.findNode("labels")
+    m.labelsShort = m.top.findNode("labelsShort")
+    m.labelsLong = m.top.findNode("labelsLong")
+    m.resize = m.top.findNode("resize")
     m.cursorGroup = m.top.findNode("cursorGroup")
     m.bubble = m.top.findNode("bubble")
     m.bubbleText = m.top.findNode("bubbleText")
@@ -30,7 +33,7 @@ sub init()
     m.holdTimer.observeField("fire", "onHoldTimer")
     m.months = []
     m.ys = []           ' y of each month on the rail
-    m.yearLabels = []   ' { first, node }: each label shown and the month it starts at
+    m.yearLabels = []   ' { first, short, long }: each label shown, its month, and both forms
     m.cursorIndex = 0
     m.holdKey = ""
     m.holdSteps = 0
@@ -45,7 +48,8 @@ end sub
 sub onMonthsSet()
     m.months = m.top.months
     if m.months = invalid then m.months = []
-    m.labels.removeChildrenIndex(m.labels.getChildCount(), 0)
+    m.labelsShort.removeChildrenIndex(m.labelsShort.getChildCount(), 0)
+    m.labelsLong.removeChildrenIndex(m.labelsLong.getChildCount(), 0)
     m.ys = []
     m.yearLabels = []
     height = m.top.railHeight
@@ -68,15 +72,19 @@ sub onMonthsSet()
         year = yearAt(i)
         newYear = (i = 0) or (year <> yearAt(i - 1))
         if newYear and y - lastLabelY >= minLabelGap()
-            m.yearLabels.Push({ first: i, year: year, node: addYearLabel(yearText(year), y) })
+            m.yearLabels.Push({
+                first: i
+                short: addYearLabel(m.labelsShort, Chr(8217) + Right(year, 2), y)
+                long: addYearLabel(m.labelsLong, year, y)
+            })
             lastLabelY = y
         end if
     end for
     updateCurrentYear()
 end sub
 
-function addYearLabel(year as string, y as integer) as object
-    label = m.labels.createChild("Label")
+function addYearLabel(parent as object, text as string, y as integer) as object
+    label = parent.createChild("Label")
     label.translation = [0, y - 14]
     label.width = 60
     label.height = 28
@@ -84,21 +92,9 @@ function addYearLabel(year as string, y as integer) as object
     label.vertAlign = "center"
     label.font = m.labelFont
     label.color = yearColor(false)
-    label.text = year
+    label.text = text
     return label
 end function
-
-' "2026" while the rail has focus, "'26" (with a typographic apostrophe) otherwise: quieter beside the photos.
-function yearText(year as string) as string
-    if m.top.hasFocus() then return year
-    return Chr(8217) + Right(year, 2)
-end function
-
-sub updateYearTexts()
-    for each entry in m.yearLabels
-        entry.node.text = yearText(entry.year)
-    end for
-end sub
 
 function yearColor(isCurrent as boolean) as string
     if isCurrent then return "0xFFFFFFFF"
@@ -114,11 +110,13 @@ sub updateCurrentYear()
     currentLabel = invalid
     if index >= 0 and index < m.months.Count()
         for each entry in m.yearLabels
-            if entry.first <= index then currentLabel = entry.node
+            if entry.first <= index then currentLabel = entry
         end for
     end if
     for each entry in m.yearLabels
-        entry.node.color = yearColor(currentLabel <> invalid and entry.node.isSameNode(currentLabel))
+        isCurrent = (currentLabel <> invalid and entry.short.isSameNode(currentLabel.short))
+        entry.short.color = yearColor(isCurrent)
+        entry.long.color = yearColor(isCurrent)
     end for
 end sub
 
@@ -128,7 +126,7 @@ sub onFocusChanged()
     focused = m.top.hasFocus()
     m.cursorGroup.visible = focused
     m.hint.visible = focused
-    updateYearTexts()
+    setWide(focused)
     if focused then moveCursor(m.cursorIndex) else stopHold()
 end sub
 
@@ -237,3 +235,26 @@ function onKeyEvent(key as string, press as boolean) as boolean
     end if
     return true
 end function
+
+' ---- Width: narrow at rest ('26), wide while focused (2026), eased between ----
+
+sub setWide(wide as boolean)
+    if wide
+        lineX = 67
+        labelsX = 0
+        markerWidth = 72
+    else
+        lineX = 45
+        labelsX = -22
+        markerWidth = 50
+    end if
+    longOpacity = 0.0
+    if wide then longOpacity = 1.0
+    m.resize.control = "stop"
+    m.top.findNode("lineMove").keyValue = [m.line.translation, [lineX, 0]]
+    m.top.findNode("labelsMove").keyValue = [m.labels.translation, [labelsX, 0]]
+    m.top.findNode("markerWidth").keyValue = [m.marker.width, markerWidth]
+    m.top.findNode("shortFade").keyValue = [m.labelsShort.opacity, 1.0 - longOpacity]
+    m.top.findNode("longFade").keyValue = [m.labelsLong.opacity, longOpacity]
+    m.resize.control = "start"
+end sub

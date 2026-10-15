@@ -25,11 +25,15 @@
     <script type="text/brightscript" uri="pkg:/source/common/Format.brs" />
 
     <children>
-        <Rectangle id="line" translation="[67,0]" width="2" color="0x4A4960FF" />
+        <Rectangle id="line" translation="[45,0]" width="2" color="0x4A4960FF" />
         <!-- The month on screen: a thin, semi-transparent lavender line under its year label and
              across the rail, stopping short of the photos. -->
-        <Rectangle id="marker" translation="[0,0]" width="72" height="3" color="0xC6A1E7A0" visible="false" />
-        <Group id="labels" />
+        <Rectangle id="marker" translation="[0,0]" width="50" height="3" color="0xC6A1E7A0" visible="false" />
+        <!-- Both forms of each year label, crossfaded as the rail widens (focused) or narrows. -->
+        <Group id="labels" translation="[-22,0]">
+            <Group id="labelsShort" />
+            <Group id="labelsLong" opacity="0" />
+        </Group>
 
         <!-- While focused: the cursor's month in a lavender pill beside the rail, and the keys. -->
         <Group id="cursorGroup" visible="false">
@@ -39,6 +43,15 @@
             <Label id="bubbleText" translation="[98,-25]" height="56" vertAlign="center"
                 font="font:SmallBoldSystemFont" color="0x24232FFF" />
         </Group>
+        <!-- Eases the rail between narrow (resting, '26) and wide (focused, 2026). Key values are
+             set when it starts, from wherever it is. -->
+        <Animation id="resize" duration="0.3" easeFunction="inOutCubic">
+            <Vector2DFieldInterpolator id="lineMove" key="[0.0, 1.0]" fieldToInterp="line.translation" />
+            <Vector2DFieldInterpolator id="labelsMove" key="[0.0, 1.0]" fieldToInterp="labels.translation" />
+            <FloatFieldInterpolator id="markerWidth" key="[0.0, 1.0]" fieldToInterp="marker.width" />
+            <FloatFieldInterpolator id="shortFade" key="[0.0, 1.0]" fieldToInterp="labelsShort.opacity" />
+            <FloatFieldInterpolator id="longFade" key="[0.0, 1.0]" fieldToInterp="labelsLong.opacity" />
+        </Animation>
         <!-- Holding Up/Down (or Rewind/Fast forward) keeps stepping until the key is released. -->
         <Timer id="holdTimer" repeat="true" duration="0.4" />
         <Group id="hint" visible="false">

@@ -39,7 +39,7 @@
         <Group id="viewport">
             <Group id="content">
                 <Group id="rows" />
-                <Poster id="focusFrame" uri="pkg:/images/focus.9.png" visible="false" />
+                <Poster id="focusFrame" uri="pkg:/images/focus.9.png" blendColor="0xC6A1E7FF" visible="false" />
             </Group>
         </Group>
         <!-- The current group's title, shown while its own header is scrolled off the top. -->

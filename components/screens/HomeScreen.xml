@@ -35,7 +35,7 @@
             <MarkupGrid id="albums" translation="[80,216]" itemComponentName="AlbumTile"
                 numColumns="5" numRows="3" itemSize="[328,272]" itemSpacing="[30,16]"
                 vertFocusAnimationStyle="floatingFocus"
-                focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
+                focusBitmapUri="pkg:/images/focus.9.png" focusBitmapBlendColor="0xC6A1E7FF" drawFocusFeedbackOnTop="true" />
             <Label id="albumStatus" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
                 font="font:MediumSystemFont" color="0xE0E4E8FF" />
         </Group>
@@ -46,7 +46,7 @@
             <MarkupGrid id="places" translation="[80,216]" itemComponentName="AlbumTile"
                 numColumns="5" numRows="3" itemSize="[328,272]" itemSpacing="[30,16]"
                 vertFocusAnimationStyle="floatingFocus"
-                focusBitmapUri="pkg:/images/focus.9.png" drawFocusFeedbackOnTop="true" />
+                focusBitmapUri="pkg:/images/focus.9.png" focusBitmapBlendColor="0xC6A1E7FF" drawFocusFeedbackOnTop="true" />
             <Label id="placeStatus" translation="[160,460]" width="1600" wrap="true" horizAlign="center"
                 font="font:MediumSystemFont" color="0xE0E4E8FF" />
         </Group>

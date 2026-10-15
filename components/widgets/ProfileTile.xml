@@ -12,7 +12,7 @@
     <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
 
     <children>
-        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
+        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" blendColor="0xC6A1E7FF" opacity="0" />
         <Poster id="circle" uri="pkg:/images/circle-mask.png" translation="[6,6]" width="220" height="220" />
         <Label id="initial" translation="[6,6]" width="220" height="220" horizAlign="center" vertAlign="center"
             color="0xFFFFFFFF">

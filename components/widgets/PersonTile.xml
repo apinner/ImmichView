@@ -12,7 +12,7 @@
     <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
 
     <children>
-        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
+        <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" blendColor="0xC6A1E7FF" opacity="0" />
         <!-- Round placeholder (MaskGroup masks textures, not Rectangles). -->
         <Poster uri="pkg:/images/circle-mask.png" translation="[6,6]" width="220" height="220"
             blendColor="0x2E2D3AFF" />

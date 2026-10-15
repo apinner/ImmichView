@@ -28,7 +28,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
 - **Test only on the Guest Bedroom Roku (10.10.10.161 since 2026-10-15, was .163; the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
 - `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill, countdown ring, and the title logo cropped from `art/ImmichView-icon.png`). Channel posters and splash screens in `images/` are supplied artwork (from the brand kit); don't regenerate them.
-- The focus highlight is a plain white outline (`focus.9.png`, `focus-ring.png`). A soft glow was tried and rejected; keep the outline.
+- The focus highlight is a plain outline (`focus.9.png`, `focus-ring.png`, white images) tinted the logo lavender `0xC6A1E7` with blendColor / focusBitmapBlendColor, so it shows on light photos. A soft glow was tried and rejected; keep the outline.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
 - Dot-notation (`aa.pinSalt = x`) stores lowercase keys and `ParseJson` dictionaries are case-sensitive, so `Delete`/lookups by string must use the lowercase key.
 - Don't open the next dialog from inside a dialog's `wasClosed` observer: Roku clears `scene.dialog` afterwards and dismisses it. `PinPrompt` reports its result via a short Timer for this reason.

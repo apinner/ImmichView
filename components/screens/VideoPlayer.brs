@@ -25,13 +25,23 @@ sub onFocusChanged()
 end sub
 
 ' ---- Choosing a stream ----
-' With Immich's real-time transcoding on, main.m3u8 lists variants (480/720/1080... in H.264
-' and HEVC) made on demand; the largest one this Roku can decode is played, so portrait videos
-' play upright at a size that fits. Without it, /video/playback serves the stored transcode.
+' The stored transcode (/video/playback) plays first: it reliably has sound. If it can't play
+' (portrait taller than 1080, VP9...), Immich's real-time transcoding is asked for variants
+' (main.m3u8: 480/720/1080... in H.264 and HEVC) and the largest this Roku can decode plays.
+' Roku reports no audio track for those HLS streams (unconfirmed whether they're silent).
 
 sub onAssetSet()
     m.assetId = m.top.asset.assetId
+    m.triedRealtime = false
     logDebug("play video " + m.assetId)
+    playStoredTranscode()
+end sub
+
+' The stored copy didn't play (e.g. portrait taller than 1080, or VP9): ask for real-time variants.
+sub requestRealtime()
+    m.triedRealtime = true
+    m.video.control = "stop"
+    m.ignoreFinished = true  ' Roku reports "finished" after an error
     m.streamTask = startApiRequest(currentSettings(), "GET", streamBase() + "/main.m3u8", "onMainPlaylist", invalid, 15000, true)
 end sub
 
@@ -45,8 +55,8 @@ sub onMainPlaylist(event as object)
     m.candidates = []
     if resp.ok then m.candidates = playableVariants(parseVariants(resp.data))
     if m.candidates.Count() = 0
-        logDebug("no real-time stream (" + resp.status.ToStr() + "), using /video/playback")
-        playStoredTranscode()
+        logDebug("no real-time stream (" + resp.status.ToStr() + ")")
+        showError()
         return
     end if
     playNextCandidate()
@@ -121,19 +131,20 @@ end sub
 ' then the stored transcode, then explain.
 function tryAnotherStream() as boolean
     failed = m.current
-    if failed = invalid or failed.codec = "mp4" then return false
+    if failed = invalid then return false
+    if failed.codec = "mp4"
+        if m.triedRealtime then return false
+        requestRealtime()
+        return true
+    end if
     remaining = []
     for each v in m.candidates
         if v.codec <> failed.codec or v.h < failed.h then remaining.Push(v)
     end for
     m.candidates = remaining
     m.ignoreFinished = true  ' Roku reports "finished" after an error
-    if m.candidates.Count() > 0
-        playNextCandidate()
-    else
-        endSession()
-        playStoredTranscode()
-    end if
+    if m.candidates.Count() = 0 then return false
+    playNextCandidate()
     return true
 end function
 
@@ -178,6 +189,8 @@ sub onPictureCheck()
     format = m.video.videoFormat
     if format = invalid then return
     logDebug("video format: " + format)
+    tracks = m.video.availableAudioTracks
+    if tracks <> invalid then logDebug("audio tracks: " + FormatJson(tracks) + " audioFormat: " + m.video.audioFormat)
     if format <> "" and LCase(format) <> "none" then return
     m.top.playbackStarted = false
     if tryAnotherStream() then return

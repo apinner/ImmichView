@@ -31,11 +31,11 @@ chosen in ImmichView; choose which photos and what it shows in ImmichView's Sett
 
 <h2>Common questions</h2>
 <p><strong>Portrait videos play sideways, a video has sound but no picture, or videos won't play on an HD Roku.</strong>
-Roku can't rotate video, can't decode some formats (such as VP9, which some phones record), and HD models can't play HEVC. In Immich, open <strong>Administration &gt; Settings &gt; Video Transcoding</strong>
-and set the target resolution to <strong>480p</strong>, the transcode policy to <strong>All videos</strong> and H.264 as the only
-accepted video codec, then run <strong>Jobs &gt; Transcode Videos &gt; All</strong>. Roku can't play video taller than 1080 pixels,
-and Immich's resolution setting applies to the shorter side, so 480p is the setting that keeps portrait videos playable
-(landscape videos become 854&times;480). ImmichView plays Immich's transcodes automatically.</p>
+Roku can't rotate video, can't decode some formats (such as VP9, which some phones record), and HD models can't play HEVC. Roku can't rotate video or play H.264 taller than 1080 pixels (portrait videos). In Immich, open
+<strong>Administration &gt; Settings &gt; Video Transcoding</strong> and turn on <strong>real-time transcoding</strong> with H.264 (and HEVC,
+for 4K Rokus) at 480p, 720p and 1080p. ImmichView then asks for a version this Roku can play, upright and at the
+best size it can manage, without changing your stored videos or how they play elsewhere. Keep the usual transcoding
+(720p, H.264) for the videos real-time transcoding doesn't cover. ImmichView plays Immich's transcodes automatically.</p>
 <p><strong>The first search is slow.</strong> After your server has been idle, Immich loads its search model on
 the first search, which can take up to a minute. Later searches are quick.</p>
 <p><strong>I forgot a user's PIN.</strong> Choose <strong>Add user</strong> and sign in again with that user's

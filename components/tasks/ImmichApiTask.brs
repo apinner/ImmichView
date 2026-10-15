@@ -34,6 +34,7 @@ function performRequest(method as string, path as string, body as object) as obj
     if status < 0 then return makeResponse(false, status, "network", msg.GetFailureReason(), invalid)
 
     text = msg.GetString()
+    if m.top.rawText and status >= 200 and status < 300 then return makeResponse(true, status, "", "", text)
     data = invalid
     if text <> "" then data = ParseJson(text)
 

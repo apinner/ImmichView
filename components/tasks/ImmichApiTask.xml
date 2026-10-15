@@ -8,6 +8,8 @@
         <field id="path" type="string" />
         <field id="body" type="assocarray" />
         <field id="timeoutMs" type="integer" value="10000" />
+        <!-- true: data is the response body as text (e.g. an HLS playlist), not parsed JSON -->
+        <field id="rawText" type="boolean" />
         <!-- { ok, status, kind, message, data }
              kind: "" on success, else "timeout" | "network" | "http" | "parse" -->
         <field id="response" type="assocarray" />

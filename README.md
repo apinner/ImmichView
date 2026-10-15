@@ -31,7 +31,7 @@ The screensaver is a separate app, **ImmichView Screensaver** (Roku only allows 
 ## Immich server tips
 
 - Create an API key in the Immich web app under **Account Settings > API Keys**.
-- Roku can't rotate video, can't decode some formats (VP9 plays as sound with no picture; ImmichView then shows a message) and HD Rokus can't play HEVC. It also won't play H.264 taller than 1080 pixels, and Immich's target resolution applies to the shorter side, so set **Administration > Settings > Video Transcoding** to target resolution **480p**, policy **All videos**, H.264 only, then run **Jobs > Transcode Videos > All**. Portrait videos become 480x854 (playable, upright); landscape 854x480. ImmichView plays Immich's transcodes automatically.
+- Roku can't rotate video, can't decode some formats (VP9 plays as sound with no picture; ImmichView then shows a message) and HD Rokus can't play HEVC. It also won't play H.264 taller than 1080 pixels (portrait videos). Turn on Immich's **real-time transcoding** (Administration > Settings > Video Transcoding) with H.264 and HEVC at 480p, 720p and 1080p: ImmichView then picks a variant this Roku can decode (HEVC up to 3840x2160 on 4K Rokus, H.264 up to 1920x1080), upright, without changing stored transcodes. Keep the stored transcode at 720p H.264 for videos without real-time variants. ImmichView plays Immich's transcodes automatically.
 - The first smart search after the server has been idle can take up to a minute while Immich loads its model.
 
 ## Development setup

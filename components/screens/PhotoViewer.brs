@@ -73,6 +73,7 @@ sub showIndex(index as integer, fadeSeconds as float)
     m.videoNote.visible = asset.isVideo
     if asset.isVideo then m.videoText.text = "Video  " + formatDuration(asset.durationMs) + "  -  press OK to play"
 
+    logDebug("show " + index.ToStr() + " preloaded=" + isReady(m.target).ToStr() + " slideshow=" + m.slideshow.ToStr())
     if isReady(m.target)
         m.message.text = ""
         presentTarget()
@@ -114,11 +115,14 @@ end sub
 
 ' ---- Posters: current plus preloaded neighbours ----
 
-' Points the three posters at index-1, index and index+1, reusing any already loaded.
+' Points the three posters at the previous, current and next item, reusing any already
+' loaded. In a slideshow "next" is the next photo (videos are skipped), so it's ready in time.
 sub assignPosters()
     count = m.timeline.assetCount
+    nextIndex = m.index + 1
+    if m.slideshow then nextIndex = nextPhotoIndex(m.index)
     wanted = []
-    for each i in [m.index, m.index + 1, m.index - 1]
+    for each i in [m.index, nextIndex, m.index - 1]
         if i >= 0 and i < count then wanted.Push(i)
     end for
 
@@ -135,6 +139,16 @@ sub assignPosters()
         if posterSlotFor(i) < 0 then loadInto(freeSlot(), i)
     end for
 end sub
+
+' The next photo after index among the loaded items (looking up to 50 ahead), or -1.
+function nextPhotoIndex(index as integer) as integer
+    last = m.timeline.assetCount - 1
+    if last > index + 50 then last = index + 50
+    for i = index + 1 to last
+        if not assetAt(i).isVideo then return i
+    end for
+    return -1
+end function
 
 function posterSlotFor(index as integer) as integer
     for p = 0 to 2
@@ -231,6 +245,7 @@ sub toggleSlideshow()
         return
     end if
     m.slideshow = true
+    assignPosters()  ' preload the next photo rather than the next item
     seconds = loadSlideshowSeconds()
     m.slideTimer.duration = seconds
     showToast("Slideshow on  -  " + seconds.ToStr() + " seconds per photo")
@@ -299,9 +314,9 @@ function createKenBurns(poster as object) as object
     return { anim: anim, scale: scale, move: move }
 end function
 
-' A slow zoom in, zoom out or pan across, lasting through the next crossfade.
+' A slow, subtle zoom in, zoom out or pan across (5%), lasting through the next crossfade.
 sub startKenBurns(poster as object)
-    zoom = 1.15
+    zoom = 1.05
     ' Room to pan at full zoom without showing the edge of a full-screen photo.
     roomX = Int((zoom - 1) * 960)
     roomY = Int((zoom - 1) * 540)

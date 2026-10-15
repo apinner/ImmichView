@@ -26,6 +26,9 @@ end sub
 
 sub onStateChanged()
     state = m.video.state
+    logDebug("video state: " + state)
+    ' After an error Roku can also report "finished"; keep the error message on screen.
+    if m.error.visible then return
     if state = "playing" and not m.top.playbackStarted
         m.top.playbackStarted = true
         m.pictureCheck.control = "start"
@@ -52,6 +55,9 @@ sub showError()
     text = "This video couldn't be played (" + m.video.errorMsg + ")."
     if not canDecodeHevc()
         text = text + Chr(10) + Chr(10) + "This Roku can't play HEVC (H.265) video. In Immich, go to Administration > Settings > Video Transcoding and set the transcode policy so HEVC videos are converted to H.264, then run the transcode job."
+    else if m.video.errorCode = -5
+        ' e.g. a 1080x1920 portrait original: too tall for the Roku decoder
+        text = text + Chr(10) + Chr(10) + "Immich can convert it to a size and format that plays everywhere. In Immich, go to Administration > Settings > Video Transcoding, set the target resolution to 720p with H.264 as the only accepted video codec, then run Jobs > Transcode Videos > Missing."
     end if
     showMessage(text)
 end sub

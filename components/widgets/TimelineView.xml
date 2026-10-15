@@ -3,6 +3,7 @@
     A JustifiedGrid fed from one of two sources:
     - query: timeline buckets (e.g. "albumId=...&order=desc"), grouped by month
     - searchText: smart (CLIP) search results, in relevance order
+    - metadataSearch: metadata search results (e.g. a place), newest first, grouped by month
     Either way it pages in more as focus nears the end, and PhotoViewer can step through it.
     The timeline can also start at any month (jumpToMonth) and loads newer months above as
     focus nears the top.
@@ -11,6 +12,9 @@
     <interface>
         <field id="query" type="string" onChange="onQueryChanged" />
         <field id="searchText" type="string" onChange="onSearchTextChanged" />
+        <!-- A metadata search filter, e.g. { city, state, country } for a place: newest first,
+             grouped by month. -->
+        <field id="metadataSearch" type="assocarray" onChange="onMetadataSearchChanged" />
         <field id="viewHeight" type="float" alias="grid.viewHeight" />
         <field id="emptyText" type="string" value="No photos here yet." />
         <!-- Status label position relative to the view. -->

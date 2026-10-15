@@ -58,9 +58,9 @@ source/
   common/             ' Shared helpers (both apps), incl. DevLaunch.brs (dev launch params)
 components/
   MainScene.xml/.brs
-  screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Search tabs), CollectionScreen (album or person), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
+  screens/            ' LoginScreen, HomeScreen (Photos/Albums/People/Places/Search tabs), CollectionScreen (album, person or place), PhotoViewer, VideoPlayer, SettingsScreen, ProfilePickerScreen (Who's watching), ScreensaverSourceScreen
   tasks/              ' ImmichApiTask and any other Task nodes
-  widgets/            ' JustifiedGrid, TimelineView (timeline buckets or smart search), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, MonthPanel (Jump to), PinPrompt, ProfileTile, ProgressRing, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
+  widgets/            ' JustifiedGrid, TimelineView (timeline buckets, smart search, or metadata search for a place), TabBar, AppTitle, IconPill, UserMenu, OptionsPanel, MonthPanel (Jump to), PinPrompt, ProfileTile, ProgressRing, ListItem, AlbumTile, PeoplePane, PersonTile, SearchPane, AssetListSource
   screensaver/        ' ScreensaverScene and its components
 images/               ' Icons, splash, focus art (shipped)
 art/                  ' Brand kit: logo SVGs and the icon PNG that make-images.ps1 crops the title logo from (not shipped)
@@ -94,6 +94,7 @@ Reference: https://api.immich.app and the OpenAPI spec for the server's version.
 | Metadata search | `POST /api/search/metadata` |
 | Random assets (screensaver) | `POST /api/search/random` (verified v3.3.1: `{size, type: "IMAGE", withExif, visibility}` or `albumIds` for one album; returns an array of assets) |
 | People | `GET /api/people`, plus person filter in search |
+| Places | `GET /api/search/cities` (verified v3.3.1: one asset per city, alphabetical, with `exifInfo.city/state/country`); a place's photos via `POST /api/search/metadata` with `city`, `state`, `country` (own assets only, not partners'; timeline buckets can't filter by city) |
 | Memories ("on this day") | `GET /api/memories?for=YYYY-MM-DD` (verified: memories of type `on_this_day` with `data.year` and `assets[]`) |
 
 Format notes:

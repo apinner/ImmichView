@@ -6,7 +6,7 @@ A Roku channel for browsing a self-hosted [Immich](https://immich.app) library (
 
 - **Photos:** your whole library as a timeline grouped by month, in a justified grid like the Immich web app, with a Jump to panel (years and months) for going straight to any month
 - **All / Photos / Videos filter** in the `*` View options panel, applied everywhere and remembered
-- **Albums** and **People** (named faces), each opening the same month-grouped grid
+- **Albums**, **People** (named faces) and **Places** (every town and city in your photos), each opening the same month-grouped grid
 - **Search:** Immich smart search by what's in the photo, typed or spoken with the Roku keyboard's mic
 - **Photo viewer:** full-screen photos with crossfade, an info overlay (date, place, camera), optional names of the people in each photo, a choice of background beside photos that don't fill the screen (default, black, ambient glow or blur), and a slideshow with a slow Ken Burns zoom and pan and a countdown ring
 - **Videos:** played with the standard Roku player and trick play

@@ -18,7 +18,12 @@ end sub
 
 sub onSourceSet()
     m.title.text = m.top.source.title
-    m.timeline.query = m.top.source.query
+    if m.top.source.search <> invalid
+        m.timeline.metadataSearch = m.top.source.search  ' a place
+    else
+        m.timeline.query = m.top.source.query
+    end if
+    updateCount()
 end sub
 
 ' "1281 items", or which filter is on (bucket counts include both photos and videos).
@@ -29,6 +34,8 @@ sub updateCount()
         m.count.text = "Videos only"
     else if m.timeline.totalCount >= 0
         m.count.text = formatItemCount(m.timeline.totalCount)
+    else if m.top.source <> invalid and m.top.source.subtitle <> invalid
+        m.count.text = m.top.source.subtitle  ' a place: its region and country
     else
         m.count.text = ""
     end if

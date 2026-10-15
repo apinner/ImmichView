@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A titled set of photos grouped by month: an album, or everything with one person in it. -->
+<!-- A titled set of photos grouped by month: an album, a person, or a place. -->
 <component name="CollectionScreen" extends="Group">
     <interface>
-        <!-- { title, query } where query selects timeline buckets, e.g. "albumId=...&order=desc" -->
+        <!-- { title, query } where query selects timeline buckets, e.g. "albumId=...&order=desc",
+             or { title, subtitle, search } for a place, where search is a metadata search filter
+             such as { city, state, country }. -->
         <field id="source" type="assocarray" onChange="onSourceSet" />
         <field id="navigate" type="assocarray" alwaysNotify="true" />
     </interface>

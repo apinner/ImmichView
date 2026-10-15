@@ -10,5 +10,10 @@ sub onContentChanged()
     if item = invalid then return
     m.cover.uri = item.thumbUrl
     m.name.text = item.title
-    m.count.text = formatItemCount(item.assetCount)
+    ' Places show their region and country instead of a count.
+    if item.hasField("subtitle")
+        m.count.text = item.subtitle
+    else
+        m.count.text = formatItemCount(item.assetCount)
+    end if
 end sub

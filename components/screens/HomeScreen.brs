@@ -8,13 +8,17 @@ sub init()
     m.albumsPane = m.top.findNode("albumsPane")
     m.albums = m.top.findNode("albums")
     m.albumStatus = m.top.findNode("albumStatus")
+    m.placesPane = m.top.findNode("placesPane")
+    m.places = m.top.findNode("places")
+    m.placeStatus = m.top.findNode("placeStatus")
+    m.placesLoaded = false
     m.peoplePane = m.top.findNode("peoplePane")
     m.searchPane = m.top.findNode("searchPane")
     m.status = m.top.findNode("status")
     m.failed = false
     m.albumsLoaded = false
     ' Tab index -> content pane, in TabBar order.
-    m.panes = [m.timeline, m.albumsPane, m.peoplePane, m.searchPane]
+    m.panes = [m.timeline, m.albumsPane, m.peoplePane, m.placesPane, m.searchPane]
 
     m.tabs.observeField("selected", "onTabChanged")
     m.timeline.observeField("exitedTop", "focusTabs")
@@ -22,11 +26,12 @@ sub init()
     m.timeline.observeField("itemSelected", "onTimelineSelected")
     m.timeline.observeField("jumpRequested", "openMonthPanel")
     m.albums.observeField("itemSelected", "onAlbumSelected")
+    m.places.observeField("itemSelected", "onPlaceSelected")
     m.peoplePane.observeField("personSelected", "onPersonSelected")
     m.searchPane.observeField("itemSelected", "onSearchResultSelected")
     m.top.observeField("focusedChild", "onFocusChanged")
 
-    m.tabs.tabs = ["Photos", "Albums", "People", "Search"]
+    m.tabs.tabs = ["Photos", "Albums", "People", "Places", "Search"]
     m.optionsHint = m.top.findNode("optionsHint")
     m.userPill = m.top.findNode("userPill")
     m.gearPill = m.top.findNode("gearPill")
@@ -58,6 +63,7 @@ sub onTabChanged()
     if selected = 0 then m.optionsHint.text = optionsHintText(true) else m.optionsHint.text = optionsHintText(false)
     if selected = 1 and not m.albumsLoaded then loadAlbums()
     if selected = 2 then m.peoplePane.load = true
+    if selected = 3 and not m.placesLoaded then loadPlaces()
 end sub
 
 function optionsHintText(withJump as boolean) as string
@@ -75,6 +81,8 @@ sub focusContent()
         m.tabs.setFocus(true)
     else if selected = 1
         if m.albums.content <> invalid then m.albums.setFocus(true) else m.tabs.setFocus(true)
+    else if selected = 3
+        if m.places.content <> invalid then m.places.setFocus(true) else m.tabs.setFocus(true)
     else
         m.panes[selected].setFocus(true)
     end if
@@ -117,7 +125,7 @@ end function
 sub openOverlay(overlay as object)
     ' Remember where focus was, to return there when the overlay closes.
     m.overlayReturn = m.tabs
-    for each node in [m.userPill, m.gearPill, m.timeline, m.albums, m.peoplePane, m.searchPane]
+    for each node in [m.userPill, m.gearPill, m.timeline, m.albums, m.peoplePane, m.places, m.searchPane]
         if node.isInFocusChain() then m.overlayReturn = node
     end for
     if overlay.subtype() = "MonthPanel"
@@ -288,5 +296,62 @@ sub onAlbumSelected()
     m.top.navigate = {
         screen: "CollectionScreen"
         params: { source: { title: item.title, query: "albumId=" + item.albumId + "&order=" + item.order } }
+    }
+end sub
+
+' ---- Places tab ----
+
+' One photo per city from Immich (alphabetical), like the web app's Places page.
+sub loadPlaces()
+    m.placesLoaded = true
+    m.placeStatus.text = "Loading places..."
+    m.placesTask = startApiRequest(currentSettings(), "GET", "/api/search/cities", "onPlaces")
+end sub
+
+sub onPlaces(event as object)
+    resp = event.getData()
+    m.placesTask = invalid
+    if not resp.ok
+        m.placesLoaded = false
+        m.placeStatus.text = describeApiError(resp)
+        return
+    end if
+    content = CreateObject("roSGNode", "ContentNode")
+    for each asset in resp.data
+        exif = asset.exifInfo
+        if exif <> invalid and exif.city <> invalid and exif.city <> ""
+            state = exif.state
+            if state = invalid then state = ""
+            country = exif.country
+            if country = invalid then country = ""
+            item = content.createChild("ContentNode")
+            item.update({
+                title: exif.city
+                subtitle: joinNonEmpty([state, country], ", ")
+                thumbUrl: thumbnailUrl(asset.id, "thumbnail")
+                city: exif.city
+                state: state
+                country: country
+            }, true)
+        end if
+    end for
+    if content.getChildCount() = 0
+        m.placeStatus.text = "No places yet. Immich finds places from the location in your photos."
+        return
+    end if
+    m.placeStatus.text = ""
+    m.places.content = content
+end sub
+
+' Opens the photos taken in that city (matching region and country too, for towns that
+' share a name).
+sub onPlaceSelected()
+    item = m.places.content.getChild(m.places.itemSelected)
+    search = { city: item.city }
+    if item.state <> "" then search.state = item.state
+    if item.country <> "" then search.country = item.country
+    m.top.navigate = {
+        screen: "CollectionScreen"
+        params: { source: { title: item.title, subtitle: item.subtitle, search: search } }
     }
 end sub

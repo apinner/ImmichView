@@ -57,6 +57,8 @@ sub onFilterChanged()
         onQueryChanged()
     else if m.mode = "search" and m.top.searchText <> ""
         onSearchTextChanged()
+    else if m.mode = "metadata"
+        onMetadataSearchChanged()
     end if
 end sub
 
@@ -342,11 +344,97 @@ function searchItem(asset as object) as object
     return { assetId: asset.id, ratio: ratio, isVideo: asset.type = "VIDEO", durationMs: durationMs }
 end function
 
+' ---- Metadata search (a place): newest first, grouped into months as pages arrive ----
+
+function metadataPageSize() as integer
+    return 250
+end function
+
+sub onMetadataSearchChanged()
+    m.mode = "metadata"
+    m.grid.exitLeft = false
+    m.grid.clear = true
+    resetData()
+    m.top.totalCount = -1
+    m.lastMonth = ""
+    m.status.text = "Loading..."
+    loadMore()
+end sub
+
+sub loadNextMetadataPage()
+    if m.loading or m.nextPage = invalid then return
+    m.loading = true
+    body = {}
+    body.Append(m.top.metadataSearch)
+    body.page = m.nextPage
+    body.size = metadataPageSize()
+    body.order = "desc"
+    if m.global.mediaFilter = "photos" then body.type = "IMAGE"
+    if m.global.mediaFilter = "videos" then body.type = "VIDEO"
+    m.task = startApiRequest(currentSettings(), "POST", "/api/search/metadata", "onMetadataPage", body)
+end sub
+
+sub onMetadataPage(event as object)
+    if not isCurrent(event) then return
+    resp = event.getData()
+    m.task = invalid
+    m.loading = false
+    if not resp.ok
+        if m.assets.Count() = 0 then m.status.text = describeApiError(resp)
+        m.top.loaded = true
+        logDebug("metadata page failed: " + resp.status.ToStr())
+        return
+    end if
+
+    result = resp.data.assets
+    m.nextPage = invalid
+    if result.nextPage <> invalid then m.nextPage = result.nextPage.ToInt()
+    m.top.hasMore = (m.nextPage <> invalid)
+    if result.items.Count() = 0 and m.assets.Count() = 0
+        m.status.text = emptyMessage()
+        m.top.loaded = true
+        return
+    end if
+    m.status.text = ""
+
+    ' Runs of photos from the same month go under one month header; a month that carries
+    ' on from the previous page continues its group.
+    group = invalid
+    for each asset in result.items
+        month = assetMonth(asset)
+        if group = invalid or month <> group.month
+            if group <> invalid then appendMonthGroup(group)
+            group = { month: month, title: formatMonthYear(month + "-01"), items: [] }
+        end if
+        group.items.Push(searchItem(asset))
+    end for
+    if group <> invalid then appendMonthGroup(group)
+end sub
+
+' "2024-08" from the asset's local date.
+function assetMonth(asset as object) as string
+    date = asset.localDateTime
+    if date = invalid then date = asset.fileCreatedAt
+    if date = invalid then return ""
+    return Left(date, 7)
+end function
+
+sub appendMonthGroup(group as object)
+    if group.month = m.lastMonth
+        group.title = ""
+        group.continues = true
+    end if
+    m.lastMonth = group.month
+    appendItems(group)
+end sub
+
 ' ---- Shared ----
 
 sub loadMore()
     if m.mode = "search"
         loadNextSearchPage()
+    else if m.mode = "metadata"
+        loadNextMetadataPage()
     else
         loadNextBucket()
     end if

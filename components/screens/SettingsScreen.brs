@@ -10,12 +10,17 @@ sub init()
     refreshOptions()
     version = CreateObject("roAppInfo").GetVersion()
     m.top.findNode("about").text = "ImmichView " + version + "   -   Unofficial app, not affiliated with or endorsed by Immich or FUTO."
+    m.statusShown = false
     checkServer()
+    m.statusTimer = m.top.findNode("statusTimer")
+    m.statusTimer.observeField("fire", "checkServer")
+    m.statusTimer.control = "start"
 end sub
 
 ' Also runs when returning from the screensaver photo picker.
 sub onFocusChanged()
     if not m.top.hasFocus() then return
+    checkServer()
     refreshOptions()
     focusList(m.lastList)
 end sub
@@ -276,7 +281,8 @@ end sub
 ' ---- Server status (top right): ping, then version ----
 
 sub checkServer()
-    showStatus("Checking server...", "0x80888FFF")
+    if m.statusTask <> invalid then return  ' a check is still running
+    if not m.statusShown then showStatus("Checking server...", "0x80888FFF")
     m.statusTask = startApiRequest(currentSettings(), "GET", "/api/server/ping", "onPing")
 end sub
 
@@ -284,7 +290,7 @@ sub onPing(event as object)
     resp = event.getData()
     m.statusTask = invalid
     if not resp.ok
-        showStatus("Offline   " + Chr(183) + "   " + describeApiError(resp), "0xE5484DFF")
+        showStatus("Offline   " + Chr(183) + "   " + serverHost(m.global.serverUrl), "0xE5484DFF", describeApiError(resp))
         return
     end if
     m.statusTask = startApiRequest(currentSettings(), "GET", "/api/server/version", "onVersion")
@@ -302,7 +308,8 @@ sub onVersion(event as object)
 end sub
 
 ' Right-aligned to the screen margin (the label sizes to its text), with the dot before it.
-sub showStatus(text as string, color as string)
+sub showStatus(text as string, color as string, detail = "" as string)
+    if text <> "Checking server..." then m.statusShown = true
     label = m.top.findNode("statusText")
     label.text = text
     width = label.boundingRect().width
@@ -310,4 +317,7 @@ sub showStatus(text as string, color as string)
     dot = m.top.findNode("statusDot")
     dot.blendColor = color
     dot.translation = [1760 - width - 28, 100]
+    detailLabel = m.top.findNode("statusDetail")
+    detailLabel.text = detail
+    detailLabel.translation = [1760 - detailLabel.boundingRect().width, 136]
 end sub

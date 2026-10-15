@@ -12,7 +12,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 
 ## Setup (answered 2026-10-09)
 
-- Immich server v3.3.1, reached over HTTPS (reverse proxy) and on the LAN.
+- Immich server v3.3.3 (was v3.3.1 until 2026-10-15), reached over HTTPS (reverse proxy) and on the LAN (10.10.10.10:2283).
 - Rokus: a mix of HD and 4K models; dev device is a Streaming Stick 4K (3820EU), Roku OS 15.1.4.
 - Dev Roku IP/password, test server URL and API key live in the git-ignored `.env` (see `.env.example`).
 - ECP "Control by mobile apps" is Permissive, so `tools/drive.ps1` can send remote keys.

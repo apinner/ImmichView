@@ -20,13 +20,13 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 ## Dev workflow
 
 - `.\deploy.ps1` zips and sideloads (curl.exe, no Node). Sideloading wipes the channel registry.
-- `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors.
+- `.\tools\relaunch.ps1` relaunches with `serverUrl`/`apiKey` launch params from `.env` (restores the profile) and prints the debug console, which shows compile errors. Alex's own users on the test Roku use the LAN address (10.10.10.10:2283), so when the dev app already has users the `.env` URL adds a separate "Unnamed user": launch with ECP `/launch/dev` (no params) instead, or remove it afterwards in Settings.
 - `.\tools\screenshot.ps1`, `.\tools\drive.ps1 -Steps 'Up,Right,Down'` (screenshots per step into `out\drive.png`). Key names: `Info` is the `*` button (opens Settings on Home), `Lit_x` types a character into a keyboard dialog.
 - **Two apps:** Roku only allows screensavers as standalone apps (bundling one blocks publishing), so the screensaver is a separate channel, **ImmichView Screensaver** (`manifest.screensaver`: `source/screensaver.brs`, `source/common`, `components/screensaver`, `components/tasks`, ProgressRing, a few images). The app's `manifest` must not have `screensaver_title`. Both are signed with the same key, so they share a registry: the screensaver reads ImmichView's active user and the screensaver options set in ImmichView's Settings.
 - `.\deploy.ps1 -Screensaver` / `.\tools\package.ps1 -Screensaver` build the screensaver app. A Roku holds one sideloaded app, so it replaces the dev ImmichView; `.\deploy.ps1` puts the app back. With the screensaver sideloaded, `.\tools\relaunch.ps1 -Screensaver` shows it straight away (a DEV-only `Main` in `screensaver.brs`; release builds have none, as Roku requires).
 - Dev vs release: the manifest has `bs_const=DEV=false`; `deploy.ps1` rewrites it to `true` in the zip unless `-Release`. `#if DEV` guards the dev launch params and `logDebug`. Never ship a DEV build.
 - `.\tools\deeplink.ps1 -ContentId <asset id> [-MediaType movie] [-Running]` tests deep links at launch (ECP /launch) or while running (ECP /input → roInput).
-- **Test only on the Guest Bedroom Roku (10.10.10.163, the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
+- **Test only on the Guest Bedroom Roku (10.10.10.161 since 2026-10-15, was .163; the default `ROKU_HOST`).** Don't deploy to, drive or screenshot the Living Room Roku (10.10.10.164); it's a household TV. The scripts' `-RokuHost` option exists, but don't point it there unless Alex asks.
 - `.\tools\make-images.ps1` regenerates the small UI images (play icon, focus frames, masks, pill, countdown ring, and the title logo cropped from `art/ImmichView-icon.png`). Channel posters and splash screens in `images/` are supplied artwork (from the brand kit); don't regenerate them.
 - The focus highlight is a plain white outline (`focus.9.png`, `focus-ring.png`). A soft glow was tried and rejected; keep the outline.
 - BrightScript reserves some identifiers that look like ordinary names: `pos`, `tab` caused compile errors.
@@ -35,6 +35,7 @@ A Roku channel (BrightScript + SceneGraph) that acts as a client for a self-host
 - `drive.ps1` sends a step's keys 250 ms apart; put a key that opens a dialog in its own step, or the following keys can be lost.
 - The screensaver manifest must not have `title=` (only `screensaver_title`), and its release source must contain no `Main`: either makes Static Analysis treat it as an app with an in-channel screensaver (Req 4.5). The dev `Main` lives in `source/screensaver-dev.brs`, which release builds leave out.
 - Certification (from 1 Oct 2026): keep `rsg_version=1.3` in both manifests and the memory monitor (`source/common/Memory.brs`) in both apps' main loops.
+- Some files play as sound over black with no error (VP9 in MP4 on the 3820): the Video node reports `videoFormat` "none". VideoPlayer checks 2 s after playback starts and shows a message. ECP `/query/media-player` shows `video="none"` for these, even for store builds.
 - Dev-installer screenshots don't capture the video plane: playing video shows as black, only the trick-play UI is visible.
 
 ## Tech stack and tooling

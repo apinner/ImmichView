@@ -18,6 +18,8 @@
     <children>
         <Rectangle width="1920" height="1080" color="0x000000FF" />
         <Video id="video" width="1920" height="1080" enableUI="true" />
+        <!-- A moment after playback starts: checks Roku found a video track it can decode. -->
+        <Timer id="pictureCheck" duration="2" repeat="false" />
         <Label id="error" translation="[260,420]" width="1400" wrap="true" horizAlign="center"
             font="font:MediumSystemFont" color="0xE0E4E8FF" visible="false" />
     </children>

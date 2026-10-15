@@ -9,6 +9,7 @@
 
     <script type="text/brightscript" uri="PersonTile.brs" />
     <script type="text/brightscript" uri="pkg:/source/common/Api.brs" />
+    <script type="text/brightscript" uri="pkg:/source/common/Log.brs" />
 
     <children>
         <Poster id="ring" uri="pkg:/images/focus-ring.png" width="232" height="232" opacity="0" />
@@ -19,6 +20,8 @@
             <Poster id="face" width="220" height="220" loadWidth="220" loadHeight="220"
                 loadDisplayMode="scaleToZoom" />
         </MaskGroup>
+        <!-- Retries a face that failed to load (Roku drops some when a screenful load at once). -->
+        <Timer id="retryTimer" duration="1.5" repeat="false" />
         <Label id="name" translation="[0,240]" width="232" height="36" horizAlign="center"
             font="font:SmallSystemFont" color="0xA0A8B0FF" />
     </children>

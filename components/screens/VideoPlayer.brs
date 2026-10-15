@@ -48,7 +48,7 @@ sub onPictureCheck()
     logDebug("video format: " + format)
     if format <> "" and LCase(format) <> "none" then return
     m.video.control = "stop"
-    showMessage("This video has sound but no picture on this Roku: its video format isn't supported." + Chr(10) + Chr(10) + "Immich can convert it to one that plays everywhere. In Immich, go to Administration > Settings > Video Transcoding, keep H.264 as the only accepted video codec, then run Jobs > Transcode Videos > Missing.")
+    showMessage("This video has sound but no picture on this Roku: its video format isn't supported." + Chr(10) + Chr(10) + transcodeAdvice())
 end sub
 
 sub showError()
@@ -57,7 +57,7 @@ sub showError()
         text = text + Chr(10) + Chr(10) + "This Roku can't play HEVC (H.265) video. In Immich, go to Administration > Settings > Video Transcoding and set the transcode policy so HEVC videos are converted to H.264, then run the transcode job."
     else if m.video.errorCode = -5
         ' e.g. a 1080x1920 portrait original: too tall for the Roku decoder
-        text = text + Chr(10) + Chr(10) + "Immich can convert it to a size and format that plays everywhere. In Immich, go to Administration > Settings > Video Transcoding, set the target resolution to 720p with H.264 as the only accepted video codec, then run Jobs > Transcode Videos > Missing."
+        text = text + Chr(10) + Chr(10) + transcodeAdvice()
     end if
     showMessage(text)
 end sub
@@ -71,6 +71,12 @@ sub showMessage(text as string)
     m.top.setFocus(true)
     m.top.playbackStarted = true  ' playback attempt is over: lets a deep-linked launch complete
 end sub
+
+' Roku won't decode H.264 taller than 1080 px, and Immich's target resolution sets the shorter
+' side, so only 480p keeps portrait videos (480x854) playable.
+function transcodeAdvice() as string
+    return "Immich can convert it to a size and format that plays on Roku. In Immich, go to Administration > Settings > Video Transcoding and set: target resolution 480p, transcode policy All videos, accepted video codec H.264 only. Then run Jobs > Transcode Videos > All."
+end function
 
 function canDecodeHevc() as boolean
     result = CreateObject("roDeviceInfo").CanDecodeVideo({ Codec: "hevc" })

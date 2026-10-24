@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ImmichView Support</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<h1><picture><source srcset="logo-dark.png" media="(prefers-color-scheme: dark)"><img class="logo" src="logo-light.png" alt="ImmichView" width="440" height="120"></picture></h1>
+<p class="meta">A Roku channel for your <a href="https://immich.app">Immich</a> photo library</p>
+
+<p>Browse your photo timeline, albums, people and places, find photos with smart search (typed or spoken), watch
+your videos, run slideshows, and, with the companion ImmichView Screensaver app, use your photos as the Roku screensaver. ImmichView connects to an Immich
+server you run or have access to; it has no service of its own.</p>
+
+<h2>Getting started</h2>
+<ol>
+<li>In the Immich web app, open <strong>Account Settings &gt; API Keys</strong> and create a key.</li>
+<li>Open ImmichView on your Roku and enter your server address (for example
+<code>https://photos.example.com</code> or <code>http://192.168.1.20:2283</code>) and the API key.
+The keyboard in the Roku mobile app makes typing the key much easier.</li>
+<li>To add more people, press <strong>Up</strong> to the user button at the top right and choose
+<strong>Add or manage users</strong>. With several users, ImmichView asks "Who's watching?" when it opens; each
+user can set a PIN in Settings (press <strong>*</strong> on their name).</li>
+<li>For the screensaver, add the companion <strong>ImmichView Screensaver</strong> app from the Roku Channel Store, then pick
+<strong>ImmichView</strong> in Roku <strong>Settings &gt; Theme &gt; Screensavers</strong>. It shows the photos of the user last
+chosen in ImmichView; choose which photos and what it shows in ImmichView's Settings.</li>
+</ol>
+
+<h2>Common questions</h2>
+<p><strong>Portrait videos play sideways, a video has sound but no picture, or videos won't play on an HD Roku.</strong>
+Roku can't rotate video, can't decode some formats (such as VP9, which some phones record), and HD models can't play HEVC. Roku can't rotate video or play H.264 taller than 1080 pixels (portrait videos). In Immich, open
+<strong>Administration &gt; Settings &gt; Video Transcoding</strong> and turn on <strong>real-time transcoding</strong> with H.264 (and HEVC,
+for 4K Rokus) at 480p, 720p and 1080p. ImmichView then asks for a version this Roku can play, upright and at the
+best size it can manage, without changing your stored videos or how they play elsewhere. Keep the usual transcoding
+(720p, H.264) for the videos real-time transcoding doesn't cover. Roku plays Immich's real-time versions without sound, so
+ImmichView uses them only for videos that can't play otherwise, and says so on screen. ImmichView plays Immich's transcodes automatically.</p>
+<p><strong>The first search is slow.</strong> After your server has been idle, Immich loads its search model on
+the first search, which can take up to a minute. Later searches are quick.</p>
+<p><strong>I forgot a user's PIN.</strong> Choose <strong>Add user</strong> and sign in again with that user's
+server and API key; this clears their PIN.</p>
+<p><strong>"The API key was rejected."</strong> The key may have been deleted or may lack permissions. Create a
+new key in Immich and add it again in ImmichView's Settings.</p>
+
+<h2>Support</h2>
+<p>Report a problem or ask a question by opening an issue on the
+<a href="https://github.com/apinner/ImmichView/issues">ImmichView GitHub project</a>.</p>
+<p><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a></p>
+
+<p class="disclaimer">ImmichView is an unofficial app. It is not affiliated with or endorsed by Immich or FUTO.</p>
+</main>
+</body>
+</html>

@@ -3,6 +3,8 @@
   --text: #24232f;
   --muted: #6a6f7a;
   --accent: #6e3997;
+  --brand-immich: #2d0f47;
+  --brand-view: #662d91;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -10,6 +12,8 @@
     --text: #e0e4e8;
     --muted: #a0a8b0;
     --accent: #c6a1e7;
+    --brand-immich: #ffffff;
+    --brand-view: #a274d4;
   }
 }
 body {
@@ -29,4 +33,18 @@ a { color: var(--accent); }
 code { font-size: 0.95em; }
 .meta, .back { color: var(--muted); margin-top: 0; }
 .disclaimer { margin-top: 3em; color: var(--muted); font-size: 0.9rem; }
-.logo { display: block; max-width: 100%; height: auto; margin-left: -8px; }
+/* Logo: the icon with the wordmark as text (Poppins, like the brand lockup). */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: "Poppins", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 2.6rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.brand img { flex: none; }
+.brand-immich { color: var(--brand-immich); }
+.brand-view { color: var(--brand-view); }
